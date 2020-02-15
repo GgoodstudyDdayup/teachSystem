@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Tree, Icon } from 'antd';
+import { Input, Tree, Icon} from 'antd';
 const { Search } = Input;
 const { TreeNode } = Tree;
 const TreeMain = () => {

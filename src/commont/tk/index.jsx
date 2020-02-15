@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon } from 'antd';
+import { Tabs, Spin, Badge, Icon, Input } from 'antd';
 import Select from './selection'
 import Tree from './tree'
+import Know from './knowlist'
 import List from './list'
-import Search from './searchbtn'
+import Searchbtn from './searchbtn'
+const { Search } = Input
 const options = [
     {
         code: '小学',
@@ -67,13 +69,40 @@ class tikuguanli extends Component {
         super(props)
         this.state = {
             list: [
-                { appear: false ,btnc:true},
-                { appear: true ,btnc:true}
+                { appear: false, btnc: true },
+                { appear: true, btnc: true }
             ],
+            searchList: [{
+                name: '题型',
+                h: 13,
+                list: [{ id: 13, title: '不限' }, { id: 1, title: '解答' }, { id: 2, title: '判断' }, { id: 3, title: '填空' }]
+            }, {
+                name: '年份',
+                h: 14,
+                list: [{ id: 14, title: '不限' }, { id: 4, title: '171' }, { id: 5, title: '4171' }, { id: 6, title: '4141' }]
+            }, {
+                name: '来源',
+                h: 15,
+                list: [{ id: 15, title: '不限' }, { id: 7, title: '888' }, { id: 8, title: '888' }, { id: 9, title: '888' }]
+            }, {
+                name: '难度',
+                h: 16,
+                list: [{ id: 16, title: '不限' }, { id: 10, title: '999' }, { id: 11, title: '999' }, { id: 12, title: '999' }]
+            }],
             spin: false,
             clear: 'none',
             count: 10
         }
+    }
+    //更改筛选id
+    changeSearchId = (e, index) => {
+        console.log(e, index)
+        const that = this
+        let searchList = that.state.searchList
+        searchList[index].h = e
+        that.setState({
+            searchList
+        })
     }
     //查看答案的伸缩
     add = (e) => {
@@ -84,7 +113,7 @@ class tikuguanli extends Component {
         })
     }
     //放入答题栏的变化
-    btnChange = (e)=>{
+    btnChange = (e) => {
         const list = this.state.list
         list[e].btnc = !list[e].btnc
         this.setState({
@@ -148,6 +177,7 @@ class tikuguanli extends Component {
                         <div className="see-btn">查看试卷</div>
                     </div>
                 </div>
+
                 <Tabs defaultActiveKey="1" size="Default" onTabClick={this.spin}>
                     <TabPane tab="知识点" key="1" className="m-tk" >
                         <div className="knowlage">
@@ -155,14 +185,24 @@ class tikuguanli extends Component {
                                 <Tree></Tree>
                             </div>
                             <div className="list">
-                                <Search></Search>
+                                <Searchbtn list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
+                                <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
                                 <List addfun={this.state.list} fun={this.add} btn={this.btnChange}></List>
                             </div>
                         </div>
                     </TabPane>
                     <TabPane tab="真题试卷" key="2" >
-                        Content of tab 1
-          </TabPane>
+                        <div className="knowlage">
+                            <div className="tree">
+                                <Know></Know>
+                            </div>
+                            <div className="list">
+                                <Searchbtn list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
+                                <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
+                                <List addfun={this.state.list} fun={this.add} btn={this.btnChange}></List>
+                            </div>
+                        </div>
+                    </TabPane>
                     <TabPane tab="机构私库" key="3" >
                         Content of tab 2
           </TabPane>

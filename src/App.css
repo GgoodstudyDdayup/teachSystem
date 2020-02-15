@@ -142,6 +142,7 @@
 
 .tree {
   width: 370px;
+  margin-right: 10px;
 }
 
 .list {
@@ -364,4 +365,17 @@
   margin: 5px;
   cursor: pointer;
   border-radius: 4px;
+}
+.m-bottom{
+  margin-bottom: 10px;
+}
+.m-know-list{
+  margin-top: 10px;
+  height: 600px;
+  overflow-y: scroll;
+}
+.m-pageination{
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }

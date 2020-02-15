@@ -1,164 +1,34 @@
 import React from 'react';
 
-const Search = () => {
+const Search = (props) => {
     return (
         <div className="search_condition">
-            <Tixing></Tixing>
-            <Nianfen></Nianfen>
-            <Laiyuan></Laiyuan>
-            <Nandu></Nandu>
-            <Shengfen></Shengfen>
+            <Tixing list={props.list} funt={props.funt}></Tixing>
         </div>
     )
 }
 
-const Tixing = () => {
+const Tixing = (props) => {
+    const l1 = props.list
+    const changeitemId = (e,index)=>{
+        props.funt(e,index)
+    }
     return (
         <div className="type">
-            <div>
-                <div className="title">题型</div>
-                <div className="item_wrapper">
-                    <div className="item active">不限</div>
-                    <div className="item">
-                        判断题
-                </div>
-                    <div className="item">
-                        填空题
-                </div>
-                    <div className="item">
-                        计算题
-                </div>
-                    <div className="item">
-                        解答题
-                </div>
-                    <div className="item">
-                        材料综合题
-                </div>
-                    <div className="item">
-                        选择题
-                </div>
-                </div>
-            </div>
-        </div>
-    )
-}
-const Nianfen = () => {
-    return (
-        <div className="type">
-            <div>
-                <div className="title">题型</div>
-                <div className="item_wrapper">
-                    <div className="item active">不限</div>
-                    <div className="item">
-                        判断题
-                </div>
-                    <div className="item">
-                        填空题
-                </div>
-                    <div className="item">
-                        计算题
-                </div>
-                    <div className="item">
-                        解答题
-                </div>
-                    <div className="item">
-                        材料综合题
-                </div>
-                    <div className="item">
-                        选择题
-                </div>
-                </div>
-            </div>
-        </div>
-    )
-}
-const Laiyuan = () => {
-    return (
-        <div className="type">
-            <div>
-                <div className="title">题型</div>
-                <div className="item_wrapper">
-                    <div className="item active">不限</div>
-                    <div className="item">
-                        判断题
-                </div>
-                    <div className="item">
-                        填空题
-                </div>
-                    <div className="item">
-                        计算题
-                </div>
-                    <div className="item">
-                        解答题
-                </div>
-                    <div className="item">
-                        材料综合题
-                </div>
-                    <div className="item">
-                        选择题
-                </div>
-                </div>
-            </div>
-        </div>
-    )
-}
-const Nandu = () => {
-    return (
-        <div className="type">
-            <div>
-                <div className="title">题型</div>
-                <div className="item_wrapper">
-                    <div className="item active">不限</div>
-                    <div className="item">
-                        判断题
-                </div>
-                    <div className="item">
-                        填空题
-                </div>
-                    <div className="item">
-                        计算题
-                </div>
-                    <div className="item">
-                        解答题
-                </div>
-                    <div className="item">
-                        材料综合题
-                </div>
-                    <div className="item">
-                        选择题
-                </div>
-                </div>
-            </div>
-        </div>
-    )
-}
-const Shengfen = () => {
-    return (
-        <div className="type">
-            <div>
-                <div className="title">题型</div>
-                <div className="item_wrapper">
-                    <div className="item active">不限</div>
-                    <div className="item">
-                        判断题
-                </div>
-                    <div className="item">
-                        填空题
-                </div>
-                    <div className="item">
-                        计算题
-                </div>
-                    <div className="item">
-                        解答题
-                </div>
-                    <div className="item">
-                        材料综合题
-                </div>
-                    <div className="item">
-                        选择题
-                </div>
-                </div>
-            </div>
+            {
+                l1.map((ele,index) =>
+                    <div key={index}>
+                        <div className="title">{ele.name}</div>
+                        <ul className="item_wrapper">
+                            {ele.list.map((res) =>
+                                <li className={ele.h === res.id?'item active':'item'} key={res.id} onClick={()=>changeitemId(res.id,index)}>
+                                    {res.title}
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+                )
+            }
         </div>
     )
 }
