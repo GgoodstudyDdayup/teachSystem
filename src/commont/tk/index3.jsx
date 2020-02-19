@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Input } from 'antd';
+import { Tabs, Spin, Badge, Icon} from 'antd';
 import Select from './selection'
-import Tree from './tree'
-import List from './list'
 import Searchbtn from './searchbtn'
-const { Search } = Input
+import Empty from './siku'
 const options = [
     {
         code: '小学',
@@ -63,7 +61,7 @@ const options = [
     }
 ];
 const { TabPane } = Tabs;
-class tikuguanli extends Component {
+class tikuguanli3 extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -141,7 +139,6 @@ class tikuguanli extends Component {
             })
         }
     }
-    
     onTabClick = (e) => {
         switch (e) {
             case '1':
@@ -156,9 +153,6 @@ class tikuguanli extends Component {
             default:
                 this.props.history.push("/main/tk/mine")
         }
-    }
-    zujuan = ()=>{
-        this.props.history.push('/zujuan')
     }
     render() {
         return (
@@ -192,31 +186,27 @@ class tikuguanli extends Component {
                     </div>
                     <div className="topic-ctrls">
                         <div className="clear-btn" >清空全部</div>
-                        <div className="see-btn" onClick={this.zujuan}>查看试卷</div>
+                        <div className="see-btn">查看试卷</div>
                     </div>
                 </div>
-                <Tabs defaultActiveKey="1" size="Default" onTabClick={this.spin} onChange={this.onTabClick}>
+
+                <Tabs defaultActiveKey="3" size="Default" onTabClick={this.spin} onChange={this.onTabClick}>
                     <TabPane tab="知识点" key="1" className="m-tk" >
-                        <div className="knowlage">
-                            <div className="tree">
-                                <Tree></Tree>
-                            </div>
-                            <div className="list">
-                                <Searchbtn list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
-                                <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
-                                <List addfun={this.state.list} fun={this.add} btn={this.btnChange}></List>
-                            </div>
-                        </div>
+                        
                     </TabPane>
                     <TabPane tab="真题试卷" key="2" >
+                        
                     </TabPane>
                     <TabPane tab="机构私库" key="3" >
+                        <Searchbtn list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
+                        <Empty></Empty>
                     </TabPane>
-                    <TabPane tab="我的题目" key="4" >
-                    </TabPane>
+                    <TabPane tab="我的题目" key="4">
+                        
+          </TabPane>
                 </Tabs>
             </div >
-        );
-    }
-}
-export default tikuguanli;
+                    );
+                }
+            }
+export default tikuguanli3;

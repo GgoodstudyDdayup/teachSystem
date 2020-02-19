@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tabs, Spin, Badge, Icon, Input } from 'antd';
 import Select from './selection'
-import Tree from './tree'
+import Know from './knowlist'
 import List from './list'
 import Searchbtn from './searchbtn'
 const { Search } = Input
@@ -63,7 +63,7 @@ const options = [
     }
 ];
 const { TabPane } = Tabs;
-class tikuguanli extends Component {
+class tikuguanli2 extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -141,7 +141,6 @@ class tikuguanli extends Component {
             })
         }
     }
-    
     onTabClick = (e) => {
         switch (e) {
             case '1':
@@ -156,9 +155,6 @@ class tikuguanli extends Component {
             default:
                 this.props.history.push("/main/tk/mine")
         }
-    }
-    zujuan = ()=>{
-        this.props.history.push('/zujuan')
     }
     render() {
         return (
@@ -192,14 +188,18 @@ class tikuguanli extends Component {
                     </div>
                     <div className="topic-ctrls">
                         <div className="clear-btn" >清空全部</div>
-                        <div className="see-btn" onClick={this.zujuan}>查看试卷</div>
+                        <div className="see-btn">查看试卷</div>
                     </div>
                 </div>
-                <Tabs defaultActiveKey="1" size="Default" onTabClick={this.spin} onChange={this.onTabClick}>
+
+                <Tabs defaultActiveKey="2" size="Default" onTabClick={this.spin} onChange={this.onTabClick}>
                     <TabPane tab="知识点" key="1" className="m-tk" >
+                        
+                    </TabPane>
+                    <TabPane tab="真题试卷" key="2" >
                         <div className="knowlage">
                             <div className="tree">
-                                <Tree></Tree>
+                                <Know></Know>
                             </div>
                             <div className="list">
                                 <Searchbtn list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
@@ -208,15 +208,15 @@ class tikuguanli extends Component {
                             </div>
                         </div>
                     </TabPane>
-                    <TabPane tab="真题试卷" key="2" >
-                    </TabPane>
                     <TabPane tab="机构私库" key="3" >
+
                     </TabPane>
-                    <TabPane tab="我的题目" key="4" >
+                    <TabPane tab="我的题目" key="4">
+
                     </TabPane>
                 </Tabs>
             </div >
         );
     }
 }
-export default tikuguanli;
+export default tikuguanli2;

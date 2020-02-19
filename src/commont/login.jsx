@@ -26,7 +26,7 @@ class Login extends Component {
         console.log(filter)
     }
     login = () => {
-        this.props.history.push("/main/tk")
+        this.props.history.push("/main")
     }
     render() {
         return (

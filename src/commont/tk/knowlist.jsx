@@ -43,6 +43,7 @@ const Knowlage = () => {
             </Search>
             <div className='m-know-list'>
                 <List
+                    className="list-hover"
                     itemLayout="vertical"
                     dataSource={data}
                     size='small'

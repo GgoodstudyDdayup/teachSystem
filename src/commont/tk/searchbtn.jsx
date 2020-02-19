@@ -1,5 +1,4 @@
 import React from 'react';
-
 const Search = (props) => {
     return (
         <div className="search_condition">
@@ -7,7 +6,6 @@ const Search = (props) => {
         </div>
     )
 }
-
 const Tixing = (props) => {
     const l1 = props.list
     const changeitemId = (e,index)=>{
