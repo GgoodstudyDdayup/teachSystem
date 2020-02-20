@@ -48,9 +48,7 @@ export default class EditorDemo extends React.Component {
                     />
                 </div>
             </div>
-
         )
-
     }
 
 }

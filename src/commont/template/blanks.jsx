@@ -1,3 +1,4 @@
+//默认填空题模板
 import React from 'react'
 // 引入编辑器组件
 import BraftEditor from 'braft-editor'

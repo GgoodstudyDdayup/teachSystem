@@ -28,8 +28,8 @@ const getItemStyle = (isDragging, draggableStyle) => {
         border: '1px solid #eee',
         // styles we need to apply on draggables
         ...draggableStyle,
-        textAlign:'start',
-        justifyContent:'space-between',
+        textAlign: 'start',
+        justifyContent: 'space-between',
         display: 'flex'
     }
     return (
