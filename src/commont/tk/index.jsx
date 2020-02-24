@@ -141,7 +141,21 @@ class tikuguanli extends Component {
             })
         }
     }
-    
+    componentDidMount() {
+        window.addEventListener('resize', this.handleSize);
+        this.handleSize()
+    }
+    componentWillUnmount() {
+        // 移除监听事件
+        window.removeEventListener('resize', this.handleSize);
+    }
+    // 自适应浏览器的高度
+    handleSize = () => {
+        console.log(document.body.clientHeight)
+        this.setState({
+            height: document.body.clientHeight,
+        });
+    }
     onTabClick = (e) => {
         switch (e) {
             case '1':
@@ -157,7 +171,7 @@ class tikuguanli extends Component {
                 this.props.history.push("/main/tk/mine")
         }
     }
-    zujuan = ()=>{
+    zujuan = () => {
         this.props.history.push('/zujuan')
     }
     render() {
@@ -201,10 +215,13 @@ class tikuguanli extends Component {
                             <div className="tree">
                                 <Tree></Tree>
                             </div>
-                            <div className="list">
+
+                            <div className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
                                 <Searchbtn list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
                                 <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
+                                {/* <div className="m-scroll-list"> */}
                                 <List addfun={this.state.list} fun={this.add} btn={this.btnChange}></List>
+                                {/* </div> */}
                             </div>
                         </div>
                     </TabPane>

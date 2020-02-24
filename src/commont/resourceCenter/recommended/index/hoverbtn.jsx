@@ -23,9 +23,6 @@ const Search = (props) => {
 }
 const Tixing = (props) => {
     const l1 = props.list
-    const changeitemId = (e, index, name, title) => {
-        props.funt(e, index, name, title)
-    }
     return (
         <div >
             {
@@ -34,7 +31,7 @@ const Tixing = (props) => {
                         <div className="title">{ele.name}</div>
                         <ul className="item_wrapper">
                             {ele.list.map((res) =>
-                                <li className={ele.h === res.id ? 'item active' : 'item'} key={res.id} onClick={() => changeitemId(res.id, index, ele.name, res.title)}>
+                                <li className={ele.h === res.id ? 'item active' : 'item'} key={res.id} onClick={() => props.funt(res.id, index, ele.name, res.title)}>
                                     {res.title}
                                 </li>
                             )}

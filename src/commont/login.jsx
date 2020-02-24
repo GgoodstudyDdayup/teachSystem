@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {login} from '../axios/http'
 //定义组件内部私有的状态
 class Login extends Component {
     constructor(opt) {
@@ -13,9 +14,20 @@ class Login extends Component {
         }
     }
     componentDidMount() {
+        window.addEventListener('resize', this.handleSize);
+    }
+
+    componentWillUnmount() {
+        // 移除监听事件
+        window.removeEventListener('resize', this.handleSize);
+    }
+
+    // 自适应浏览器的高度
+    handleSize = () => {
+        console.log(document.body.clientHeight)
         this.setState({
-            height: window.innerHeight
-        })
+            height: document.body.clientHeight,
+        });
     }
     loginChange = (e) => {
         const filter = this.state.filter
@@ -26,6 +38,12 @@ class Login extends Component {
         console.log(filter)
     }
     login = () => {
+        // const params = this.state.filter
+        // login(params).then(res => {
+        //     console.log(res)
+        // }).catch(err => {
+        //     console.log(err)
+        // })
         this.props.history.push("/main")
     }
     render() {

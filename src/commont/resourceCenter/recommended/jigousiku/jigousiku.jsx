@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Tabs, Input } from 'antd';
 import HoverBtn from '../index/hoverbtn'
 import List from '../index/hoverList'
+
 const { TabPane } = Tabs;
 const { Search } = Input
 class recommended extends Component {
@@ -35,6 +36,7 @@ class recommended extends Component {
             }]
         }
     }
+    
     cardChange = (nameType, title) => {
         const banben = this.state.banben
         const kechen = this.state.kechen

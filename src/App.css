@@ -146,7 +146,14 @@
 
 .list {
   width: 85%;
-  height: 700px;
+  height: 280px;
+  overflow-y: scroll;
+  min-height: 200px;
+}
+
+.m-scroll-list {
+  min-height: 200px;
+  height: 400px;
   overflow-y: scroll;
 }
 
@@ -165,7 +172,7 @@
 
 .listT:hover {
   box-shadow: 0 4px 10px #eee;
-  border-top: 3px solid #1890ff;
+  border-top: 3px solid #1890ff
 }
 
 .line-shu {
@@ -365,28 +372,34 @@
   cursor: pointer;
   border-radius: 4px;
 }
-.m-bottom{
+
+.m-bottom {
   margin-bottom: 10px;
 }
-.m-know-list{
+
+.m-know-list {
   margin-top: 10px;
   height: 600px;
   overflow-y: scroll;
 }
-.m-pageination{
+
+.m-pageination {
   width: 100%;
   display: flex;
   justify-content: center;
 }
-.ant-list-vertical .ant-list-item:hover{
+
+.ant-list-vertical .ant-list-item:hover {
   color: #69f!important;
   background: #f5f7fa;
 }
-.my-editor-component{
+
+.my-editor-component {
   border-radius: 5px;
   border: 1px solid #eee;
 }
-.zujuan-m{
+
+.zujuan-m {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -394,7 +407,8 @@
   font-size: 16px;
   width: 155px;
 }
-.zujuan-m-item-input{
+
+.zujuan-m-item-input {
   width: 50px;
   display: inline-block;
 }

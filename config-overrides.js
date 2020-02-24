@@ -3,7 +3,6 @@ const {
     fixBabelImports,
     addLessLoader,
 } = require("customize-cra");
-
 module.exports = override(
     fixBabelImports('import', {
         libraryName: 'antd',

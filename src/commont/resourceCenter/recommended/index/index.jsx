@@ -3,6 +3,7 @@ import { Tabs } from 'antd';
 import HoverBtn from './hoverbtn'
 import Tree from './hoverTree'
 import List from './hoverList'
+import { tree } from '../../../../axios/http'
 const { TabPane } = Tabs;
 class recommended extends Component {
     constructor(props) {
@@ -35,6 +36,17 @@ class recommended extends Component {
                 list: [{ id: 15, title: '不限' }, { id: 7, title: '888' }, { id: 8, title: '888' }, { id: 9, title: '888' }]
             }],
         }
+    }
+    componentDidMount = () => {
+        const params = {
+            subject_id: 38,
+            name: ''
+        }
+        tree(params).then(res => {
+            console.log(res)
+        }).catch(err => {
+            console.log(err)
+        })
     }
     cardChange = (nameType, title) => {
         const banben = this.state.banben

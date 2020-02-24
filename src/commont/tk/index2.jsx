@@ -156,6 +156,21 @@ class tikuguanli2 extends Component {
                 this.props.history.push("/main/tk/mine")
         }
     }
+    componentDidMount() {
+        window.addEventListener('resize', this.handleSize);
+        this.handleSize()
+    }
+    componentWillUnmount() {
+        // 移除监听事件
+        window.removeEventListener('resize', this.handleSize);
+    }
+    // 自适应浏览器的高度
+    handleSize = () => {
+        console.log(document.body.clientHeight)
+        this.setState({
+            height: document.body.clientHeight,
+        });
+    }
     render() {
         return (
             <div>
@@ -194,17 +209,19 @@ class tikuguanli2 extends Component {
 
                 <Tabs defaultActiveKey="2" size="Default" onTabClick={this.spin} onChange={this.onTabClick}>
                     <TabPane tab="知识点" key="1" className="m-tk" >
-                        
+
                     </TabPane>
                     <TabPane tab="真题试卷" key="2" >
                         <div className="knowlage">
                             <div className="tree">
                                 <Know></Know>
                             </div>
-                            <div className="list">
+                            <div className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
                                 <Searchbtn list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
                                 <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
+                                {/* <div className="m-scroll-list"> */}
                                 <List addfun={this.state.list} fun={this.add} btn={this.btnChange}></List>
+                                {/* </div> */}
                             </div>
                         </div>
                     </TabPane>

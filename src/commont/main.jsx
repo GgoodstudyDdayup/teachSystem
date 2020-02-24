@@ -26,10 +26,19 @@ class main extends Component {
         }
     }
     componentDidMount() {
+        window.addEventListener('resize', this.handleSize);
+        this.handleSize()
+    }
+    componentWillUnmount() {
+        // 移除监听事件
+        window.removeEventListener('resize', this.handleSize);
+    }
+    // 自适应浏览器的高度
+    handleSize = () => {
+        console.log(document.body.clientHeight)
         this.setState({
-            height: window.innerHeight
-        })
-        console.log(window.innerHeight)
+            height: document.body.clientHeight,
+        });
     }
     toggle = () => {
         this.setState({
@@ -125,7 +134,7 @@ class main extends Component {
                                 <Link to="/main/resourceCenter/recommended">推荐资源</Link>
                             </Menu.Item>
                             <Menu.Item key="12">
-                                <Link to="/main/resourceCenter/myresources">我的资源</Link>
+                                <Link to="/main/resourceCenter/myresources/wenjianjia">我的资源</Link>
                             </Menu.Item>
                         </SubMenu>
                     </Menu>
@@ -159,8 +168,8 @@ class main extends Component {
                             <Route path="/main/resourceCenter/recommended/share" component={RecommendedShare}></Route>
                             <Route path="/main/resourceCenter/recommended/real" component={RecommendedReal}></Route>
                             {/* 资源中心的我的资源 */}
-                            <Route path="/main/resourceCenter/myresources" exact component={Myresources}></Route>
-                            <Route path="/main/resourceCenter/myresources/wenjianjia" component={MyresourcesWenjianjia}></Route>
+                            <Route path="/main/resourceCenter/myresources/wenjianjia" exact component={Myresources}></Route>
+                            <Route path="/main/resourceCenter/myresources" component={MyresourcesWenjianjia}></Route>
 
                             <Route path="/main/bk" exact component={BK} />
                             <Route path="/main/zy" component={ZY} />

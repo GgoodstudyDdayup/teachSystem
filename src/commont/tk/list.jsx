@@ -19,7 +19,7 @@ const ListT = (props) => {
         </div>
     )
 }
- const KnowlageName = () => {
+const KnowlageName = () => {
     return (
         <div className="know-name-m">
             <span className="know-name">1. (2019天津市期末测试卷)</span>
