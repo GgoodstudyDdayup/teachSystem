@@ -149,6 +149,5 @@
   "homepage": ".",
   "devDependencies": {
     "react-scripts": "^3.3.1"
-  },
-  "proxy": "https://jiaoxueapi.yanuojiaoyu.com"
+  }
 }

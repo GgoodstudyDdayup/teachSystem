@@ -4,6 +4,7 @@ import Select from './selection'
 import Tree from './tree'
 import List from './list'
 import Searchbtn from './searchbtn'
+import { tree ,subjectList} from '../../axios/http'
 const { Search } = Input
 const options = [
     {
@@ -144,6 +145,15 @@ class tikuguanli extends Component {
     componentDidMount() {
         window.addEventListener('resize', this.handleSize);
         this.handleSize()
+        // const params = {
+        //     subject_id:1
+        // }
+        // tree(params).then(res=>{
+        //     console.log(res)
+        // })
+        subjectList().then(res=>{
+            console.log(res)
+        })
     }
     componentWillUnmount() {
         // 移除监听事件

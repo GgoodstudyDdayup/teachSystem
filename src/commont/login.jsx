@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import {login} from '../axios/http'
+import { login } from '../axios/http'
+import { message } from 'antd'
+import store from '../store'
+import { UserStateActionCreators } from '../actions/UserStateAction'
 //定义组件内部私有的状态
 class Login extends Component {
     constructor(opt) {
@@ -16,7 +19,6 @@ class Login extends Component {
     componentDidMount() {
         window.addEventListener('resize', this.handleSize);
     }
-
     componentWillUnmount() {
         // 移除监听事件
         window.removeEventListener('resize', this.handleSize);
@@ -35,16 +37,38 @@ class Login extends Component {
         this.setState({
             filter
         })
-        console.log(filter)
     }
     login = () => {
-        // const params = this.state.filter
-        // login(params).then(res => {
-        //     console.log(res)
-        // }).catch(err => {
-        //     console.log(err)
-        // })
-        this.props.history.push("/main")
+        const params = this.state.filter
+        login(params).then(res => {
+            console.log(res)
+            if (res.data.code === 0) {
+                message.success({
+                    content: `${res.data.message}`,
+                    onClose: () => {
+                        //将获取到的token放入redux中
+                        store.dispatch(UserStateActionCreators.SaveUserStateActionCreator(res.data.data))
+                        this.props.history.push("/main")
+                    },
+                    duration: 1
+                })
+            } else {
+                message.error({
+                    content: `${res.data.message}`,
+                    duration: 1
+                })
+            }
+
+        }).catch(err => {
+            message.error({
+                content: `${err.data.message}`,
+                onClose: () => {
+                    console.log('fail')
+                },
+                duration: 1
+            })
+            console.log(err)
+        })
     }
     render() {
         return (
