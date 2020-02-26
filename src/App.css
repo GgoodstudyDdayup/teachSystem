@@ -412,3 +412,6 @@
   width: 50px;
   display: inline-block;
 }
+.disappear{
+  display: none;
+}

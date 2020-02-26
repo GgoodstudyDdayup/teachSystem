@@ -17,8 +17,6 @@ const Search = (props) => {
                         <Tixing list={props.list} funt={props.funt}></Tixing>
                     </div>}
         </div>
-
-
     )
 }
 const Tixing = (props) => {

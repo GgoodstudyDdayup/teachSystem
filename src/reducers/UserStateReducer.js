@@ -1,6 +1,5 @@
 import { UserStateActionTypes } from '../actions/UserStateAction'
 const UserStateReducer = (preState = [], action) => {
-    console.log(action)
     switch (action.type) {
         case UserStateActionTypes.LOAD_USERSTATE:
             return preState = action.payload.user_info
