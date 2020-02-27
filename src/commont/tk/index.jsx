@@ -4,7 +4,7 @@ import Select from './selection'
 import Tree from './tree'
 import List from './list'
 import Searchbtn from './searchbtn'
-import { tree, subjectList, tkList } from '../../axios/http'
+import { tree, subjectList, tkList, question } from '../../axios/http'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
 const { Search } = Input
@@ -17,11 +17,8 @@ class tikuguanli extends Component {
                 { appear: false, btnc: true },
                 { appear: true, btnc: true }
             ],
-            search: {
-                subject_id: 38
-            },
             params: {
-                subject_id: '',
+                subject_id: 38,
                 knowledge_id: '',
                 ques_type_id: '',
                 province_id: '',
@@ -29,6 +26,9 @@ class tikuguanli extends Component {
                 difficulty_id: '',
                 source_id: '',
                 grade_id: '',
+                key_words: '',
+                page: '',
+                page_size: ''
             },
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
@@ -53,11 +53,30 @@ class tikuguanli extends Component {
                 h: 16,
                 list: [{ id: 16, title: '不限' }, { id: 10, title: '999' }, { id: 11, title: '999' }, { id: 12, title: '999' }]
             }],
+            tree: [{
+                title: '1',
+                aitifen_id: '1',
+                children: [
+                    {
+                        title: '2', aitifen_id: '2', children: [
+                            {
+                                title: '3', aitifen_id: '3', children: [
+                                    {
+                                        title: '4', aitifen_id: '4', children: []
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+            ],
             spin: false,
             clear: 'none',
             count: 10
         }
     }
+
     //更改筛选筛选条件查询更改params
     changeSearchId = (e, index) => {
         const params = this.state.params
@@ -126,13 +145,26 @@ class tikuguanli extends Component {
         }
         console.log(params)
     }
+    //更改knowlage_id
+    changeaitifen_id = (e) => {
+        const params = this.state.params
+        params.knowledge_id = e[0]
+        this.setState({
+            params
+        })
+    }
     //查看答案的伸缩
     add = (e) => {
-        const list = this.state.list
-        list[e].appear = !list[e].appear
-        this.setState({
-            list
-        })
+        if (this.state.appear === e) {
+            this.setState({
+                appear:''
+            })
+        } else {
+            this.setState({
+                appear: e
+            })
+        }
+
     }
 
 
@@ -175,6 +207,7 @@ class tikuguanli extends Component {
         //     return x + '!'
         // }
         // const compose = function (...funt) {
+        // console.log(funt)
         //     return (...arg) => funt.reduce((preview, current) => [current(...preview)],arg)[0]
         // }
         // const shout = compose(exclami, toUpperCase)
@@ -182,21 +215,27 @@ class tikuguanli extends Component {
         // console.log(shout('send in the clowns'))
         window.addEventListener('resize', this.handleSize);
         this.handleSize()
-        const params = this.state.search
+        const params = this.state.params
         //获取科目的数据
         subjectList().then(res => {
             store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
         })
         //获取默认tree的数据
-        tree(params).then(res => {
-            this.treeList(res.data.list)
+        tree({ subject_id: params.subject_id }).then(res => {
+            console.log(res)
+            this.setState({
+                tree: res.data.list
+            })
         })
-        tkList(params).then(res => {
+        tkList({ subject_id: params.subject_id }).then(res => {
             this.shaixuanName(res.data)
         })
-    }
-    treeList = (...tree)=>{
-        console.log(tree[0])
+        question(this.state.params).then(res => {
+            console.log(res)
+            this.setState({
+                list: res.data.list
+            })
+        })
     }
     shaixuanName = (...e) => {
         const name = []
@@ -227,13 +266,6 @@ class tikuguanli extends Component {
         })
         return name
     }
-    // shaixuanitem = (...e) => {
-    //     console.log(e)
-    //     Object.keys(e[0]).forEach(function (key) {
-    //         // arg[key].list = e[0][key]
-    //         console.log(e[0][key])
-    //     });
-    // }
     componentWillUnmount() {
         // 移除监听事件
         this.state.unsubscribe()//移除监听
@@ -306,14 +338,14 @@ class tikuguanli extends Component {
                     <TabPane tab="知识点" key="1" className="m-tk" >
                         <div className="knowlage">
                             <div className="tree">
-                                <Tree></Tree>
+                                <Tree data={this.state.tree} funt={this.changeaitifen_id}></Tree>
                             </div>
 
                             <div className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
                                 <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
                                 <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
                                 {/* <div className="m-scroll-list"> */}
-                                <List addfun={this.state.list} fun={this.add} btn={this.btnChange}></List>
+                                <List data={this.state.list} fun={this.add} appear={this.state.appear}></List>
                                 {/* </div> */}
                             </div>
                         </div>

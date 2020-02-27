@@ -17,3 +17,7 @@ export const subjectList = () =>{
 export const tkList = (params) =>{
     return instance.post('/api/question/get_search_condition',params)
 }
+//获取题库列表选接口
+export const question = (params) =>{
+    return instance.post('/api/question/get_question',params)
+}
