@@ -17,7 +17,7 @@ const instance = axios.create({
     // withCredentials: true,
 })
 instance.interceptors.request.use(function (config) {
-    
+    console.log(config)
     //在发送请求之前做某事，比如加一个loading
     // console.log(store.getState())
     // if (store.getState().UserState.token) {

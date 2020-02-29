@@ -439,3 +439,19 @@
 .notes-month section {
   font-size: 28px;
 }
+.m-flex{
+  display: flex;
+  justify-content: space-between;
+}
+.m-row{
+  width: 100px;
+}
+.m-row::before {
+  content: "*";
+  display: inline-block;
+  margin-right: 4px;
+  line-height: 1;
+  font-family: SimSun;
+  font-size: 12px;
+  color: #ed3f14;
+}

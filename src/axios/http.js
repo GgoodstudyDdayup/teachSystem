@@ -1,7 +1,6 @@
 import { instance, loginPost } from './axios'
 //login为了获取token
 export const login = (params) => {
-    console.log(params)
     return loginPost.post('/api/user/login', params)
 }
 //instance实例作为系统内部cookie验证每个接口
@@ -23,4 +22,9 @@ export const question = (params) => {
 //获取排课信息
 export const paike = (params) => {
     return instance.post('/api/self_lecture/get_course', params)
+}
+
+//获取进度
+export const jindu = (params) => {
+    return instance.post('/api/self_lecture/get_list', params)
 }

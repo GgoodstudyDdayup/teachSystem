@@ -13,7 +13,6 @@ import Myresources from './resourceCenter/myResources/index/index'
 import MyresourcesWenjianjia from './resourceCenter/myResources/wenjianku/wenjianku'
 import BK from './bk/bk'
 import Prograss from './bk/prograss'
-import JiangyiPass from './bk/jiangyipass'
 import CP from './cp'
 import ZY from './zy'
 import Tkquestion from './tk/braftEditor'
@@ -90,8 +89,6 @@ class main extends Component {
                         >
                             <Menu.Item key="5">
                                 <Link to="/main/bk">课程表</Link></Menu.Item>
-                            <Menu.Item key="6">
-                                <Link to="/main/bk/jiangyipass">讲义审核</Link></Menu.Item>
                             <Menu.Item key="7">
                                 <Link to="/main/bk/prograss">审核进度</Link></Menu.Item>
                         </SubMenu>
@@ -175,7 +172,6 @@ class main extends Component {
 
                             <Route path="/main/bk" exact component={BK} />
                             <Route path="/main/bk/prograss" component={Prograss} />
-                            <Route path="/main/bk/jiangyipass" component={JiangyiPass} />
                             <Route path="/main/zy" component={ZY} />
                             <Route path="/main/cp" component={CP} />
                         </Switch>
