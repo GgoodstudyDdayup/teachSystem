@@ -120,6 +120,7 @@
 .logoicon {
   height: 32px;
   margin: 16px;
+  background-image: url('./img/lALPDgQ9rp-V0nMgzKg_168_32 (2).png');
 }
 
 .trigger {
@@ -439,13 +440,16 @@
 .notes-month section {
   font-size: 28px;
 }
-.m-flex{
+
+.m-flex {
   display: flex;
-  justify-content: space-between;
+  flex-flow: wrap;
 }
-.m-row{
+
+.m-row {
   width: 100px;
 }
+
 .m-row::before {
   content: "*";
   display: inline-block;
@@ -454,4 +458,22 @@
   font-family: SimSun;
   font-size: 12px;
   color: #ed3f14;
+}
+
+.m-Pleft {
+  margin-top: 10px!important;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.linkTab {
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.linkTab:hover {
+  color: #1890ff;
+}
+.m-left{
+  margin-left: 10px;
 }

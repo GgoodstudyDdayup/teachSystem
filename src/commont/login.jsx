@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { login } from '../axios/http'
 import { message } from 'antd'
-import store from '../store'
-import { UserStateActionCreators } from '../actions/UserStateAction'
 //定义组件内部私有的状态
 class Login extends Component {
     constructor(opt) {
@@ -46,8 +44,8 @@ class Login extends Component {
                 message.success({
                     content: `${res.data.message}`,
                     onClose: () => {
+                        localStorage.setItem("token",res.data.data.user_info.token);//设置b为"isaac"
                         //将获取到的token放入redux中
-                        store.dispatch(UserStateActionCreators.SaveUserStateActionCreator(res.data.data))
                         this.props.history.push("/main")
                     },
                     duration: 1

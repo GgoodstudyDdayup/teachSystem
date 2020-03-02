@@ -221,7 +221,10 @@ class tikuguanli extends Component {
             store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
         })
         //获取默认tree的数据
-        tree({ subject_id: params.subject_id }).then(res => {
+        const subject_id = {
+            subject_id:38
+        }
+        tree(subject_id).then(res => {
             console.log(res)
             this.setState({
                 tree: res.data.list

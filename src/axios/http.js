@@ -23,8 +23,15 @@ export const question = (params) => {
 export const paike = (params) => {
     return instance.post('/api/self_lecture/get_course', params)
 }
-
+//上传课件
+export const zidingyikejian = (params) => {
+    return instance.post('/api/self_lecture/upload_lecture', params)
+}
 //获取进度
 export const jindu = (params) => {
     return instance.post('/api/self_lecture/get_list', params)
+}
+//获取进度
+export const jiangyishenghe = (params) => {
+    return instance.post('/api/self_lecture/check_self_lecture', params)
 }

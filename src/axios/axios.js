@@ -12,12 +12,11 @@ axios.defaults.transformRequest = [
 ]
 const instance = axios.create({
     headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/x-www-form-urlencoded"
     },
     // withCredentials: true,
 })
 instance.interceptors.request.use(function (config) {
-    console.log(config)
     //在发送请求之前做某事，比如加一个loading
     // console.log(store.getState())
     // if (store.getState().UserState.token) {

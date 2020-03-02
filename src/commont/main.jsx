@@ -55,7 +55,6 @@ class main extends Component {
 
                 <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
                     <div className="logoicon">
-                        <img src={require('../img/lALPDgQ9rp-V0nMgzKg_168_32 (2).png')} alt="" />
                     </div>
                     <Menu onClick={this.handleClick} mode="vertical" theme="dark">
                         <SubMenu

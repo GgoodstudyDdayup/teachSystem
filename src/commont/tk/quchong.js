@@ -1,3 +1,5 @@
+const resolve = require("resolve")
+
 let array = [{
     name: 'carry',
     from: 'beijing'
@@ -12,6 +14,25 @@ let array = [{
     from: 'beijing'
 }]
 
+async function a(data) {
+    console.log('开始')
+    await new Promise((resolve,reject)=>{
+        console.log(123)
+        resolve(22222)
+    }).then(res=>{
+        console.log(res)
+    }).catch(err=>{
+        console.log(err)
+    })
+    await console.log(data + 234)
+}
+function abc(data) {
+    console.log(data)
+}
+a(123).then(()=>{
+    console.log(8888)
+})
+abc('456')
 // function quchong(){
 //     const obj = {}
 //     array.forEach(res=>{
