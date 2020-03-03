@@ -1,28 +1,15 @@
 import React, { Component } from 'react';
-import { Table, Button, DatePicker, Modal, Radio, Pagination, message, Input, Tag } from 'antd';
-import locale from 'antd/es/date-picker/locale/zh_CN'
-import Select from '../tk/selection'
-import { jindu, subjectList, jiangyishenghe } from '../../axios/http'
-import store from '../../store/index'
-import { XueKeActionCreators } from '../../actions/XueKeList'
-import moment from 'moment';
-import 'moment/locale/zh-cn';
-moment.locale('zh-cn')
-const { RangePicker } = DatePicker;
-const { TextArea } = Input;
-const dateFormat = 'YYYY-MM-DD'
+import { Table, Button, Modal, Radio, Pagination, message, Input } from 'antd';
+import { jiangyishenghe, quanxianList, loginUserList } from '../../axios/http'
 class bk extends Component {
     constructor(props) {
         super(props)
         this.state = {
             //这个是查询条件
             parmas: {
-                subject_id: '',
-                check_status: '',
                 name: '',
-                is_team: -1,
-                starttime: '',
-                endtime: '',
+                username: '',
+                permission: '',
                 page: 1,
                 page_size: 10,
             },
@@ -30,12 +17,6 @@ class bk extends Component {
             title: '',
             value2: -1,
             value3: -1,
-            options: store.getState().XueKeList,
-            unsubscribe: store.subscribe(() => {
-                this.setState({
-                    options: store.getState().XueKeList
-                })
-            }),
             //这个是评价自定义课件
             upParmas: {
                 id: '',
@@ -55,6 +36,7 @@ class bk extends Component {
             fileList: [],
             checkList: [],
             visible: false,
+            permission: [],
             data: [
                 {
                     key: '11',
@@ -79,22 +61,31 @@ class bk extends Component {
         let time = myDate.toLocaleDateString().split("/").join("-");
         const parmas = this.state.parmas
         parmas['starttime'] = time
-        subjectList().then(res => {
+        quanxianList().then(res => {
             console.log(res)
-            store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
+
+            this.setState({
+                permission: res.data.list
+            })
+            // store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
         })
-        jindu(parmas).then(res => {
+        loginUserList(parmas).then(res => {
+            console.log(res)
             const list = res.data.list.map((res, index) => {
                 res.key = `${index}`
                 return res
             })
             this.setState({
-                data: list,
-                totalCount: Number(res.data.total_count),
-                time,
-                parmas
+                data: list
             })
         })
+
+    }
+    quanxianList = (list) => {
+        const result = list.map((res, index) => {
+            return <Radio value={res.id} key={index}>{res.name}</Radio>
+        })
+        return result
     }
     //日期改变
     onchange = (value, dateString) => {
@@ -107,16 +98,9 @@ class bk extends Component {
         })
     }
 
-    showModal = (e, file, course_id) => {
-        const upParmas = this.state.upParmas
-        const fileList = file.split(',')
-        fileList.splice(fileList.length - 1, 1)
-        upParmas['id'] = e
-        upParmas['course_id'] = course_id
+    showModal = () => {
         this.setState({
-            visible: true,
-            upParmas,
-            fileList
+            visible: true
         });
     };
     handleOk = () => {
@@ -126,7 +110,7 @@ class bk extends Component {
             console.log(res)
             if (res.code === 0) {
                 message.success(res.message)
-                jindu(parmas).then(res => {
+                loginUserList(parmas).then(res => {
                     const list = res.data.list.map((res, index) => {
                         res.key = `${index}`
                         return res
@@ -190,21 +174,21 @@ class bk extends Component {
     changePage = page => {
         const parmas = { ...this.state.parmas }
         parmas.page = page
-        // paike(parmas).then(res => {
-        //     const list = res.data.list.map((res, index) => {
-        //         res.key = `${index}`
-        //         return res
-        //     })
-        //     this.setState({
-        //         data: list,
-        //         totalCount: Number(res.data.total_count),
-        //         parmas
-        //     })
-        // })
+        loginUserList(parmas).then(res => {
+            const list = res.data.list.map((res, index) => {
+                res.key = `${index}`
+                return res
+            })
+            this.setState({
+                data: list,
+                totalCount: Number(res.data.total_count),
+                parmas
+            })
+        })
     };
     search = () => {
         const parmas = this.state.parmas
-        jindu(parmas).then(res => {
+        loginUserList(parmas).then(res => {
             console.log(res)
             if (res.code === 0) {
                 const list = res.data.list.map((res, index) => {
@@ -213,11 +197,13 @@ class bk extends Component {
                 })
                 message.success(res.message)
                 parmas.name = ''
+                parmas.username = ''
                 this.setState({
                     data: list,
                     totalCount: Number(res.data.total_count),
                     parmas,
-                    name: ''
+                    name: '',
+                    username: ''
                 })
             } else {
                 message.error(res.message)
@@ -240,10 +226,11 @@ class bk extends Component {
             value: e.target.value,
             upParmas
         });
+        console.log(upParmas)
     }
     onchangeTuanduiRadio = (e) => {
         const parmas = this.state.parmas
-        parmas.is_team = e.target.value
+        parmas.permission = e.target.value
         this.setState({
             value2: e.target.value,
             parmas
@@ -266,32 +253,19 @@ class bk extends Component {
             name: e.target.value,
             parmas
         })
+        console.log(parmas)
     }
-    textareaChange = (e) => {
-        const upParmas = this.state.upParmas
-        upParmas.comment = e.target.value
+    changUserName = (e) => {
+        const parmas = this.state.parmas
+        parmas.username = e.target.value
         this.setState({
-            textArea: e.target.value,
-            upParmas
+            username: e.target.value,
+            parmas
         })
+        console.log(parmas)
     }
     tabLinkFilePath = (url) => {
         window.open(url)
-    }
-    actionText = (canshu) => {
-        let text = ''
-        let color = ''
-        if (canshu === '-1') {
-            text = '未审核'
-            color = 'geekblue'
-        } else if (canshu === '1') {
-            text = '审核通过'
-            color = 'green'
-        } else if (canshu === '2') {
-            text = '审核未通过'
-            color = 'volcano'
-        }
-        return <Tag color={color}>{text}</Tag>
     }
     render() {
         const columns = [
@@ -306,27 +280,12 @@ class bk extends Component {
                 ),
             },
             {
-                title: '标题',
-                dataIndex: 'title',
-                key: 'title',
-            },
-            {
-                title: '上课时间',
-                dataIndex: 'starttime',
-                key: 'starttime',
-            },
-            {
-                title: '下课时间',
-                dataIndex: 'endtime',
-                key: 'endtime',
-            },
-            {
-                title: '审核状态',
-                dataIndex: 'check_status',
-                key: 'check_status',
+                title: '用户名',
+                dataIndex: 'username',
+                key: 'username',
                 render: (text) => (
                     <span>
-                        {this.actionText(text)}
+                        {text ? text : 'null'}
                     </span>
                 ),
             },
@@ -335,7 +294,7 @@ class bk extends Component {
                 key: 'action',
                 render: (text) => (
                     <span>
-                        {text.check_status === '-1' || text.check_status === '2' ? <Button type="primary" onClick={() => this.showModal(text.id, text.file, text.course_id)}>审核课件</Button> : ''}
+                        <Button type="primary" onClick={() => this.showModal(text.id, text.file, text.course_id)}>分配权限</Button>
                     </span>
                 ),
             },
@@ -343,7 +302,7 @@ class bk extends Component {
         return (
             <div>
                 <Modal
-                    title="审核课件"
+                    title="权限设置"
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
@@ -351,54 +310,39 @@ class bk extends Component {
                     cancelText='取消'
                 >
                     <div className="m-flex m-bottom">
-                        <span className="m-row">课件地址：</span>
-                        {this.state.fileList.map((res, index) =>
-                            <div className='linkTab' key={index} onClick={() => this.tabLinkFilePath(res)}>{res}</div>
-                        )}
-                    </div>
-                    <div className="m-flex m-bottom">
-                        <span className="m-row">包含内容：</span>
+                        <span className="m-row">权限设置：</span>
                         <Radio.Group onChange={this.onChangecheckbox} value={this.state.value}>
-                            <Radio value={1}>审核通过</Radio>
-                            <Radio value={2}>审核未通过</Radio>
+                            {this.quanxianList(this.state.permission)}
                         </Radio.Group>
                     </div>
-                    <div className="m-flex">
-                        <span className="m-row">评价内容：</span>
-                        <TextArea rows={4} onChange={this.textareaChange} value={this.state.textArea}></TextArea>
-                    </div>
+
                 </Modal>
                 <div className="m-bottom m-flex" style={{ alignItems: 'center' }}>
-                    <RangePicker locale={locale} onChange={this.onchange} defaultValue={[moment(this.state.time, dateFormat)]} />
-                    <div className="m-left">
-                        <Select selectonChange={this.selectonChange} data={this.state.options}></Select>
-                    </div>
                     <div className="m-left">
                         <Input value={this.state.name} onChange={this.changName} placeholder="请输入要查询的老师"></Input>
                     </div>
                     <div className="m-left">
-                        <span >团队数据：</span>
-                        <Radio.Group onChange={this.onchangeTuanduiRadio} value={this.state.value2}>
-                            <Radio value={1}>是</Radio>
-                            <Radio value={-1}>否</Radio>
-                        </Radio.Group>
-                    </div>
-                    <div className="m-left">
-                        <span>审核状态: </span>
-                        <Radio.Group onChange={this.onchangeStateRadio} value={this.state.value3}>
-                            <Radio value={-1}>未审核</Radio>
-                            <Radio value={1}>审核通过</Radio>
-                            <Radio value={2}>审核未通过</Radio>
-                        </Radio.Group>
+                        <Input value={this.state.username} onChange={this.changUserName} placeholder="请输入要查询的用户名"></Input>
                     </div>
                     <Button type="primary" style={{ marginLeft: 10 }} onClick={this.search}>
                         查询
                     </Button>
+                    <div className="m-left">
+                        <span>权限查询: </span>
+                        <Radio.Group onChange={this.onchangeTuanduiRadio} value={this.state.value2}>
+                            {this.quanxianList(this.state.permission)}
+                            {/* <Radio value={-1}>未审核</Radio>
+                            <Radio value={1}>审核通过</Radio>
+                            <Radio value={2}>审核未通过</Radio> */}
+                        </Radio.Group>
+                    </div>
+
                 </div>
                 <Table rowKey={record => record.key} columns={columns} dataSource={this.state.data} pagination={false} scroll={{ y: 500 }} />
                 <Pagination className="m-Pleft" current={this.state.parmas.page} onChange={this.changePage} total={this.state.totalCount} />
             </div>
         );
     }
+
 }
 export default bk;

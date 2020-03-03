@@ -13,6 +13,7 @@ import Myresources from './resourceCenter/myResources/index/index'
 import MyresourcesWenjianjia from './resourceCenter/myResources/wenjianku/wenjianku'
 import BK from './bk/bk'
 import Prograss from './bk/prograss'
+import Quanxian from './quanxian/quanxian'
 import CP from './cp'
 import ZY from './zy'
 import Tkquestion from './tk/braftEditor'
@@ -110,11 +111,13 @@ class main extends Component {
                             title={
                                 <span>
                                     <Icon type="setting" />
-                                    <span>测评管理</span>
+                                    <span>权限管理</span>
                                 </span>
                             }
                         >
-                            <Menu.Item key="9">Option 9</Menu.Item>
+                            <Menu.Item key="9">
+                                <Link to="/main/quanxian">权限分配</Link>
+                            </Menu.Item>
                             <Menu.Item key="10">Option 10</Menu.Item>
                             <Menu.Item key="11">Option 11</Menu.Item>
                             <Menu.Item key="12">Option 12</Menu.Item>
@@ -171,6 +174,7 @@ class main extends Component {
 
                             <Route path="/main/bk" exact component={BK} />
                             <Route path="/main/bk/prograss" component={Prograss} />
+                            <Route path="/main/quanxian" component={Quanxian} />
                             <Route path="/main/zy" component={ZY} />
                             <Route path="/main/cp" component={CP} />
                         </Switch>

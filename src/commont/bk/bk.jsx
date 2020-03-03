@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Table, Button, DatePicker, Modal, Upload, Input, Checkbox, Pagination, message } from 'antd';
+import { Table, Button, DatePicker, Modal, Upload, Input, Checkbox, Pagination, message, Tag } from 'antd';
 import locale from 'antd/es/date-picker/locale/zh_CN'
-import { paike, zidingyikejian } from '../../axios/http'
+import { paike, zidingyikejian, kechendizhi } from '../../axios/http'
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 moment.locale('zh-cn')
@@ -21,7 +21,9 @@ class bk extends Component {
                 page: 1,
                 page_size: 10,
             },
+            visible2: false,
             title: '',
+            course_url: '',
             //这个是自定义课件
             upParmas: {
                 subject_id: '',
@@ -34,6 +36,11 @@ class bk extends Component {
                 has_suilian: -1,
                 has_kuozhan: -1,
                 file: ''
+            },
+            //这是上传直播地址的地方
+            upParmas2: {
+                course_id: '',
+                course_url: ''
             },
             totalCount: 100,
             obj: {
@@ -109,6 +116,14 @@ class bk extends Component {
             fileList: [],
         });
     };
+    showModal2 = (e) => {
+        const upParmas2 = this.state.upParmas2
+        upParmas2['course_id'] = e
+        this.setState({
+            visible2: true,
+            upParmas2,
+        });
+    }
     handleOk = () => {
         const fileList = this.state.fileList
         let path = ''
@@ -129,6 +144,17 @@ class bk extends Component {
         zidingyikejian(upParmas).then(res => {
             console.log(res)
             if (res.code === 0) {
+                const parmas = { ...this.state.parmas }
+                paike(parmas).then(res => {
+                    const list = res.data.list.map((res, index) => {
+                        res.key = `${index}`
+                        return res
+                    })
+                    this.setState({
+                        data: list,
+                        totalCount: Number(res.data.total_count),
+                    })
+                })
                 message.success(res.message)
                 this.handleCancel()
             } else {
@@ -155,6 +181,40 @@ class bk extends Component {
                 has_suilian: -1,
                 has_kuozhan: -1,
                 file: ''
+            },
+        });
+    };
+    handleOk2 = () => {
+        const upParmas2 = { ...this.state.upParmas2 }
+        kechendizhi(upParmas2).then(res => {
+            console.log(res)
+            if (res.code === 0) {
+                const parmas = { ...this.state.parmas }
+                paike(parmas).then(res => {
+                    const list = res.data.list.map((res, index) => {
+                        res.key = `${index}`
+                        return res
+                    })
+                    this.setState({
+                        data: list,
+                        totalCount: Number(res.data.total_count),
+                    })
+                })
+                message.success(res.message)
+                this.handleCancel2()
+            } else {
+                message.success(res.message)
+                this.handleCancel2()
+            }
+        })
+    };
+    handleCancel2 = e => {
+        this.setState({
+            visible2: false,
+            course_url: '',
+            upParmas2: {
+                course_id: '',
+                course_url: ''
             },
         });
     };
@@ -186,6 +246,14 @@ class bk extends Component {
             upParmas
         })
     }
+    changeTitleUrl = (e) => {
+        const upParmas2 = { ...this.state.upParmas2 }
+        upParmas2.course_url = e.target.value
+        this.setState({
+            course_url: e.target.value,
+            upParmas2
+        })
+    }
     changePage = page => {
         const parmas = { ...this.state.parmas }
         parmas.page = page
@@ -214,6 +282,35 @@ class bk extends Component {
                 parmas
             })
         })
+    }
+    actionFunt = (...canshu) => {
+        if (canshu[0] === '-1' && canshu[1] === '1') {
+            return <Button onClick={() => this.showModal(canshu[2])}>调整备课</Button>
+        } else if (canshu[0] === '1' && canshu[1] === '1') {
+            return <Button onClick={() => this.showModal2(canshu[2])}>我要直播</Button>
+        } else if (canshu[0] === '2' && canshu[1] === '1') {
+            return <Button type="danger" onClick={() => this.showModal(canshu[2])}>重新备课</Button>
+        } else {
+            return <Button type="primary" onClick={() => this.showModal(canshu[2])}>我要备课</Button>
+        }
+    }
+    actionText = (...canshu) => {
+        let text = ''
+        let color = ''
+        if (canshu[0] === '-1' && canshu[1] === '1') {
+            text = '审核中'
+            color = 'geekblue'
+        } else if (canshu[0] === '1' && canshu[1] === '1') {
+            text = '审核通过'
+            color = 'green'
+        } else if (canshu[0] === '2' && canshu[1] === '1') {
+            text = '审核未通过'
+            color = 'volcano'
+        } else {
+            text = ''
+            color = 'geekblue'
+        }
+        return <Tag color={color}>{text}</Tag>
     }
     render() {
         const columns = [
@@ -249,7 +346,16 @@ class bk extends Component {
                 key: 'is_beike',
                 render: (text) => (
                     <span>
-                        {text === 1 ? '已备课' : '未备课'}
+                        {text === '1' ? '已备课' : '未备课'}
+                    </span>
+                ),
+            },
+            {
+                title: '备课审核状态',
+                key: 'beike_check_status',
+                render: (text) => (
+                    <span>
+                        {this.actionText(text.beike_check_status, text.is_beike)}
                     </span>
                 ),
             },
@@ -259,28 +365,17 @@ class bk extends Component {
                 key: 'isfinished',
                 render: (text) => (
                     <span>
-                        {text === 1 ? '已完成' : '未完成'}
+                        {text === '1' ? '已完成' : '未完成'}
                     </span>
                 ),
             },
-            {
-                title: '备课审核状态',
-                dataIndex: 'beike_check_status',
-                key: 'beike_check_status',
-                render: (text) => (
-                    <span>
-                        {text === '-1' ? '暂无审核' : '审核未通过'}
-                        
-                    </span>
-                ),
-            },
+
             {
                 title: '操作',
                 key: 'action',
                 render: (text) => (
                     <span>
-                        {text.beike_check_status === '-1' ? <Button type="primary" onClick={() => this.showModal(text.course_id)}>我要备课</Button> : <Button type="danger" onClick={() => this.showModal(text.course_id)}>重新备课</Button>}
-
+                        {this.actionFunt(text.beike_check_status, text.is_beike, text.course_id)}
                     </span>
                 ),
             },
@@ -301,6 +396,7 @@ class bk extends Component {
                     okText='确认'
                     cancelText='取消'
                 >
+
                     <div className="m-flex">
                         <span className="m-row">标题：</span>
                         <Input style={{ marginBottom: 20 }} placeholder="请输入标题" value={this.state.title} onChange={this.changeTitle}></Input>
@@ -318,6 +414,19 @@ class bk extends Component {
                             上传文件
                         </Button>
                     </Upload>
+                </Modal>
+                <Modal
+                    title="直播地址上传"
+                    visible={this.state.visible2}
+                    onOk={this.handleOk2}
+                    onCancel={this.handleCancel2}
+                    okText='确认'
+                    cancelText='取消'
+                >
+                    <div className="m-flex">
+                        <span className="m-row m-bottom">直播地址：</span>
+                        <Input style={{ marginBottom: 20 }} placeholder="请输入地址" value={this.state.course_url} onChange={this.changeTitleUrl}></Input>
+                    </div>
                 </Modal>
                 <div className="m-bottom" >
                     <RangePicker locale={locale} onChange={this.onchange} defaultValue={[moment(this.state.time, dateFormat)]} />

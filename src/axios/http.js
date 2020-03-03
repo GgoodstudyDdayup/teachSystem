@@ -35,3 +35,15 @@ export const jindu = (params) => {
 export const jiangyishenghe = (params) => {
     return instance.post('/api/self_lecture/check_self_lecture', params)
 }
+//上传课程地址
+export const kechendizhi = (params) => {
+    return instance.post('/api/self_lecture/upload_course_url', params)
+}
+//获取后台权限组列表
+export const quanxianList = (params) => {
+    return instance.get('/api/user/get_permission_group', params)
+}
+//获取后台登录用户列表
+export const loginUserList = (params) => {
+    return instance.post('/api/user/get_user_list', params)
+}
