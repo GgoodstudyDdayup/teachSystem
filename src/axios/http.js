@@ -47,3 +47,15 @@ export const quanxianList = (params) => {
 export const loginUserList = (params) => {
     return instance.post('/api/user/get_user_list', params)
 }
+//添加用户
+export const add_user = (params) => {
+    return instance.post('/api/user/add_user', params)
+}
+//获取所有年级
+export const grade_id_List = (params) => {
+    return instance.get('/api/system/get_grade_list', params)
+}
+//获取自定义科目
+export const object_id_List = (params) => {
+    return instance.get('/api/system/get_own_subject_list', params)
+}

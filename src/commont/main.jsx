@@ -118,9 +118,6 @@ class main extends Component {
                             <Menu.Item key="9">
                                 <Link to="/main/quanxian">权限分配</Link>
                             </Menu.Item>
-                            <Menu.Item key="10">Option 10</Menu.Item>
-                            <Menu.Item key="11">Option 11</Menu.Item>
-                            <Menu.Item key="12">Option 12</Menu.Item>
                         </SubMenu>
                         <SubMenu
                             key="sub6"
