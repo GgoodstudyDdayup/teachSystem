@@ -59,3 +59,15 @@ export const grade_id_List = (params) => {
 export const object_id_List = (params) => {
     return instance.get('/api/system/get_own_subject_list', params)
 }
+//删除账号
+export const delete_user = (params) => {
+    return instance.post('/api/user/del_user', params)
+}
+//获取用户详情
+export const get_user_detail = (params) => {
+    return instance.post('/api/user/get_user_detail', params)
+}
+//修改账号权限
+export const edit_user = (params) => {
+    return instance.post('/api/user/edit_user', params)
+}

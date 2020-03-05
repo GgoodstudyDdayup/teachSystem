@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal, Radio, Pagination, message, Input, Checkbox, Tag } from 'antd';
-import { add_user, quanxianList, loginUserList, grade_id_List, object_id_List } from '../../axios/http'
+import { add_user, quanxianList, loginUserList, grade_id_List, object_id_List, delete_user, get_user_detail, edit_user } from '../../axios/http'
+const { confirm } = Modal;
 class bk extends Component {
     constructor(props) {
         super(props)
@@ -15,6 +16,7 @@ class bk extends Component {
             },
             textArea: '',
             title: '',
+            value: -1,
             value2: -1,
             value3: -1,
             //这个是评价自定义课件
@@ -103,10 +105,11 @@ class bk extends Component {
             })
         })
 
+
     }
     quanxianList = (list) => {
         const result = list.map((res, index) => {
-            return <Radio value={res.id} key={index}>{res.name}</Radio>
+            return <Radio value={Number(res.id)} key={index}>{res.name}</Radio>
         })
         return result
     }
@@ -173,9 +176,60 @@ class bk extends Component {
             })
         }
     };
+    handleOk2 = () => {
+        const upParmas = { ...this.state.upParmas }
+        const parmas = { ...this.state.parmas }
+        const grade_list = this.state.grade_list
+        const own_subject_list = this.state.own_subject_list
+        const check = this.state.check
+        const check2 = this.state.check2
+        if (check.length < 0) {
+            message.error('请填写必填项')
+            return false
+        } else {
+            let grade = ''
+            let object = ''
+            check.forEach(res => {
+                grade_list.forEach(res2 => {
+                    if (res2.name === res) {
+                        grade += res2.id + ','
+                    }
+                })
+            })
+            check2.forEach(res => {
+                own_subject_list.forEach(res2 => {
+                    if (res2.name === res) {
+                        object += res2.id + ','
+                    }
+                })
+            })
+            upParmas.grade_ids = grade
+            upParmas.own_subject_ids = object
+            edit_user(upParmas).then(res => {
+                if (res.code === 0) {
+                    message.success(res.message)
+                    loginUserList(parmas).then(res => {
+                        const list = res.data.list.map((res, index) => {
+                            res.key = `${index}`
+                            return res
+                        })
+                        this.setState({
+                            data: list,
+                            totalCount: Number(res.data.total_count),
+                        })
+                    })
+                    this.handleCancel()
+                } else {
+                    message.success(res.message)
+                    this.handleCancel()
+                }
+            })
+        }
+    };
     handleCancel = e => {
         this.setState({
             visible: false,
+            visible2: false,
             fileList: [],
             title: '',
             checkList: [],
@@ -183,6 +237,7 @@ class bk extends Component {
             check: [],
             check2: [],
             value: '',
+            value3: '',
             upParmas: {
                 id: '',
                 status: null,
@@ -274,6 +329,7 @@ class bk extends Component {
         });
     }
     onChangecheckbox2 = (e) => {
+        console.log(e)
         const upParmas = { ...this.state.upParmas }
         let check2 = this.state.check2
         upParmas.own_subject_ids = e
@@ -337,7 +393,7 @@ class bk extends Component {
         const permission = this.state.permission
         let name = ''
         permission.forEach(res => {
-            if(res.id === e){
+            if (res.id === e) {
                 name = res.name
             }
         })
@@ -356,8 +412,86 @@ class bk extends Component {
         }
         return <Tag color='geekblue' >{name}</Tag>
     }
-    detail = e=>{
-        message.warning('功能开发中，敬请期待！')
+    detail = e => {
+        let user_id = { user_id: e.id }
+        const grade_list = this.state.grade_list
+        const own_subject_list = this.state.own_subject_list
+        const upParmas = this.state.upParmas
+        let value = this.state.value
+        let value3 = this.state.value3
+        get_user_detail(user_id).then(res => {
+            upParmas.name = res.data.model.name
+            upParmas.username = res.data.model.username
+            upParmas.user_id = res.data.model.id
+            upParmas.permission = res.data.model.permission
+            upParmas.teacher_type = res.data.model.teacher_type
+            value = Number(res.data.model.permission)
+            value3 = Number(res.data.model.teacher_type)
+            console.log(upParmas)
+            const tags = res.data.model.tags.split(',')
+            const check = tags.map(res => {
+                const list = []
+                grade_list.forEach(l1 => {
+                    if (res === l1.name) {
+                        list.push(l1.name)
+                    }
+                })
+                return list
+            })
+            const check2 = tags.map(res => {
+                const list = []
+                own_subject_list.forEach(l1 => {
+                    if (res === l1.name) {
+                        list.push(l1.name)
+                    }
+                })
+                return list
+            })
+            this.setState({
+                check: check[0],
+                check2: check2[1],
+                upParmas,
+                value,
+                value3,
+                visible2: true,
+            })
+        })
+    }
+    delete = e => {
+        const that = this
+        let user_id = {
+            user_id: e.id
+        }
+        const parmas = { ...this.state.parmas }
+        confirm({
+            title: `删除账号：${e.name}`,
+            content: '你确定要删除吗',
+            okText: '删除',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk() {
+                delete_user(user_id).then(res => {
+                    if (res.code === 0) {
+                        loginUserList(parmas).then(res => {
+                            const list = res.data.list.map((res, index) => {
+                                res.key = `${index}`
+                                return res
+                            })
+                            that.setState({
+                                data: list,
+                                totalCount: Number(res.data.total_count),
+                            })
+                        })
+                        message.success(res.message)
+                    } else {
+                        message.error(res.message)
+                    }
+
+                })
+            },
+            onCancel() {
+            },
+        });
     }
     render() {
         const columns = [
@@ -416,7 +550,8 @@ class bk extends Component {
                 key: 'action',
                 render: (text) => (
                     <span>
-                        <Button type="primary" onClick={this.detail}>修改</Button>
+                        <Button type="primary" onClick={() => this.detail(text)}>修改</Button>
+                        <Button className="m-left" type="danger" onClick={() => this.delete(text)}>删除</Button>
                     </span>
                 ),
             },
@@ -427,6 +562,66 @@ class bk extends Component {
                     title="添加账户"
                     visible={this.state.visible}
                     onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                    okText='确认'
+                    cancelText='取消'
+                >
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>用户名：</span>
+                        <Input value={this.state.upParmas.username} onChange={(e) => this.setUsername(e, 'username')} placeholder="请输入用户名"></Input>
+                    </div>
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>登录密码：</span>
+                        <Input text='password' value={this.state.upParmas.password} onChange={(e) => this.setUsername(e, 'password')} placeholder="请输入登录密码"></Input>
+                    </div>
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>姓名：</span>
+                        <Input text='password' value={this.state.upParmas.name} onChange={(e) => this.setUsername(e, 'name')} placeholder="请输入姓名"></Input>
+                    </div>
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>手机号码：</span>
+                        <Input text='password' value={this.state.upParmas.mobile} onChange={(e) => this.setUsername(e, 'mobile')} placeholder="请输入手机号码"></Input>
+                    </div>
+                    <div className="m-flex m-bottom">
+                        <span className="m-row">权限设置：</span>
+                        <Radio.Group onChange={this.onchangeStateRadio} value={this.state.value}>
+                            {this.quanxianList(this.state.permission)}
+                        </Radio.Group>
+                    </div>
+                    <div className="m-flex m-bottom">
+
+                        <span className="m-row">老师类型：</span>
+                        <Radio.Group onChange={this.onChangeteachType} value={this.state.value3}>
+                            <Radio value={1} >校助</Radio>
+                            <Radio value={2} >教学主管</Radio>
+                            <Radio value={3} >教研组长</Radio>
+                            <Radio value={4} >普通老师</Radio>
+                        </Radio.Group>
+                    </div>
+                    <div className="m-flex m-bottom">
+                        <span className="m-row">年级(多选)：</span>
+                        <Checkbox.Group
+                            options={this.state.grade_list2}
+                            value={this.state.check}
+                            onChange={this.onChangecheckbox}
+                        />
+
+                    </div>
+                    <div className="m-flex m-bottom">
+                        <span className="m-row">学科(多选)：</span>
+                        <Checkbox.Group
+                            options={this.state.own_subject_list2}
+                            value={this.state.check2}
+                            onChange={this.onChangecheckbox2}
+                        />
+                    </div>
+                </Modal>
+
+
+                <Modal
+                    title="修改账户"
+                    visible={this.state.visible2}
+                    onOk={this.handleOk2}
                     onCancel={this.handleCancel}
                     okText='确认'
                     cancelText='取消'
