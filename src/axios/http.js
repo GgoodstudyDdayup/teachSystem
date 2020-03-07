@@ -71,3 +71,29 @@ export const get_user_detail = (params) => {
 export const edit_user = (params) => {
     return instance.post('/api/user/edit_user', params)
 }
+//管理员修改用户密码
+export const change_password = (params) => {
+    return instance.post('/api/user/change_password', params)
+}
+
+
+//获取教研组
+export const get_teaching_group = (params) => {
+    return instance.post('/api/system/get_teaching_group', params)
+}
+//添加教研组
+export const add_teaching_group = (params) => {
+    return instance.post('/api/system/add_teaching_group', params)
+}
+//删除教研组
+export const del_teaching_group = (params) => {
+    return instance.post('/api/system/del_teaching_group', params)
+}
+//修改教研组
+export const edit_teaching_group = (params) => {
+    return instance.post('/api/system/edit_teaching_group', params)
+}
+//获取修改教研组
+export const get_teaching_group_detail = (params) => {
+    return instance.post('/api/system/get_teaching_group_detail', params)
+}

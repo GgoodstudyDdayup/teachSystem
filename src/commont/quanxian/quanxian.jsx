@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal, Radio, Pagination, message, Input, Checkbox, Tag } from 'antd';
-import { add_user, quanxianList, loginUserList, grade_id_List, object_id_List, delete_user, get_user_detail, edit_user } from '../../axios/http'
+import { add_user, quanxianList, loginUserList, grade_id_List, object_id_List, delete_user, get_user_detail, edit_user, change_password } from '../../axios/http'
 const { confirm } = Modal;
 class bk extends Component {
     constructor(props) {
@@ -46,6 +46,7 @@ class bk extends Component {
             fileList: [],
             checkList: [],
             visible: false,
+            visible3: false,
             permission: [],
             data: [
                 {
@@ -72,8 +73,13 @@ class bk extends Component {
         const parmas = this.state.parmas
         parmas['starttime'] = time
         quanxianList().then(res => {
+            let permission = res.data.list
+            permission.unshift({
+                id: '',
+                name: '不限'
+            })
             this.setState({
-                permission: res.data.list
+                permission
             })
             // store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
         })
@@ -83,7 +89,8 @@ class bk extends Component {
                 return res
             })
             this.setState({
-                data: list
+                data: list,
+                totalCount: Number(res.data.total_count)
             })
         })
         grade_id_List().then(res => {
@@ -205,6 +212,7 @@ class bk extends Component {
             })
             upParmas.grade_ids = grade
             upParmas.own_subject_ids = object
+            console.log(upParmas)
             edit_user(upParmas).then(res => {
                 if (res.code === 0) {
                     message.success(res.message)
@@ -226,10 +234,27 @@ class bk extends Component {
             })
         }
     };
+    handleOk3 = () => {
+        const upParmas = this.state.upParmas
+        const data = {
+            user_id: this.state.user_id,
+            password: upParmas.password
+        }
+        change_password(data).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                this.handleCancel()
+            } else {
+                message.error(res.message)
+                this.handleCancel()
+            }
+        })
+    };
     handleCancel = e => {
         this.setState({
             visible: false,
             visible2: false,
+            visible3: false,
             fileList: [],
             title: '',
             checkList: [],
@@ -427,34 +452,44 @@ class bk extends Component {
             upParmas.teacher_type = res.data.model.teacher_type
             value = Number(res.data.model.permission)
             value3 = Number(res.data.model.teacher_type)
-            console.log(upParmas)
-            const tags = res.data.model.tags.split(',')
-            const check = tags.map(res => {
-                const list = []
-                grade_list.forEach(l1 => {
-                    if (res === l1.name) {
-                        list.push(l1.name)
-                    }
+            if (res.data.model.tags) {
+                const tags = res.data.model.tags.split(',')
+                const check = []
+                const check2 = []
+                tags.forEach(res => {
+                    grade_list.forEach(l1 => {
+                        if (res === l1.name) {
+                            check.push(l1.name)
+                        }
+                    })
+
                 })
-                return list
-            })
-            const check2 = tags.map(res => {
-                const list = []
-                own_subject_list.forEach(l1 => {
-                    if (res === l1.name) {
-                        list.push(l1.name)
-                    }
+                tags.forEach(res => {
+                    own_subject_list.forEach(l1 => {
+                        if (res === l1.name) {
+                            check2.push(l1.name)
+                        }
+                    })
                 })
-                return list
-            })
-            this.setState({
-                check: check[0],
-                check2: check2[1],
-                upParmas,
-                value,
-                value3,
-                visible2: true,
-            })
+                this.setState({
+                    check,
+                    check2,
+                    upParmas,
+                    value,
+                    value3,
+                    visible2: true,
+                    user_id
+                })
+            } else {
+                this.setState({
+                    upParmas,
+                    value,
+                    value3,
+                    visible2: true,
+                    user_id
+                })
+            }
+
         })
     }
     delete = e => {
@@ -492,6 +527,12 @@ class bk extends Component {
             onCancel() {
             },
         });
+    }
+    detailPassword = e => {
+        this.setState({
+            user_id: e.id,
+            visible3: true,
+        })
     }
     render() {
         const columns = [
@@ -550,8 +591,9 @@ class bk extends Component {
                 key: 'action',
                 render: (text) => (
                     <span>
-                        <Button type="primary" onClick={() => this.detail(text)}>修改</Button>
-                        <Button className="m-left" type="danger" onClick={() => this.delete(text)}>删除</Button>
+                        <Button type="primary" onClick={() => this.detailPassword(text)}>修改密码</Button>
+                        <Button className="m-left" type="primary" onClick={() => this.detail(text)}>修改</Button>
+                        {text.id === '1' ? '' : <Button className="m-left" type="danger" onClick={() => this.delete(text)}>删除</Button>}
                     </span>
                 ),
             },
@@ -630,10 +672,7 @@ class bk extends Component {
                         <span className="m-row" style={{ textAlign: 'right' }}>用户名：</span>
                         <Input value={this.state.upParmas.username} onChange={(e) => this.setUsername(e, 'username')} placeholder="请输入用户名"></Input>
                     </div>
-                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
-                        <span className="m-row" style={{ textAlign: 'right' }}>登录密码：</span>
-                        <Input text='password' value={this.state.upParmas.password} onChange={(e) => this.setUsername(e, 'password')} placeholder="请输入登录密码"></Input>
-                    </div>
+
                     <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
                         <span className="m-row" style={{ textAlign: 'right' }}>姓名：</span>
                         <Input text='password' value={this.state.upParmas.name} onChange={(e) => this.setUsername(e, 'name')} placeholder="请输入姓名"></Input>
@@ -676,6 +715,21 @@ class bk extends Component {
                         />
                     </div>
                 </Modal>
+
+                <Modal
+                    title="修改密码"
+                    visible={this.state.visible3}
+                    onOk={this.handleOk3}
+                    onCancel={this.handleCancel}
+                    okText='确认'
+                    cancelText='取消'
+                >
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>密码：</span>
+                        <Input value={this.state.upParmas.password} onChange={(e) => this.setUsername(e, 'password')} placeholder="请输新密码"></Input>
+                    </div>
+                </Modal>
+
                 <div className="m-bottom m-flex" style={{ alignItems: 'center' }}>
                     <div >
                         <Input value={this.state.name} onChange={this.changName} placeholder="请输入要查询的老师"></Input>

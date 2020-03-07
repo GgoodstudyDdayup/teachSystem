@@ -14,6 +14,7 @@ import MyresourcesWenjianjia from './resourceCenter/myResources/wenjianku/wenjia
 import BK from './bk/bk'
 import Prograss from './bk/prograss'
 import Quanxian from './quanxian/quanxian'
+import Jiaoyanzu from './quanxian/jiaoyanzuquanxian'
 import CP from './cp'
 import ZY from './zy'
 import Tkquestion from './tk/braftEditor'
@@ -118,6 +119,9 @@ class main extends Component {
                             <Menu.Item key="9">
                                 <Link to="/main/quanxian">权限分配</Link>
                             </Menu.Item>
+                            <Menu.Item key="10">
+                                <Link to="/main/jiaoyanzu">教研组</Link>
+                            </Menu.Item>
                         </SubMenu>
                         <SubMenu
                             key="sub6"
@@ -172,6 +176,8 @@ class main extends Component {
                             <Route path="/main/bk" exact component={BK} />
                             <Route path="/main/bk/prograss" component={Prograss} />
                             <Route path="/main/quanxian" component={Quanxian} />
+                            <Route path="/main/jiaoyanzu" component={Jiaoyanzu} />
+
                             <Route path="/main/zy" component={ZY} />
                             <Route path="/main/cp" component={CP} />
                         </Switch>
