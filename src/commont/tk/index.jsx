@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Input } from 'antd';
+import { Tabs, Spin, Badge, Icon, Input, message } from 'antd';
 import Select from './selection'
 import Tree from './tree'
 import List from './list'
 import Searchbtn from './searchbtn'
-import { tree, subjectList, tkList, question } from '../../axios/http'
+import { tree, subjectList, tkList, question, add_question_cart } from '../../axios/http'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
 const { Search } = Input
@@ -76,7 +76,6 @@ class tikuguanli extends Component {
             count: 10
         }
     }
-
     //更改筛选筛选条件查询更改params
     changeSearchId = (e, index) => {
         const params = this.state.params
@@ -143,31 +142,37 @@ class tikuguanli extends Component {
                 })
                 break
         }
-        console.log(params)
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list
+            })
+        })
     }
     //更改knowlage_id
     changeaitifen_id = (e) => {
         const params = this.state.params
         params.knowledge_id = e[0]
-        this.setState({
-            params
+        console.log(params)
+        question(params).then(res => {
+            console.log(res)
+            this.setState({
+                params,
+                list: res.data.list
+            })
         })
     }
     //查看答案的伸缩
     add = (e) => {
         if (this.state.appear === e) {
             this.setState({
-                appear:''
+                appear: ''
             })
         } else {
             this.setState({
                 appear: e
             })
         }
-
     }
-
-
     //放入答题栏的变化
     btnChange = (e) => {
         const list = this.state.list
@@ -176,17 +181,6 @@ class tikuguanli extends Component {
             list
         })
     }
-    //spin加载效果
-    // spin = () => {
-    //     this.setState({
-    //         spin: true
-    //     })
-    //     setTimeout(() => {
-    //         this.setState({
-    //             spin: false
-    //         })
-    //     }, 1500);
-    // }
     mouse = (e) => {
         if (e) {
             this.setState({
@@ -199,20 +193,6 @@ class tikuguanli extends Component {
         }
     }
     componentDidMount() {
-        //请忽略这段代码有兴趣的可以看看主要用于一个函数触发多个函数的写法compose操作
-        // const toUpperCase = function (x) {
-        //     return x.toUpperCase()
-        // }
-        // const exclami = function (x) {
-        //     return x + '!'
-        // }
-        // const compose = function (...funt) {
-        // console.log(funt)
-        //     return (...arg) => funt.reduce((preview, current) => [current(...preview)],arg)[0]
-        // }
-        // const shout = compose(exclami, toUpperCase)
-        // shout('send in the clowns')
-        // console.log(shout('send in the clowns'))
         window.addEventListener('resize', this.handleSize);
         this.handleSize()
         const params = this.state.params
@@ -222,10 +202,9 @@ class tikuguanli extends Component {
         })
         //获取默认tree的数据
         const subject_id = {
-            subject_id:38
+            subject_id: 38
         }
         tree(subject_id).then(res => {
-            console.log(res)
             this.setState({
                 tree: res.data.list
             })
@@ -234,7 +213,6 @@ class tikuguanli extends Component {
             this.shaixuanName(res.data)
         })
         question(this.state.params).then(res => {
-            console.log(res)
             this.setState({
                 list: res.data.list
             })
@@ -245,21 +223,27 @@ class tikuguanli extends Component {
         Object.keys(e[0]).forEach(function (key, index) {
             switch (key) {
                 case 'province_rela_list':
+                    e[0][key].unshift({ province_id: '', name: '不限' })
                     name.push({ name: '地区', h: 'province_id', list: e[0][key] })
                     break
                 case 'difficulty_rela_list':
+                    e[0][key].unshift({ difficulty_id: '', name: '不限' })
                     name.push({ name: '难度', h: 'difficulty_id', list: e[0][key] })
                     break
                 case 'year_rela_list':
+                    e[0][key].unshift({ year: '', name: '不限' })
                     name.push({ name: '年份', h: 'year', list: e[0][key] })
                     break
                 case 'ques_type_rela_list':
+                    e[0][key].unshift({ ques_type_id: '', name: '不限' })
                     name.push({ name: '题型', h: 'ques_type_id', list: e[0][key] })
                     break
                 case 'source_rela_list':
+                    e[0][key].unshift({ source_id: '', name: '不限' })
                     name.push({ name: '来源', h: 'source_id', list: e[0][key] })
                     break
                 default:
+                    e[0][key].unshift({ grade_id: '', name: '不限' })
                     name.push({ name: '年级', h: 'grade_id', list: e[0][key] })
                     break
             }
@@ -300,7 +284,43 @@ class tikuguanli extends Component {
         this.props.history.push('/zujuan')
     }
     selectonChange = (value) => {
-        console.log(value);
+        const params = { ...this.state.params }
+        params.subject_id = value[1]
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list,
+                params
+            })
+        })
+    }
+    addQuestoin = (e, id) => {
+        e.stopPropagation()
+        add_question_cart({ ques_id: id }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+            } else {
+                message.error(res.message)
+            }
+        })
+    }
+    searchKnowLage = e => {
+        const params = { ...this.state.params }
+        params.key_words = e
+        question(params).then(res => {
+            params.key_words = ''
+            this.setState({
+                list: res.data.list,
+                params
+            })
+        })
+
+    }
+    knowLageValueChange = e => {
+        const params = { ...this.state.params }
+        params.key_words = e.target.value
+        this.setState({
+            params
+        })
     }
     render() {
         return (
@@ -341,14 +361,14 @@ class tikuguanli extends Component {
                     <TabPane tab="知识点" key="1" className="m-tk" >
                         <div className="knowlage">
                             <div className="tree">
-                                <Tree data={this.state.tree} funt={this.changeaitifen_id}></Tree>
+                                <Tree data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage} knowLageValueChange={this.knowLageValueChange} knowLageValue={this.state.params.key_words}></Tree>
                             </div>
 
                             <div className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
                                 <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
                                 <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
                                 {/* <div className="m-scroll-list"> */}
-                                <List data={this.state.list} fun={this.add} appear={this.state.appear}></List>
+                                <List data={this.state.list} fun={this.add} appear={this.state.appear} addQuestoin={this.addQuestoin}></List>
                                 {/* </div> */}
                             </div>
                         </div>

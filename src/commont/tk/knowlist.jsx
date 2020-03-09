@@ -1,39 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input, List, Avatar, Pagination } from 'antd';
+import { ztshijuan } from '../../axios/http'
 const { Search } = Input;
-const data = [
-    {
-        title: 'Ant Design Title 1',
-    },
-    {
-        title: 'Ant Design Title 2',
-    },
-    {
-        title: 'Ant Design Title 3',
-    },
-    {
-        title: 'Ant Design Title 4',
-    },
-    {
-        title: 'Ant Design Title 3',
-    },
-    {
-        title: 'Ant Design Title 4',
-    },
-    {
-        title: 'Ant Design Title 3',
-    },
-    {
-        title: 'Ant Design Title 4',
-    },
-    {
-        title: 'Ant Design Title 3',
-    },
-    {
-        title: 'Ant Design Title 3',
-    },
-];
-const Knowlage = () => {
+const Knowlage = (props) => {
+    const [total_count, setTotal_count] = useState(0)
+    const [count, setCount] = useState(1)
+    const [shijuanList, setShijuanList] = useState('')
+    const onChangePage = (e) => {
+        props.params.page = e
+        setCount(e)
+        ztshijuan(props.params).then(res => {
+            setTotal_count(Number(res.data.total_count))
+            setShijuanList(res.data.list)
+        })
+    }
+    useEffect(() => {
+        props.params.page = 1
+        ztshijuan(props.params).then(res => {
+            setTotal_count(Number(res.data.total_count))
+            setShijuanList(res.data.list)
+            setCount(1)
+        })
+    }, [props.params])
     return (
         <div>
             <Search
@@ -45,20 +33,20 @@ const Knowlage = () => {
                 <List
                     className="list-hover"
                     itemLayout="vertical"
-                    dataSource={data}
+                    dataSource={shijuanList}
                     size='small'
                     renderItem={item => (
                         <List.Item>
                             <List.Item.Meta
                                 avatar={<Avatar src={require('../../img/shijuan.png')} />}
-                                description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                                description={item.show_name}
                             />
                         </List.Item>
                     )}
                 />
             </div>
             <div className="m-pageination">
-                <Pagination total={1000} defaultCurrent={1} simple />
+                <Pagination onChange={onChangePage} total={total_count} current={count} simple />
             </div>
         </div>
     )

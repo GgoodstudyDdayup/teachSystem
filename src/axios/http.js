@@ -19,6 +19,17 @@ export const tkList = (params) => {
 export const question = (params) => {
     return instance.post('/api/question/get_question', params)
 }
+
+//获取真题试卷
+export const ztshijuan = (params) => {
+    return instance.post('/api/paper/get_paper_list', params)
+}
+//添加到试题篮
+export const add_question_cart = (params) => {
+    return instance.post('/api/question/add_question_cart', params)
+}
+
+
 //获取排课信息
 export const paike = (params) => {
     return instance.post('/api/self_lecture/get_course', params)

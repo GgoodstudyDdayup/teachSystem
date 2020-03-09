@@ -5,19 +5,19 @@ const ListT = (props) => {
         <div className="listT" onClick={() => { props.fun(res.question_id) }} key={index}>
             <KnowlageName paper_name={res.paper_name} ques_content={res.ques_content} index={index} key={res.paper_id}></KnowlageName>
             <Divider dashed />
-            <Knowlage key={res.ques_id} ques_number={res.ques_number} ques_difficulty_text={res.ques_difficulty_text} color={res.btnc} index={index} ques_knowledge_name={res.ques_knowledge_name} btn={props.btn} btn2={props.btn2}></Knowlage>
+            <Knowlage id={res.ques_id} ques_number={res.ques_number} ques_difficulty_text={res.ques_difficulty_text} color={res.btnc} index={index} ques_knowledge_name={res.ques_knowledge_name} btn={props.addQuestoin} ></Knowlage>
             <div className={props.appear === res.question_id ? '' : 'question-active'} >
                 <Divider dashed />
                 <div>
                     <p className="line-shu">答案</p>
                     <p dangerouslySetInnerHTML={{
-                        __html:res.ques_answer
+                        __html: res.ques_answer
                     }}></p>
                 </div>
                 <div>
                     <p className="line-shu">解析</p>
                     <p dangerouslySetInnerHTML={{
-                        __html:res.ques_analysis
+                        __html: res.ques_analysis
                     }}></p>
                 </div>
             </div>
@@ -25,7 +25,7 @@ const ListT = (props) => {
     )
     return (
         <div>
-            {total}
+            {total ? total : ''}
         </div>
     )
 }
@@ -58,7 +58,7 @@ const Knowlage = (props) => {
                 </p>
             </div>
             <div>
-                <Button className="z-index" type={props.color ? 'primary' : 'danger'} onClick={(e) => props.btn(e, props.index)}>{props.color ? '加入试题篮' : '移除试题篮'}</Button>
+                <Button className="z-index" type={props.color ? 'danger' : 'primary'} onClick={(e) => props.btn(e, props.id)}>{props.color ? '移除试题篮' : '加入试题篮'}</Button>
             </div>
         </div>
     )

@@ -7,14 +7,15 @@ const TreeMain = (props) => {
         <div>
             <Search
                 placeholder="搜索知识点"
-                onSearch={value => console.log(value)}
+                onSearch={value => props.search(value)}
                 style={{ width: 200 }}
+                value={props.knowLageValue}
+                onChange={props.knowLageValueChange}
             />
             <TreeList tree={props.data} funt={props.funt}></TreeList>
         </div>
     )
 }
-
 const TreeList = (props) => {
     const l1 = props.tree.map((res) =>
         <TreeNode icon={<Icon type="carry-out" />} title={res.title} key={res.aitifen_id} >
