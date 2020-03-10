@@ -4,7 +4,7 @@ import Select from './selection'
 import Tree from './tree'
 import List from './list'
 import Searchbtn from './searchbtn'
-import { tree, subjectList, tkList, question, add_question_cart } from '../../axios/http'
+import { tree, subjectList, tkList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../axios/http'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
 const { Search } = Input
@@ -71,9 +71,11 @@ class tikuguanli extends Component {
                 ]
             }
             ],
+            cart_ques_ids: [],
             spin: false,
             clear: 'none',
-            count: 10
+            cardTotal: 0,
+            question_cart: []
         }
     }
     //更改筛选筛选条件查询更改params
@@ -217,6 +219,21 @@ class tikuguanli extends Component {
                 list: res.data.list
             })
         })
+        get_ques_ids_cart().then(res => {
+            this.setState({
+                cart_ques_ids: res.data.cart_ques_ids
+            })
+        })
+        get_question_cart().then(res => {
+            let cardTotal = null
+            res.data.list.forEach(res => {
+                cardTotal += Number(res.count)
+            })
+            this.setState({
+                question_cart: res.data.list,
+                cardTotal
+            })
+        })
     }
     shaixuanName = (...e) => {
         const name = []
@@ -257,6 +274,9 @@ class tikuguanli extends Component {
         // 移除监听事件
         this.state.unsubscribe()//移除监听
         window.removeEventListener('resize', this.handleSize);
+        this.setState = (state, callback) => {
+            return
+        }
     }
     // 自适应浏览器的高度
     handleSize = () => {
@@ -293,16 +313,7 @@ class tikuguanli extends Component {
             })
         })
     }
-    addQuestoin = (e, id) => {
-        e.stopPropagation()
-        add_question_cart({ ques_id: id }).then(res => {
-            if (res.code === 0) {
-                message.success(res.message)
-            } else {
-                message.error(res.message)
-            }
-        })
-    }
+
     searchKnowLage = e => {
         const params = { ...this.state.params }
         params.key_words = e
@@ -322,6 +333,93 @@ class tikuguanli extends Component {
             params
         })
     }
+    moveOrAdd = (id) => {
+        let cart_ques_ids = this.state.cart_ques_ids
+        let result = ''
+        if (typeof (cart_ques_ids) !== 'object') {
+            let strArray = cart_ques_ids.split(',')
+            strArray.forEach(res => {
+                if (res === id) {
+                    result = true
+                }
+            })
+        } else {
+            result = false
+        }
+        return result
+    }
+    addQuestoin = (e, id) => {
+        e.stopPropagation()
+        add_question_cart({ ques_id: id }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                get_ques_ids_cart().then(res => {
+                    this.setState({
+                        cart_ques_ids: res.data.cart_ques_ids
+                    })
+                })
+                get_question_cart().then(res => {
+                    let cardTotal = null
+                    res.data.list.forEach(res => {
+                        cardTotal += Number(res.count)
+                    })
+                    this.setState({
+                        question_cart: res.data.list,
+                        cardTotal
+                    })
+                })
+            } else {
+                message.error(res.message)
+            }
+        })
+    }
+    deleteQuestoin = (e, id) => {
+        e.stopPropagation()
+        remove_question_cart({ ques_id: id }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                get_ques_ids_cart().then(res => {
+                    this.setState({
+                        cart_ques_ids: res.data.cart_ques_ids
+                    })
+                })
+                get_question_cart().then(res => {
+                    let cardTotal = null
+                    res.data.list.forEach(res => {
+                        cardTotal += Number(res.count)
+                    })
+                    this.setState({
+                        question_cart: res.data.list,
+                        cardTotal
+                    })
+                })
+            } else {
+                message.error(res.message)
+            }
+        })
+    }
+    deleteLei = (id) => {
+        remove_question_type({ ques_type_id: id }).then(res => {
+            message.success(res.message)
+            get_ques_ids_cart().then(res => {
+                this.setState({
+                    cart_ques_ids: res.data.cart_ques_ids
+                })
+            })
+            get_question_cart().then(res => {
+                let cardTotal = null
+                res.data.list.forEach(res => {
+                    cardTotal += Number(res.count)
+                })
+                this.setState({
+                    question_cart: res.data.list,
+                    cardTotal
+                })
+            })
+        }).catch((err) => {
+            message.error(err)
+        })
+    }
     render() {
         return (
             <div>
@@ -330,7 +428,7 @@ class tikuguanli extends Component {
                 <div className="m-shopcar" onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <Icon type="container" style={{ margin: `0 15px 0 0` }} />
                     我的试题篮
-                    <Badge count={this.state.count} className="m-shopicon">
+                    <Badge count={this.state.cardTotal} className="m-shopicon">
                     </Badge>
                 </div>
                 <div className="topic-panel" style={{ display: this.state.clear }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
@@ -339,21 +437,23 @@ class tikuguanli extends Component {
                         <div className="topic-col">数量</div>
                         <div className="topic-col">删除</div>
                     </div>
-                    <div className="topic-bd" >
-                        <div className="topic-row">
-                            <div className="topic-col">
-                                解答题
+                    {this.state.question_cart.map(res =>
+                        <div className="topic-bd" key={res.ques_type_id}>
+                            <div className="topic-row">
+                                <div className="topic-col">
+                                    {res.ques_type_name}
                                 </div>
-                            <div className="topic-col">
-                                1
+                                <div className="topic-col">
+                                    {res.count}
                                 </div>
-                            <div className="topic-col">
-                                <Icon type="close" />
+                                <div className="topic-col">
+                                    <Icon type="close" onClick={() => this.deleteLei(res.ques_type_id)} />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                     <div className="topic-ctrls">
-                        <div className="clear-btn" >清空全部</div>
+                        {/* <div className="clear-btn" >清空全部</div> */}
                         <div className="see-btn" onClick={this.zujuan}>查看试卷</div>
                     </div>
                 </div>
@@ -363,12 +463,11 @@ class tikuguanli extends Component {
                             <div className="tree">
                                 <Tree data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage} knowLageValueChange={this.knowLageValueChange} knowLageValue={this.state.params.key_words}></Tree>
                             </div>
-
                             <div className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
                                 <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
                                 <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
                                 {/* <div className="m-scroll-list"> */}
-                                <List data={this.state.list} fun={this.add} appear={this.state.appear} addQuestoin={this.addQuestoin}></List>
+                                <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
                                 {/* </div> */}
                             </div>
                         </div>

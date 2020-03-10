@@ -5,7 +5,7 @@ const ListT = (props) => {
         <div className="listT" onClick={() => { props.fun(res.question_id) }} key={index}>
             <KnowlageName paper_name={res.paper_name} ques_content={res.ques_content} index={index} key={res.paper_id}></KnowlageName>
             <Divider dashed />
-            <Knowlage id={res.ques_id} ques_number={res.ques_number} ques_difficulty_text={res.ques_difficulty_text} color={res.btnc} index={index} ques_knowledge_name={res.ques_knowledge_name} btn={props.addQuestoin} ></Knowlage>
+            <Knowlage moveOrAdd={props.moveOrAdd} id={res.ques_id} ques_number={res.ques_number} ques_difficulty_text={res.ques_difficulty_text} color={res.btnc} index={index} ques_knowledge_name={res.ques_knowledge_name} btn={props.addQuestoin} btn2={props.deleteQuestoin}></Knowlage>
             <div className={props.appear === res.question_id ? '' : 'question-active'} >
                 <Divider dashed />
                 <div>
@@ -41,6 +41,7 @@ const KnowlageName = (props) => {
     )
 }
 const Knowlage = (props) => {
+
     return (
         <div className="shop-btn">
             <div className="know-title-div">
@@ -58,7 +59,7 @@ const Knowlage = (props) => {
                 </p>
             </div>
             <div>
-                <Button className="z-index" type={props.color ? 'danger' : 'primary'} onClick={(e) => props.btn(e, props.id)}>{props.color ? '移除试题篮' : '加入试题篮'}</Button>
+                <Button className="z-index" type={props.moveOrAdd(props.id) ? 'danger' : 'primary'} onClick={props.moveOrAdd(props.id)?(e) => props.btn2(e, props.id):(e) => props.btn(e, props.id)}>{props.moveOrAdd(props.id) ? '移除试题篮' : '加入试题篮'}</Button>
             </div>
         </div>
     )

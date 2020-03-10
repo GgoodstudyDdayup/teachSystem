@@ -19,7 +19,10 @@ export const tkList = (params) => {
 export const question = (params) => {
     return instance.post('/api/question/get_question', params)
 }
-
+//获取已添加试题
+export const get_ques_ids_cart = () => {
+    return instance.get('/api/question/get_ques_ids_cart ')
+}
 //获取真题试卷
 export const ztshijuan = (params) => {
     return instance.post('/api/paper/get_paper_list', params)
@@ -27,6 +30,10 @@ export const ztshijuan = (params) => {
 //添加到试题篮
 export const add_question_cart = (params) => {
     return instance.post('/api/question/add_question_cart', params)
+}
+//删除某个问题
+export const remove_question_cart = (params) => {
+    return instance.post('/api/question/remove_question_cart', params)
 }
 
 
@@ -107,4 +114,13 @@ export const edit_teaching_group = (params) => {
 //获取修改教研组
 export const get_teaching_group_detail = (params) => {
     return instance.post('/api/system/get_teaching_group_detail', params)
+}
+
+//获取我的试题篮(按照题型分组)
+export const get_question_cart = () => {
+    return instance.get('/api/question/get_question_cart')
+}
+//移除某类题型
+export const remove_question_type = (params) => {
+    return instance.post('/api/question/remove_question_type', params)
 }

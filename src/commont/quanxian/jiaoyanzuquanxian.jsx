@@ -259,7 +259,7 @@ class bk extends Component {
         }
         const parmas = { ...this.state.parmas }
         confirm({
-            title: `删除项目组：${e.name}`,
+            title: `删除教研组：${e.name}`,
             content: '你确定要删除吗',
             okText: '删除',
             okType: 'danger',
@@ -359,7 +359,7 @@ class bk extends Component {
         return (
             <div>
                 <Modal
-                    title="添加项目组"
+                    title="添加教研组"
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
@@ -385,7 +385,7 @@ class bk extends Component {
 
                 </Modal>
                 <Modal
-                    title="修改项目组"
+                    title="修改教研组"
                     visible={this.state.visible2}
                     onOk={this.handleOk2}
                     onCancel={this.handleCancel}
@@ -423,7 +423,7 @@ class bk extends Component {
                     </Button>
                 </div>
                 <div className="m-bottom">
-                    <Button type="primary" onClick={this.showModal}>添加项目组</Button>
+                    <Button type="primary" onClick={this.showModal}>添加教研组</Button>
                 </div>
                 <Table rowKey={record => record.key} columns={columns} dataSource={this.state.data} pagination={false} scroll={{ y: 500 }} />
                 <Pagination className="m-Pleft" current={this.state.parmas.page} onChange={this.changePage} total={this.state.totalCount} />
