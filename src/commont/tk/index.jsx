@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Input, message } from 'antd';
+import { Tabs, Spin, Badge, Icon, Input, message, BackTop } from 'antd';
 import Select from './selection'
 import Tree from './tree'
 import List from './list'
@@ -14,8 +14,7 @@ class tikuguanli extends Component {
         super(props)
         this.state = {
             list: [
-                { appear: false, btnc: true },
-                { appear: true, btnc: true }
+
             ],
             params: {
                 subject_id: 38,
@@ -27,8 +26,8 @@ class tikuguanli extends Component {
                 source_id: '',
                 grade_id: '',
                 key_words: '',
-                page: '',
-                page_size: ''
+                page: 1,
+                page_size: 20
             },
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
@@ -195,18 +194,13 @@ class tikuguanli extends Component {
         }
     }
     componentDidMount() {
-        window.addEventListener('resize', this.handleSize);
-        this.handleSize()
-        const params = this.state.params
+        const params = { ...this.state.params }
         //获取科目的数据
         subjectList().then(res => {
             store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
         })
         //获取默认tree的数据
-        const subject_id = {
-            subject_id: 38
-        }
-        tree(subject_id).then(res => {
+        tree({ subject_id: params.subject_id }).then(res => {
             this.setState({
                 tree: res.data.list
             })
@@ -219,11 +213,6 @@ class tikuguanli extends Component {
                 list: res.data.list
             })
         })
-        get_ques_ids_cart().then(res => {
-            this.setState({
-                cart_ques_ids: res.data.cart_ques_ids
-            })
-        })
         get_question_cart().then(res => {
             let cardTotal = null
             res.data.list.forEach(res => {
@@ -234,6 +223,15 @@ class tikuguanli extends Component {
                 cardTotal
             })
         })
+        get_ques_ids_cart().then(res => {
+            this.setState({
+                cart_ques_ids: res.data.cart_ques_ids
+            })
+        })
+        window.addEventListener('resize', this.handleSize);
+        this.handleSize()
+
+
     }
     shaixuanName = (...e) => {
         const name = []
@@ -280,7 +278,6 @@ class tikuguanli extends Component {
     }
     // 自适应浏览器的高度
     handleSize = () => {
-        console.log(document.body.clientHeight)
         this.setState({
             height: document.body.clientHeight,
         });
@@ -423,6 +420,7 @@ class tikuguanli extends Component {
     render() {
         return (
             <div>
+
                 <Spin tip="加载中..." size="large" className={this.state.spin ? 'm-spin' : 'm-spin-dis'} />
                 <Select selectonChange={this.selectonChange} data={this.state.options}></Select>
                 <div className="m-shopcar" onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
@@ -463,11 +461,13 @@ class tikuguanli extends Component {
                             <div className="tree">
                                 <Tree data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage} knowLageValueChange={this.knowLageValueChange} knowLageValue={this.state.params.key_words}></Tree>
                             </div>
-                            <div className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
+                            <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
                                 <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
                                 <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
                                 {/* <div className="m-scroll-list"> */}
-                                <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
+                                <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}>
+                                </List>
+                                <BackTop target={() => document.getElementById('scroll-y')} />
                                 {/* </div> */}
                             </div>
                         </div>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Input, message } from 'antd';
+import { Tabs, Spin, Badge, Icon, Input, message,BackTop } from 'antd';
 import Select from './selection'
 import Know from './knowlist'
 import List from './list'
@@ -15,8 +15,7 @@ class tikuguanli2 extends Component {
         super(props)
         this.state = {
             list: [
-                { appear: false, btnc: true },
-                { appear: true, btnc: true }
+                
             ],
             searchList: [{
                 name: '题型',
@@ -45,7 +44,7 @@ class tikuguanli2 extends Component {
                 difficulty_id: '',
                 key_words: '',
                 page: 1,
-                page_size: 10
+                page_size: 20
             },
             cart_ques_ids: '',
             options: store.getState().XueKeList,
@@ -200,6 +199,11 @@ class tikuguanli2 extends Component {
             this.setState({
                 question_cart: res.data.list,
                 cardTotal
+            })
+        })
+        get_ques_ids_cart().then(res => {
+            this.setState({
+                cart_ques_ids: res.data.cart_ques_ids
             })
         })
         window.addEventListener('resize', this.handleSize);
@@ -395,12 +399,13 @@ class tikuguanli2 extends Component {
                             <div className="tree">
                                 <Know params={this.state.params}></Know>
                             </div>
-                            <div className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
+                            <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
                                 <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
                                 <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
                                 {/* <div className="m-scroll-list"> */}
                                 <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
                                 {/* </div> */}
+                                <BackTop target={() => document.getElementById('scroll-y')} />
                             </div>
                         </div>
                     </TabPane>

@@ -38,7 +38,6 @@ class main extends Component {
     }
     // 自适应浏览器的高度
     handleSize = () => {
-        console.log(document.body.clientHeight)
         this.setState({
             height: document.body.clientHeight,
         });
@@ -49,7 +48,6 @@ class main extends Component {
         });
     };
     handleClick = (e) => {
-        console.log(e)
     }
     render() {
         return (
@@ -68,16 +66,18 @@ class main extends Component {
                                 </span>
                             }
                         >
-                            <Menu.ItemGroup title="Item 1">
-                                <Menu.Item key="1">
-                                    <Link to="/main">Option 1</Link>
-                                </Menu.Item>
-                                <Menu.Item key="2">Option 2</Menu.Item>
-                            </Menu.ItemGroup>
-                            <Menu.ItemGroup title="Iteom 2">
-                                <Menu.Item key="3">Option 3</Menu.Item>
-                                <Menu.Item key="4">Option 4</Menu.Item>
-                            </Menu.ItemGroup>
+                            <Menu.Item key="1">
+                                <Link to="/main">知识点</Link>
+                            </Menu.Item>
+                            <Menu.Item key="2">
+                                <Link to="/main/tk/system">真题试卷</Link>
+                            </Menu.Item>
+                            <Menu.Item key="3">
+                                <Link to="/main/tk/own">机构私库</Link>
+                            </Menu.Item>
+                            <Menu.Item key="4">
+                                <Link to="/main/tk/mine">知识点</Link>
+                            </Menu.Item>
                         </SubMenu>
                         <SubMenu
                             key="sub2"
@@ -90,7 +90,7 @@ class main extends Component {
                         >
                             <Menu.Item key="5">
                                 <Link to="/main/bk">课程表</Link></Menu.Item>
-                            <Menu.Item key="7">
+                            <Menu.Item key="6">
                                 <Link to="/main/bk/prograss">审核进度</Link></Menu.Item>
                         </SubMenu>
                         <SubMenu
@@ -102,10 +102,10 @@ class main extends Component {
                                 </span>
                             }
                         >
-                            <Menu.Item key="9">Option 9</Menu.Item>
-                            <Menu.Item key="10">Option 10</Menu.Item>
-                            <Menu.Item key="11">Option 11</Menu.Item>
-                            <Menu.Item key="12">Option 12</Menu.Item>
+                            <Menu.Item key="7">Option 9</Menu.Item>
+                            <Menu.Item key="8">Option 10</Menu.Item>
+                            <Menu.Item key="9">Option 11</Menu.Item>
+                            <Menu.Item key="10">Option 12</Menu.Item>
                         </SubMenu>
                         <SubMenu
                             key="sub5"
@@ -116,10 +116,10 @@ class main extends Component {
                                 </span>
                             }
                         >
-                            <Menu.Item key="9">
+                            <Menu.Item key="11">
                                 <Link to="/main/quanxian">权限分配</Link>
                             </Menu.Item>
-                            <Menu.Item key="10">
+                            <Menu.Item key="12">
                                 <Link to="/main/jiaoyanzu">教研组</Link>
                             </Menu.Item>
                         </SubMenu>
@@ -132,10 +132,10 @@ class main extends Component {
                                 </span>
                             }
                         >
-                            <Menu.Item key="11">
+                            <Menu.Item key="13">
                                 <Link to="/main/resourceCenter/recommended">推荐资源</Link>
                             </Menu.Item>
-                            <Menu.Item key="12">
+                            <Menu.Item key="14">
                                 <Link to="/main/resourceCenter/myresources/wenjianjia">我的资源</Link>
                             </Menu.Item>
                         </SubMenu>

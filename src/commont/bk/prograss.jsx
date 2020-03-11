@@ -20,7 +20,7 @@ class bk extends Component {
                 subject_id: '',
                 check_status: '',
                 name: '',
-                is_team: -1,
+                is_team: 1,
                 starttime: '',
                 endtime: '',
                 page: 1,
@@ -28,7 +28,7 @@ class bk extends Component {
             },
             textArea: '',
             title: '',
-            value2: -1,
+            value2: 1,
             value3: -1,
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {

@@ -168,7 +168,6 @@ class bk extends Component {
             visible: false,
             fileList: [],
             title: '',
-            fileList: [],
             checkList: [],
             upParmas: {
                 subject_id: '',

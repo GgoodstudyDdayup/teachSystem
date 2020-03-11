@@ -46,6 +46,7 @@ class Login extends Component {
                     onClose: () => {
                         localStorage.setItem("token",res.data.data.user_info.token);//设置b为"isaac"
                         //将获取到的token放入redux中
+                        // window.location.href = "/main"
                         this.props.history.push("/main")
                     },
                     duration: 1

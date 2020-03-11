@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal, Pagination, message, Input, Select } from 'antd';
-import { add_teaching_group, del_teaching_group, loginUserList, get_teaching_group, get_teaching_group_detail ,edit_teaching_group} from '../../axios/http'
+import { add_teaching_group, del_teaching_group, loginUserList, get_teaching_group, get_teaching_group_detail, edit_teaching_group } from '../../axios/http'
 const { confirm } = Modal;
 const { Option } = Select;
 class bk extends Component {
@@ -195,6 +195,9 @@ class bk extends Component {
             parmas
         })
     }
+
+
+
     detail = e => {
         let teaching_group_id = { teaching_group_id: e.id }
         const upParmas = this.state.upParmas
@@ -205,32 +208,35 @@ class bk extends Component {
             page_size: 100,
         }).then(res => {
             const children = res.data.list.map((res, index) => {
-                console.log(res)
-                return <Option key={res.id}>{res.name}</Option>
+                return <Option key={res.name} value={res.name}>{res.name}</Option>
             })
             this.setState({
                 children,
+                visible2: true,
                 user_list: res.data.list,
                 teaching_group_id: e.id
             })
-        })
-        get_teaching_group_detail(teaching_group_id).then(res => {
-            upParmas.group_admin_id = res.data.model.group_admin_id
-            let member_ids = ''
-            let member_idsList = []
-            res.data.teaching_group_teacher_rela.forEach(res => {
-                if (res.member_admin_id !== '0') {
-                    member_ids += res.member_admin_id + ','
-                    member_idsList.push(res.member_admin_id)
-                }
-            })
-            upParmas.member_ids = member_ids
-            upParmas.name = res.data.model.name
-            this.setState({
-                upParmas,
-                visible2: true,
-                zuzhang: res.data.model.group_leader,
-                zuyuan: member_idsList
+            return res
+        }).then(item => {
+            get_teaching_group_detail(teaching_group_id).then(res => {
+                upParmas.group_admin_id = res.data.model.group_admin_id
+                let member_ids = ''
+                let member_idsList = []
+                res.data.teaching_group_teacher_rela.forEach(res => {
+                    item.data.list.forEach(l1=>{
+                        if (res.member_admin_id === l1.id) {
+                            member_ids += l1.id + ','
+                            member_idsList.push(l1.name)
+                        }
+                    })
+                })
+                upParmas.member_ids = member_ids
+                upParmas.name = res.data.model.name
+                this.setState({
+                    upParmas,
+                    zuzhang: res.data.model.group_leader,
+                    zuyuan: member_idsList
+                })
             })
         })
     }
@@ -242,7 +248,7 @@ class bk extends Component {
             page_size: 100,
         }).then(res => {
             const children = res.data.list.map((res, index) => {
-                return <Option key={res.id}>{res.name}</Option>
+                return <Option key={res.name} value={res.name} >{res.name}</Option>
             })
             this.setState({
                 visible: true,
@@ -252,6 +258,10 @@ class bk extends Component {
         })
 
     };
+
+
+
+
     delete = e => {
         const that = this
         let teaching_group_id = {
@@ -289,13 +299,12 @@ class bk extends Component {
         });
     }
     selsectZuyuan = e => {
-        console.log(e)
         const user_list = this.state.user_list
         const upParmas = { ...this.state.upParmas }
         let member_ids = ''
         e.forEach(res => {
             user_list.forEach(item => {
-                if (res === item.id) {
+                if (res === item.name) {
                     member_ids += `${item.id},`
                 }
             })
@@ -307,19 +316,18 @@ class bk extends Component {
         })
     }
     selsectZuzhang = e => {
-        console.log(e)
         const user_list = this.state.user_list
         const upParmas = { ...this.state.upParmas }
         let group_admin_id = ''
         user_list.forEach(item => {
-            if (e === item.id) {
+            if (e === item.name) {
                 group_admin_id = item.id
             }
         })
         upParmas.group_admin_id = group_admin_id
         this.setState({
             upParmas,
-            zuzhang: group_admin_id
+            zuzhang: e
         })
     }
     render() {
@@ -372,13 +380,13 @@ class bk extends Component {
                     </div>
                     <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
                         <span className="m-row" style={{ textAlign: 'right' }}>教学组长：</span>
-                        <Select style={{ width: '100%' }} onChange={this.selsectZuzhang} value={this.state.zuzhang} placeholder="点击添加教学组长(单选)">
+                        <Select style={{ width: '100%' }} showSearch optionFilterProp="children"  onChange={this.selsectZuzhang} value={this.state.zuzhang} placeholder="点击添加教学组长(单选)">
                             {this.state.children}
                         </Select>
                     </div>
                     <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
                         <span className="m-row" style={{ textAlign: 'right' }}>组员：</span>
-                        <Select mode="tags" style={{ width: '100%' }} onChange={this.selsectZuyuan} value={this.state.zuyuan} tokenSeparators={[',']} placeholder="点击添加教学组员可多选O(∩_∩)O">
+                        <Select mode="multiple" style={{ width: '100%' }} onChange={this.selsectZuyuan} value={this.state.zuyuan} tokenSeparators={[',']} placeholder="点击添加教学组员可多选O(∩_∩)O">
                             {this.state.children}
                         </Select>
                     </div>
@@ -398,13 +406,13 @@ class bk extends Component {
                     </div>
                     <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
                         <span className="m-row" style={{ textAlign: 'right' }}>教学组长：</span>
-                        <Select style={{ width: '100%' }} onChange={this.selsectZuzhang} value={this.state.zuzhang} placeholder="点击添加教学组长(单选)">
+                        <Select style={{ width: '100%' }} showSearch optionFilterProp="children"  onChange={this.selsectZuzhang} value={this.state.zuzhang} placeholder="点击添加教学组长(单选)">
                             {this.state.children}
                         </Select>
                     </div>
                     <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
                         <span className="m-row" style={{ textAlign: 'right' }}>组员：</span>
-                        <Select mode="tags" style={{ width: '100%' }} onChange={this.selsectZuyuan} value={this.state.zuyuan} tokenSeparators={[',']} placeholder="点击添加教学组员可多选O(∩_∩)O">
+                        <Select mode="multiple" style={{ width: '100%' }} onChange={this.selsectZuyuan} value={this.state.zuyuan} tokenSeparators={[',']} placeholder="点击添加教学组员可多选O(∩_∩)O">
                             {this.state.children}
                         </Select>
                     </div>
