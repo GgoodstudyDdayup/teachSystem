@@ -13,7 +13,7 @@ class router extends Component {
                         <Route exact path="/" component={Login} />
                         <Route path="/main" component={Main} />
                         <Route path='/main/resourceCenter/recommended' component={resourceCenter}></Route>
-                        <Route path="/zujuan" component={Zujuan} />
+                        <Route path="/main/zujuan" component={Zujuan} />
                     </Switch>
                 </div>
             </Router>

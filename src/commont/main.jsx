@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Route, Link, Switch } from 'react-router-dom'
+import { Route, Link, Switch, withRouter } from 'react-router-dom'
 import { Layout, Menu, Icon } from 'antd';
 import Tk from './tk/index'
 import Tksystem from './tk/index2'
 import Tkown from './tk/index3'
 import Tkmine from './tk/index4'
+import Zujuan from './zujuan/zujuan'
 import Recommended from './resourceCenter/recommended/index/index'
 import RecommendedReal from './resourceCenter/recommended/real/real'
 import RecommendedShare from './resourceCenter/recommended/share/share'
@@ -25,7 +26,7 @@ class main extends Component {
         super(opt)
         this.state = {
             height: '',
-            collapsed: false
+            collapsed: false,
         }
     }
     componentDidMount() {
@@ -36,6 +37,7 @@ class main extends Component {
         // 移除监听事件
         window.removeEventListener('resize', this.handleSize);
     }
+
     // 自适应浏览器的高度
     handleSize = () => {
         this.setState({
@@ -52,7 +54,6 @@ class main extends Component {
     render() {
         return (
             <Layout style={{ height: this.state.height }}>
-
                 <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
                     <div className="logoicon">
                     </div>
@@ -156,6 +157,7 @@ class main extends Component {
                             background: '#fff',
                             minHeight: 280,
                         }}
+                        className={this.props.location.pathname === '/main/zujuan' ? 'conntent-none' : ''}
                     >
                         <Switch>
                             {/* 题库管理 */}
@@ -164,6 +166,8 @@ class main extends Component {
                             <Route path="/main/tk/own" component={Tkown} />
                             <Route path="/main/tk/mine" component={Tkmine} />
                             <Route path="/main/question" component={Tkquestion} />
+
+
                             {/* 资源中心的推荐资源 */}
                             <Route path="/main/resourceCenter/recommended" exact component={Recommended}></Route>
                             <Route path="/main/resourceCenter/recommended/jigousiku" component={RecommendedJigousiku}></Route>
@@ -182,9 +186,13 @@ class main extends Component {
                             <Route path="/main/cp" component={CP} />
                         </Switch>
                     </Content>
+                    <div style={{ padding: 24, minHeight: 280 }} className={this.props.location.pathname === '/main/zujuan' ? '' : 'conntent-none'}>
+                        <Route path="/main/zujuan" component={Zujuan} />
+                    </div>
                 </Layout>
             </Layout>
+
         );
     }
 }
-export default main;
+export default withRouter(main) 

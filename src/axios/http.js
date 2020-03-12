@@ -124,3 +124,9 @@ export const get_question_cart = () => {
 export const remove_question_type = (params) => {
     return instance.post('/api/question/remove_question_type', params)
 }
+
+//获取我的试题篮(按照题型分组)
+export const get_next_cart = () => {
+    return instance.get('/api/question/get_next_cart')
+}
+

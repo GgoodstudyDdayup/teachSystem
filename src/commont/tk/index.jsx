@@ -298,7 +298,7 @@ class tikuguanli extends Component {
         }
     }
     zujuan = () => {
-        this.props.history.push('/zujuan')
+        this.props.history.push('/main/zujuan')
     }
     selectonChange = (value) => {
         const params = { ...this.state.params }
