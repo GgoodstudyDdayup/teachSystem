@@ -108,7 +108,7 @@ class main extends Component {
                             <Menu.Item key="9">Option 11</Menu.Item>
                             <Menu.Item key="10">Option 12</Menu.Item>
                         </SubMenu>
-                        <SubMenu
+                        {localStorage.getItem("permission") === '1'||localStorage.getItem("permission") === '2' ? <SubMenu
                             key="sub5"
                             title={
                                 <span>
@@ -123,7 +123,8 @@ class main extends Component {
                             <Menu.Item key="12">
                                 <Link to="/main/jiaoyanzu">教研组</Link>
                             </Menu.Item>
-                        </SubMenu>
+                        </SubMenu> : ''}
+
                         <SubMenu
                             key="sub6"
                             title={

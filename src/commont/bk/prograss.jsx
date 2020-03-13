@@ -334,10 +334,13 @@ class bk extends Component {
                 title: '操作',
                 key: 'action',
                 render: (text) => (
-                    <span>
-                        {text.check_status === '-1' || text.check_status === '2' ? <Button type="primary" onClick={() => this.showModal(text.id, text.file, text.course_id)}>审核课件</Button> : ''}
-                    </span>
-                ),
+                    <div>
+                        {localStorage.getItem("teacher_type") === '4' ? <Tag color='volcano'>暂无权限</Tag> : <span>
+                            {text.check_status === '-1' || text.check_status === '2' ? <Button type="primary" onClick={() => this.showModal(text.id, text.file, text.course_id)}>审核课件</Button> : ''}
+                        </span>}
+                    </div>
+
+                )
             },
         ];
         return (

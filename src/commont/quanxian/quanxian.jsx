@@ -72,46 +72,50 @@ class bk extends Component {
         let time = myDate.toLocaleDateString().split("/").join("-");
         const parmas = this.state.parmas
         parmas['starttime'] = time
-        quanxianList().then(res => {
-            let permission = res.data.list
-            permission.unshift({
-                id: '',
-                name: '不限'
+        if (localStorage.getItem('permission') === '1' || localStorage.getItem('permission') === '2') {
+            quanxianList().then(res => {
+                let permission = res.data.list
+                permission.unshift({
+                    id: '',
+                    name: '不限'
+                })
+                this.setState({
+                    permission
+                })
+                // store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
             })
-            this.setState({
-                permission
+            loginUserList(parmas).then(res => {
+                const list = res.data.list.map((res, index) => {
+                    res.key = `${index}`
+                    return res
+                })
+                this.setState({
+                    data: list,
+                    totalCount: Number(res.data.total_count)
+                })
             })
-            // store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
-        })
-        loginUserList(parmas).then(res => {
-            const list = res.data.list.map((res, index) => {
-                res.key = `${index}`
-                return res
+            grade_id_List().then(res => {
+                const grade_list2 = res.data.grade_list.map(res => {
+                    return res.name
+                })
+                this.setState({
+                    grade_list: res.data.grade_list,
+                    grade_list2
+                })
             })
-            this.setState({
-                data: list,
-                totalCount: Number(res.data.total_count)
+            object_id_List().then(res => {
+                const own_subject_list2 = res.data.own_subject_list.map(res => {
+                    return res.name
+                })
+                this.setState({
+                    own_subject_list: res.data.own_subject_list,
+                    own_subject_list2
+                })
             })
-        })
-        grade_id_List().then(res => {
-            const grade_list2 = res.data.grade_list.map(res => {
-                return res.name
-            })
-            this.setState({
-                grade_list: res.data.grade_list,
-                grade_list2
-            })
-        })
-        object_id_List().then(res => {
-            const own_subject_list2 = res.data.own_subject_list.map(res => {
-                return res.name
-            })
-            this.setState({
-                own_subject_list: res.data.own_subject_list,
-                own_subject_list2
-            })
-        })
-
+        } else {
+            this.props.history.push("/main")
+            message.error('暂时无权限')
+        }
 
     }
     quanxianList = (list) => {
@@ -444,6 +448,7 @@ class bk extends Component {
         const upParmas = this.state.upParmas
         let value = this.state.value
         let value3 = this.state.value3
+
         get_user_detail(user_id).then(res => {
             upParmas.name = res.data.model.name
             upParmas.username = res.data.model.username
@@ -491,6 +496,8 @@ class bk extends Component {
             }
 
         })
+
+
     }
     delete = e => {
         const that = this

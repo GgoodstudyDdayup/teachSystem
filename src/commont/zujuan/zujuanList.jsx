@@ -4,7 +4,6 @@ import { Divider, Button } from 'antd';
 // import MathJax from 'simple-react-mathjax'
 import MathJax from 'react-mathjax3'
 const ListT = (props) => {
-    console.log(props)
     const total = props.data.map((res, index) =>
         <MathJax.Context
             key={index}
@@ -53,7 +52,6 @@ const ListT = (props) => {
     )
 }
 const Knowlage = (props) => {
-    console.log(props)
     return (
         <div className="shop-btn">
             <div className="know-title-div">

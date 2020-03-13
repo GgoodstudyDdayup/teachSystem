@@ -44,9 +44,11 @@ class Login extends Component {
                 message.success({
                     content: `${res.data.message}`,
                     onClose: () => {
-                        localStorage.setItem("token",res.data.data.user_info.token);//设置b为"isaac"
-                        //将获取到的token放入redux中
-                        // window.location.href = "/main"
+                        console.log(res.data.data.user_info)
+                        localStorage.setItem("token", res.data.data.user_info.token)
+                        localStorage.setItem("username", params.username)
+                        localStorage.setItem("teacher_type", res.data.data.user_info.teacher_type)
+                        localStorage.setItem("permission", res.data.data.user_info.permission)
                         this.props.history.push("/main")
                     },
                     duration: 1

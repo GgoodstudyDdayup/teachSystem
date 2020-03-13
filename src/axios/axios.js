@@ -12,11 +12,14 @@ axios.defaults.transformRequest = [
 ]
 const instance = axios.create({
     headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/x-www-form-urlencoded",
     },
-    // withCredentials: true,
+    // withCredentials: true
 })
 instance.interceptors.request.use(function (config) {
+    config.headers['username'] = localStorage.getItem("username")
+    config.headers['token'] = localStorage.getItem("token")
+    console.log(config.headers)
     //在发送请求之前做某事，比如加一个loading
     // console.log(store.getState())
     // if (store.getState().UserState.token) {
@@ -33,7 +36,12 @@ instance.interceptors.request.use(function (config) {
 });
 
 instance.interceptors.response.use(response => {
-    return response.data
+    if (response.data.code === '404') {
+        console.log(response.data)
+        // window.location.replace("/");
+    } else {
+        return response.data
+    }
 }, err => {
     return Promise.reject(err);
 });

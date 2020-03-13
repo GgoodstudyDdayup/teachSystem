@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Input, Button } from 'antd';
+import MathJax from 'react-mathjax3'
 import { get_next_cart } from '../../axios/http'
 import List from './zujuanList'
 //初始化数据
@@ -56,6 +57,7 @@ export default class ReactBeautifulDnd extends Component {
             list: [
             ],
             setIndex: 1,
+            biaotiTitle: '点击修改试卷标题',
             appear: ''
         };
         this.onDragEnd = this.onDragEnd.bind(this);
@@ -129,6 +131,11 @@ export default class ReactBeautifulDnd extends Component {
             setIndex: e
         })
     }
+    biaotiTitle = (e) => {
+        this.setState({
+            biaotiTitle: e.target.value
+        })
+    }
     render() {
         return (
             <div style={{ background: '#F5F5F5', display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
@@ -140,9 +147,9 @@ export default class ReactBeautifulDnd extends Component {
                     </div>
 
                     <div className={this.state.setIndex === 3 ? "paper-hd-title paper-hd-title-active " : 'paper-hd-title active'} style={{ background: '#fff', flex: 1 }} onClick={() => this.changeSetIndex(3)}>
-                        <h3>2020年02月14日初中历史试卷</h3>
+                        <h3>{this.state.biaotiTitle}</h3>
                     </div>
-                    <div className={this.state.setIndex === 2 ? "paper-hd-title paper-hd-title-active " : 'paper-hd-title active'} style={{ width: '100%', textAlign: 'start', background: '#fff', flex: 1, display: 'flex',justifyContent:'center' }} onClick={() => this.changeSetIndex(2)}>
+                    <div className={this.state.setIndex === 2 ? "paper-hd-title paper-hd-title-active " : 'paper-hd-title active'} style={{ width: '100%', textAlign: 'start', background: '#fff', flex: 1, display: 'flex', justifyContent: 'center' }} onClick={() => this.changeSetIndex(2)}>
                         <div className="set-item" >总分：<span>1分</span></div>
                         <div className="set-item">答题时间：<span>120</span>分钟</div>
                         <div className="set-item" >日期：<span className="line"></span></div>
@@ -179,8 +186,34 @@ export default class ReactBeautifulDnd extends Component {
                                                                 )}
                                                             >
                                                                 <div className="know-name-m">
-                                                                    <span className="know-name">{index + 1}(2019天津市期末测试卷)</span>
-                                                                    <span className="know-ques">{index + 1 + item.ques_content}</span>
+                                                                    <span className="know-ques">
+                                                                        <MathJax.Context
+                                                                            key={index}
+                                                                            input='tex'
+                                                                            onError={(MathJax, error) => {
+                                                                                console.warn(error);
+                                                                                console.log("Encountered a MathJax error, re-attempting a typeset!");
+                                                                                MathJax.Hub.Queue(
+                                                                                    MathJax.Hub.Typeset()
+                                                                                );
+                                                                            }}
+                                                                            script="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js"
+                                                                            options={{
+                                                                                messageStyle: 'none',
+                                                                                extensions: ['tex2jax.js'],
+                                                                                jax: ['input/TeX', 'output/HTML-CSS'],
+                                                                                tex2jax: {
+                                                                                    inlineMath: [['$', '$'], ['\\(', '\\)']],
+                                                                                    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                                                                                    processEscapes: true,
+                                                                                },
+                                                                                TeX: {
+                                                                                    extensions: ['AMSmath.js', 'AMSsymbols.js', 'noErrors.js', 'noUndefined.js']
+                                                                                }
+                                                                            }}>
+                                                                            <MathJax.Html html={item.ques_content} />
+                                                                        </MathJax.Context>
+                                                                    </span>
                                                                 </div>
                                                                 <div className="zujuan-m">
                                                                     <span style={{ width: 100, display: 'inline-block' }}>分值：</span>
@@ -221,14 +254,18 @@ export default class ReactBeautifulDnd extends Component {
                                     <div className="structure-header">
                                         <div>总分：1分</div>
                                     </div>
-                                    <div className="structure-panel">
-                                        <div className="structure-hd">
-                                            <span>一、选择题</span>
+                                    {this.state.list.map((res, index) =>
+                                        <div className="structure-panel" key={index}>
+                                            <div className="structure-hd">
+                                                <span>{ res.ques_type_name}</span>
+                                            </div>
+                                            <div className="structure-bd">
+                                                {res.ques_list.map((res, index) =>
+                                                    <span className="active" key={index}>{index + 1}</span>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="structure-bd">
-                                            <span className="active">1</span><span className="">2</span><span className="">3</span><span className="">4</span><span className="">5</span>
-                                        </div>
-                                    </div>
+                                    )}
                                 </div> : ''}
                             </div>
                         </div>
@@ -260,8 +297,7 @@ export default class ReactBeautifulDnd extends Component {
                                     <span className="hd-title">试卷标题修改</span>
                                 </div>
                                 <div className="bd">
-                                    <Input>
-                                    </Input>
+                                    <Input value={this.state.biaotiTitle} onChange={this.biaotiTitle}></Input>
                                 </div>
                             </div>
                         </div> : ''}
