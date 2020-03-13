@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Table, Button, Modal, Radio, Pagination, message, Input, Checkbox, Tag } from 'antd';
 import { add_user, quanxianList, loginUserList, grade_id_List, object_id_List, delete_user, get_user_detail, edit_user, change_password } from '../../axios/http'
 const { confirm } = Modal;
+
+
 class bk extends Component {
     constructor(props) {
         super(props)
@@ -48,6 +50,7 @@ class bk extends Component {
             visible: false,
             visible3: false,
             permission: [],
+            permission2:[],
             data: [
                 {
                     key: '11',
@@ -75,13 +78,39 @@ class bk extends Component {
         if (localStorage.getItem('permission') === '1' || localStorage.getItem('permission') === '2') {
             quanxianList().then(res => {
                 let permission = res.data.list
-                permission.unshift({
-                    id: '',
-                    name: '不限'
-                })
-                this.setState({
-                    permission
-                })
+                if (localStorage.getItem('permission') === '2') {
+                    const newPermission = permission.reduce((item, res) => {
+                        if (res.id !== '1' && res.id !== '2') {
+                            item.push(res)
+                        }
+                        return item
+                    }, [])
+                    permission.unshift({
+                        id: '',
+                        name: '不限'
+                    })
+                    this.setState({
+                        permission: newPermission,
+                        permission2:permission
+                    })
+                } else {
+                    const newPermission = permission.reduce((item, res) => {
+                        if (res.id !== '1') {
+                            item.push(res)
+                        }
+                        return item
+                    }, [])
+                    permission.unshift({
+                        id: '',
+                        name: '不限'
+                    })
+                    this.setState({
+                        permission: newPermission,
+                        permission2:permission
+                    })
+                    console.log(this.state.permission2)
+                }
+
                 // store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
             })
             loginUserList(parmas).then(res => {
@@ -368,6 +397,7 @@ class bk extends Component {
             upParmas
         });
     }
+    //这是查询的
     onchangeTuanduiRadio = (e) => {
         const parmas = this.state.parmas
         parmas.permission = e.target.value
@@ -377,7 +407,7 @@ class bk extends Component {
         })
     }
 
-
+    //这是修改的
     onchangeStateRadio = (e) => {
         const upParmas = this.state.upParmas
         upParmas.permission = e.target.value
@@ -419,7 +449,25 @@ class bk extends Component {
         }
     }
     quanxianTag = (e) => {
-        const permission = this.state.permission
+        const permission = [{
+            id: '1',
+            name: "系统管理员"
+        }, {
+            id: '2',
+            name: "管理员"
+        }, {
+            id: '3',
+            name: "老师"
+        }, {
+            id: '4',
+            name: "教务"
+        }, {
+            id: '5',
+            name: "招生负责人"
+        }, {
+            id: '6',
+            name: "前台"
+        }]
         let name = ''
         permission.forEach(res => {
             if (res.id === e) {
@@ -541,6 +589,54 @@ class bk extends Component {
             visible3: true,
         })
     }
+    quanxianAction = e => {
+        if (localStorage.getItem('permission') === '1') {
+            if (e.permission === '1') {
+                const btnPermission = (
+                    <div>
+                        <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
+                        {/* <Button className="m-left" type="primary" onClick={() => this.detail(e)}>修改</Button> */}
+                    </div>
+                )
+                return btnPermission
+            } else {
+                const btnPermission = (
+                    <div>
+                        <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
+                        <Button className="m-left" type="primary" onClick={() => this.detail(e)}>修改</Button>
+                        <Button className="m-left" type="danger" onClick={() => this.delete(e)}>删除</Button>
+                    </div>
+                )
+                return btnPermission
+            }
+        } else if (localStorage.getItem('permission') === '2') {
+            if (e.permission === '1') {
+                return <Tag color='volcano' >暂无权限</Tag>
+            } else if (e.permission === '2' && e.username !== localStorage.getItem('username')) {
+                return <Tag color='volcano' >暂无权限</Tag>
+            } else if (e.permission === '2' && e.username === localStorage.getItem('username')) {
+                const btnPermission = (
+                    <div>
+                        <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
+                    </div>
+                )
+                return btnPermission
+            } else {
+                const btnPermission = (
+                    <div>
+                        <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
+                        <Button className="m-left" type="primary" onClick={() => this.detail(e)}>修改</Button>
+                        <Button className="m-left" type="danger" onClick={() => this.delete(e)}>删除</Button>
+                    </div>
+                )
+                return btnPermission
+            }
+
+        }
+        // <Button type="primary" onClick={() => this.detailPassword(text)}>修改密码</Button>
+        // <Button className="m-left" type="primary" onClick={() => this.detail(text)}>修改</Button>
+        // {text.id === '1' ? '' : <Button className="m-left" type="danger" onClick={() => this.delete(text)}>删除</Button>}
+    }
     render() {
         const columns = [
             {
@@ -598,9 +694,7 @@ class bk extends Component {
                 key: 'action',
                 render: (text) => (
                     <span>
-                        <Button type="primary" onClick={() => this.detailPassword(text)}>修改密码</Button>
-                        <Button className="m-left" type="primary" onClick={() => this.detail(text)}>修改</Button>
-                        {text.id === '1' ? '' : <Button className="m-left" type="danger" onClick={() => this.delete(text)}>删除</Button>}
+                        {this.quanxianAction(text)}
                     </span>
                 ),
             },
@@ -747,7 +841,7 @@ class bk extends Component {
                     <div className="m-left">
                         <span>权限查询: </span>
                         <Radio.Group onChange={this.onchangeTuanduiRadio} value={this.state.value2}>
-                            {this.quanxianList(this.state.permission)}
+                            {this.quanxianList(this.state.permission2)}
                         </Radio.Group>
                     </div>
                     <Button style={{ marginLeft: 10 }} onClick={this.search}>
