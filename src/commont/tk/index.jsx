@@ -309,6 +309,14 @@ class tikuguanli extends Component {
                 params
             })
         })
+        tree({ subject_id: params.subject_id }).then(res => {
+            this.setState({
+                tree: res.data.list
+            })
+        })
+        tkList({ subject_id: params.subject_id }).then(res => {
+            this.shaixuanName(res.data)
+        })
     }
 
     searchKnowLage = e => {

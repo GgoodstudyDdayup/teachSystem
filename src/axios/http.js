@@ -3,6 +3,10 @@ import { instance, loginPost } from './axios'
 export const login = (params) => {
     return loginPost.post('/api/user/login', params)
 }
+//logout
+export const logout = (params) => {
+    return loginPost.post('/api/user/logout', params)
+}
 //instance实例作为系统内部cookie验证每个接口
 export const tree = (params) => {
     return instance.post('/api/system/get_tree', params)

@@ -55,21 +55,6 @@ class bk extends Component {
             checkList: [],
             visible: false,
             data: [
-                {
-                    key: '11',
-                    time: 32,
-                    endtime: 'New York No. 1 Lake Park',
-                },
-                {
-                    key: '2',
-                    time: 42,
-                    endtime: 'London No. 1 Lake Park',
-                },
-                {
-                    key: '3',
-                    time: 32,
-                    endtime: 'Sidney No. 1 Lake Park',
-                },
             ]
         }
     }

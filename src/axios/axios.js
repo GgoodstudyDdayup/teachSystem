@@ -17,19 +17,8 @@ const instance = axios.create({
     // withCredentials: true
 })
 instance.interceptors.request.use(function (config) {
-    config.headers['username'] = localStorage.getItem("username")
-    config.headers['token'] = localStorage.getItem("token")
-    console.log(config.headers)
-    //在发送请求之前做某事，比如加一个loading
-    // console.log(store.getState())
-    // if (store.getState().UserState.token) {
-    //     config.headers['Cookie'] = store.getState().UserState.token
-    //     console.log(config)
-    //     return config;
-    // } else {
-    //     window.location.replace("/");
-    //     return false
-    // }
+    config.headers['username'] = sessionStorage.getItem("username")
+    config.headers['token'] = sessionStorage.getItem("token")
     return config
 }, function (error) {
     return Promise.reject(error);
@@ -37,8 +26,7 @@ instance.interceptors.request.use(function (config) {
 
 instance.interceptors.response.use(response => {
     if (response.data.code === '404') {
-        console.log(response.data)
-        // window.location.replace("/");
+        window.location.replace("http://zt.zhongxiaoxue.cn/node/build/#/");
     } else {
         return response.data
     }

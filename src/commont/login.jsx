@@ -16,15 +16,15 @@ class Login extends Component {
     }
     componentDidMount() {
         window.addEventListener('resize', this.handleSize);
+        document.addEventListener('keydown', this.keyDownLogin);
     }
     componentWillUnmount() {
         // 移除监听事件
         window.removeEventListener('resize', this.handleSize);
+        window.removeEventListener('keydown', this.keyDownLogin);
     }
-
     // 自适应浏览器的高度
     handleSize = () => {
-        console.log(document.body.clientHeight)
         this.setState({
             height: document.body.clientHeight,
         });
@@ -39,16 +39,14 @@ class Login extends Component {
     login = () => {
         const params = this.state.filter
         login(params).then(res => {
-            console.log(res)
             if (res.data.code === 0) {
                 message.success({
                     content: `${res.data.message}`,
                     onClose: () => {
-                        console.log(res.data.data.user_info)
-                        localStorage.setItem("token", res.data.data.user_info.token)
-                        localStorage.setItem("username", params.username)
-                        localStorage.setItem("teacher_type", res.data.data.user_info.teacher_type)
-                        localStorage.setItem("permission", res.data.data.user_info.permission)
+                        sessionStorage.setItem("token", res.data.data.user_info.token)
+                        sessionStorage.setItem("username", params.username)
+                        sessionStorage.setItem("teacher_type", res.data.data.user_info.teacher_type)
+                        sessionStorage.setItem("permission", res.data.data.user_info.permission)
                         this.props.history.push("/main")
                     },
                     duration: 1
@@ -64,12 +62,15 @@ class Login extends Component {
             message.error({
                 content: `${err.data.message}`,
                 onClose: () => {
-                    console.log('fail')
                 },
                 duration: 1
             })
-            console.log(err)
         })
+    }
+    keyDownLogin = (e) => {
+        if (e.keyCode === 13) {
+            this.login()
+        }
     }
     render() {
         return (
@@ -82,10 +83,9 @@ class Login extends Component {
                         <p>欢迎登录教学管理平台</p>
                         <div className="input-div">
                             <input type="text" name="username" value={this.state.filter.username} onChange={this.loginChange} placeholder="请输入用户名" />
-                            <input type="text" name="password" value={this.state.filter.password} onChange={this.loginChange} placeholder="请输入用密码" />
+                            <input type="password" name="password" value={this.state.filter.password} onChange={this.loginChange} placeholder="请输入用密码" />
                         </div>
-                        {/* <Link  to="/FirstPage">登录</Link> */}
-                        <div className="login-btn" onClick={this.login}>登录</div>
+                        <div className="login-btn" onClick={this.login} onKeyDown={(e) => this.keyDownLogin(e)}>登录</div>
                     </div>
                 </div>
             </div>

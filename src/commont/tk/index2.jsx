@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Input, message,BackTop } from 'antd';
+import { Tabs, Spin, Badge, Icon, Input, message, BackTop } from 'antd';
 import Select from './selection'
 import Know from './knowlist'
 import List from './list'
@@ -15,7 +15,7 @@ class tikuguanli2 extends Component {
         super(props)
         this.state = {
             list: [
-                
+
             ],
             searchList: [{
                 name: '题型',
@@ -263,6 +263,16 @@ class tikuguanli2 extends Component {
         params.subject_id = Number(e[1])
         this.setState({
             params
+        })
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list,
+                params
+            })
+        })
+        
+        tkList({ subject_id: params.subject_id }).then(res => {
+            this.shaixuanName(res.data)
         })
     }
     moveOrAdd = (id) => {

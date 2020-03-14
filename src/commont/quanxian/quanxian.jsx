@@ -75,10 +75,10 @@ class bk extends Component {
         let time = myDate.toLocaleDateString().split("/").join("-");
         const parmas = this.state.parmas
         parmas['starttime'] = time
-        if (localStorage.getItem('permission') === '1' || localStorage.getItem('permission') === '2') {
+        if (sessionStorage.getItem('permission') === '1' || sessionStorage.getItem('permission') === '2') {
             quanxianList().then(res => {
                 let permission = res.data.list
-                if (localStorage.getItem('permission') === '2') {
+                if (sessionStorage.getItem('permission') === '2') {
                     const newPermission = permission.reduce((item, res) => {
                         if (res.id !== '1' && res.id !== '2') {
                             item.push(res)
@@ -108,7 +108,6 @@ class bk extends Component {
                         permission: newPermission,
                         permission2:permission
                     })
-                    console.log(this.state.permission2)
                 }
 
                 // store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
@@ -245,7 +244,6 @@ class bk extends Component {
             })
             upParmas.grade_ids = grade
             upParmas.own_subject_ids = object
-            console.log(upParmas)
             edit_user(upParmas).then(res => {
                 if (res.code === 0) {
                     message.success(res.message)
@@ -387,7 +385,6 @@ class bk extends Component {
         });
     }
     onChangecheckbox2 = (e) => {
-        console.log(e)
         const upParmas = { ...this.state.upParmas }
         let check2 = this.state.check2
         upParmas.own_subject_ids = e
@@ -590,12 +587,11 @@ class bk extends Component {
         })
     }
     quanxianAction = e => {
-        if (localStorage.getItem('permission') === '1') {
+        if (sessionStorage.getItem('permission') === '1') {
             if (e.permission === '1') {
                 const btnPermission = (
                     <div>
                         <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
-                        {/* <Button className="m-left" type="primary" onClick={() => this.detail(e)}>修改</Button> */}
                     </div>
                 )
                 return btnPermission
@@ -609,12 +605,12 @@ class bk extends Component {
                 )
                 return btnPermission
             }
-        } else if (localStorage.getItem('permission') === '2') {
+        } else if (sessionStorage.getItem('permission') === '2') {
             if (e.permission === '1') {
                 return <Tag color='volcano' >暂无权限</Tag>
-            } else if (e.permission === '2' && e.username !== localStorage.getItem('username')) {
+            } else if (e.permission === '2' && e.username !== sessionStorage.getItem('username')) {
                 return <Tag color='volcano' >暂无权限</Tag>
-            } else if (e.permission === '2' && e.username === localStorage.getItem('username')) {
+            } else if (e.permission === '2' && e.username === sessionStorage.getItem('username')) {
                 const btnPermission = (
                     <div>
                         <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
@@ -633,9 +629,6 @@ class bk extends Component {
             }
 
         }
-        // <Button type="primary" onClick={() => this.detailPassword(text)}>修改密码</Button>
-        // <Button className="m-left" type="primary" onClick={() => this.detail(text)}>修改</Button>
-        // {text.id === '1' ? '' : <Button className="m-left" type="danger" onClick={() => this.delete(text)}>删除</Button>}
     }
     render() {
         const columns = [

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
-import { Layout, Menu, Icon } from 'antd';
+import { Layout, Menu, Icon, Avatar, Dropdown, message } from 'antd';
+import { logout } from '../axios/http'
+import { LogoutOutlined } from '@ant-design/icons'
 import Tk from './tk/index'
 import Tksystem from './tk/index2'
 import Tkown from './tk/index3'
@@ -21,6 +23,7 @@ import ZY from './zy'
 import Tkquestion from './tk/braftEditor'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
+
 class main extends Component {
     constructor(opt) {
         super(opt)
@@ -51,7 +54,25 @@ class main extends Component {
     };
     handleClick = (e) => {
     }
+    logOut = () => {
+        logout().then(res => {
+            console.log(res)
+            sessionStorage.setItem("token", '')
+            sessionStorage.setItem("username", '')
+            sessionStorage.setItem("teacher_type", '')
+            sessionStorage.setItem("permission", '')
+            this.props.history.replace("/")
+            message.success(res.data.message)
+        })
+    }
     render() {
+        const menu2 = (
+            <Menu>
+                <Menu.Item onClick={this.logOut}>
+                    <LogoutOutlined />退出登录
+                </Menu.Item>
+            </Menu>
+        )
         return (
             <Layout style={{ height: this.state.height }}>
                 <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
@@ -108,7 +129,7 @@ class main extends Component {
                             <Menu.Item key="9">Option 11</Menu.Item>
                             <Menu.Item key="10">Option 12</Menu.Item>
                         </SubMenu>
-                        {localStorage.getItem("permission") === '1'||localStorage.getItem("permission") === '2' ? <SubMenu
+                        {sessionStorage.getItem("permission") === '1' || sessionStorage.getItem("permission") === '2' ? <SubMenu
                             key="sub5"
                             title={
                                 <span>
@@ -144,12 +165,21 @@ class main extends Component {
                     </Menu>
                 </Sider>
                 <Layout>
-                    <Header style={{ background: '#fff', padding: 0 }}>
+                    <Header style={{ background: '#fff', padding: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Icon
                             className="trigger"
                             type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
                             onClick={this.toggle}
                         />
+                        <div className="m-flex" style={{ alignItems: 'center', justifyContent: 'space-between', marginRight: 50 }}>
+                            <Avatar style={{ backgroundColor: '#87d068' }} icon="user"></Avatar>
+                            <div style={{ width: 30 }}></div>
+                            <Dropdown overlay={menu2}>
+                                <div>
+                                    {sessionStorage.getItem('username')}
+                                </div>
+                            </Dropdown>
+                        </div>
                     </Header>
                     <Content
                         style={{
