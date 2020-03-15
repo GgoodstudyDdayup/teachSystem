@@ -62,17 +62,30 @@ export default class ReactBeautifulDnd extends Component {
     }
     //拖拽过后的钩子
     onDragEnd(result) {
-        console.log(result)
+        const list = this.state.list
         if (!result.destination) {
             return;
         }
+        //告诉钩子是哪一个类里面的列表拖拽
+        let newList = ''
+        list.forEach(res => {
+            if (res.id === result.destination.droppableId) {
+                newList = res.ques_list
+            }
+        })
         const items = reorder(
-            this.state.items,
+            newList,
             result.source.index,
             result.destination.index
-        );
+        )
+        //告诉list你需要改变那个ques_list
+        list.forEach(res => {
+            if (res.id === result.destination.droppableId) {
+                res.ques_list = items
+            }
+        })
         this.setState({
-            items
+            list
         });
     }
     paixuIndex = (e) => {
@@ -118,6 +131,7 @@ export default class ReactBeautifulDnd extends Component {
     // }
     componentDidMount() {
         get_next_cart().then(res => {
+            console.log(res.data.list)
             this.setState({
                 list: res.data.list
             })
@@ -198,7 +212,7 @@ export default class ReactBeautifulDnd extends Component {
                             <div className="m-zijuan-flex" key={index}>
                                 {this.state.paixuIndex === res.ques_type_id ? <DragDropContext onDragEnd={this.onDragEnd}>
                                     <center style={{ width: '100%', textAlign: 'start' }}>
-                                        <Droppable droppableId="droppable">
+                                        <Droppable droppableId={res.id}>
                                             {(provided, snapshot) => (
                                                 <div
                                                     //provided.droppableProps应用的相同元素.
@@ -215,16 +229,16 @@ export default class ReactBeautifulDnd extends Component {
                                                         <Draggable key={item.id} draggableId={item.id} index={index}>
                                                             {(provided, snapshot) => (
                                                                 <div
-                                                                ref={provided.innerRef}
-                                                                
-                                                                {...provided.draggableProps}
-                                                                {...provided.dragHandleProps}
-                                                                style={getItemStyle(
-                                                                    snapshot.isDragging,
-                                                                    provided.draggableProps.style
+                                                                    ref={provided.innerRef}
+
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                    style={getItemStyle(
+                                                                        snapshot.isDragging,
+                                                                        provided.draggableProps.style
                                                                     )}
-                                                                    >
-                                                                    
+                                                                >
+
                                                                     <div className="know-name-m">
                                                                         <span className="know-ques">
                                                                             <MathJax.Context
