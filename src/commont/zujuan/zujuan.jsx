@@ -1,12 +1,10 @@
 import React, { Component } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { Input, Button } from 'antd';
+import { Input, Button, message, Modal } from 'antd';
 import SetMain from './tixinSet'
 import MathJax from 'react-mathjax3'
-import { get_next_cart } from '../../axios/http'
+import { get_next_cart, set_ques_type_sort, set_ques_sort, set_show_type_name, remove_question_type, set_pager_score } from '../../axios/http'
 import List from './zujuanList'
-
-
 // 重新记录数组顺序
 const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
@@ -40,10 +38,7 @@ const getListStyle = () => ({
     padding: grid,
     width: '100%'
 });
-//填写分数
-const changeValue = (e, index) => {
-    console.log(e.target.value, index)
-}
+
 export default class ReactBeautifulDnd extends Component {
     constructor(props) {
         super(props);
@@ -52,6 +47,12 @@ export default class ReactBeautifulDnd extends Component {
             paixuIndex: 0,
             list: [
             ],
+            scorePublic: [{
+                ques_type_id: '',
+                total_score: 0
+            }],
+            visible: false,
+            editInput: '',
             setIndex: 1,
             tixinSet: 1,
             biaotiTitle: '点击修改试卷标题',
@@ -60,7 +61,7 @@ export default class ReactBeautifulDnd extends Component {
         };
         this.onDragEnd = this.onDragEnd.bind(this);
     }
-    //拖拽过后的钩子
+    //拖拽过后的钩子设置每个类里面题目的排序
     onDragEnd(result) {
         const list = this.state.list
         if (!result.destination) {
@@ -79,14 +80,40 @@ export default class ReactBeautifulDnd extends Component {
             result.destination.index
         )
         //告诉list你需要改变那个ques_list
-        list.forEach(res => {
-            if (res.id === result.destination.droppableId) {
-                res.ques_list = items
+        let ques_ids_sort = ''
+        items.forEach(res => {
+            ques_ids_sort += res.ques_id + ','
+        })
+        set_ques_sort({ ques_type_id: this.state.paixuIndex, ques_ids_sort: ques_ids_sort }).then(res => {
+            if (res.code === 0) {
+                get_next_cart().then(res => {
+                    this.setState({
+                        list: res.data.list
+                    })
+                })
+            } else {
+                message.warning('系统繁忙请稍后再试~~~')
             }
         })
-        this.setState({
-            list
-        });
+
+    }
+    //这是设置类型排序的异步请求
+    setItem = (data) => {
+        let type_sort = ''
+        data.forEach(res => {
+            type_sort += res.ques_type_id + ','
+        })
+        set_ques_type_sort({ ques_type_ids_sort: type_sort }).then(res => {
+            if (res.code === 0) {
+                get_next_cart().then(res => {
+                    this.setState({
+                        list: res.data.list
+                    })
+                })
+            } else {
+                message.warning('系统繁忙请稍后再试~~~')
+            }
+        })
     }
     paixuIndex = (e) => {
         this.setState({
@@ -104,36 +131,24 @@ export default class ReactBeautifulDnd extends Component {
             })
         }
     }
-    // deleteQuestoin = (e, id) => {
-    //     e.stopPropagation()
-    //     remove_question_cart({ ques_id: id }).then(res => {
-    //         if (res.code === 0) {
-    //             message.success(res.message)
-    //             get_ques_ids_cart().then(res => {
-    //                 this.setState({
-    //                     cart_ques_ids: res.data.cart_ques_ids
-    //                 })
-    //             })
-    //             get_question_cart().then(res => {
-    //                 let cardTotal = null
-    //                 res.data.list.forEach(res => {
-    //                     cardTotal += Number(res.count)
-    //                 })
-    //                 this.setState({
-    //                     question_cart: res.data.list,
-    //                     cardTotal
-    //                 })
-    //             })
-    //         } else {
-    //             message.error(res.message)
-    //         }
-    //     })
-    // }
     componentDidMount() {
         get_next_cart().then(res => {
-            console.log(res.data.list)
+            const scorePublic = res.data.list.reduce((item, res) => {
+                item.push({
+                    ques_type_id: res.ques_type_id,
+                    total_score: res.ques_score
+                })
+                return item
+            }, [])
+            const totalNum = scorePublic.reduce((item, res) => {
+                item += Number(res.total_score)
+                return item
+            }, 0)
+            //scorePublic是类型的总分集合
             this.setState({
-                list: res.data.list
+                list: res.data.list,
+                scorePublic,
+                totalNum
             })
         })
     }
@@ -162,37 +177,128 @@ export default class ReactBeautifulDnd extends Component {
             appearPaixu: ''
         })
     }
-    tixinSet = () => {
+    tixinSet = (e) => {
         this.setState({
-            tixinSet: 1
+            tixinSet: Number(e)
         })
     }
-    changeInputDefault = (e, id) => {
+
+    changeInputDefault = (e) => {
+        this.setState({
+            editInput: e.target.value
+        })
+    }
+    suerEditInput = (id) => {
         const list = this.state.list
+        let newInputData = ''
         list.forEach(element => {
             if (element.id === id) {
-                element.show_type_name = e.target.value
+                newInputData = element.show_type_name
             }
         });
         this.setState({
-            list
+            editInput: newInputData,
         })
     }
     //确认的时候修改的名字后我要发送一个请求
     sureInputDefault = (id) => {
-        console.log(id)
+        set_show_type_name({ ques_type_id: id, show_type_name: this.state.editInput }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                get_next_cart().then(res => {
+                    this.setState({
+                        list: res.data.list
+                    })
+                })
+            } else {
+                message.error(res.message)
+            }
+        })
     }
     //删除一个类
     deleteTlei = (id) => {
-        console.log(id)
+        remove_question_type({ ques_type_id: id }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+            } else {
+                message.error(res.message)
+            }
+        }).then(() => {
+            get_next_cart().then(res => {
+                this.setState({
+                    list: res.data.list
+                })
+            })
+        })
+    }
+    showModal = () => {
+        this.setState({
+            visible: true
+        });
+    };
+    //用于设置分值
+    handleOk = e => {
+        const scorePublic = this.state.scorePublic
+        set_pager_score({ score_json: JSON.stringify(scorePublic) }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                //scorePublic是类型的总分集合
+                this.setState({
+                    visible: false
+                })
+            } else {
+                message.error(res.message)
+                this.setState({
+                    visible: false,
+                });
+            }
+        }).then(() => {
+            get_next_cart().then(res => {
+                const scorePublic = res.data.list.reduce((item, res) => {
+                    item.push({
+                        ques_type_id: res.ques_type_id,
+                        total_score: res.ques_score
+                    })
+                    return item
+                }, [])
+                const totalNum = scorePublic.reduce((item, res) => {
+                    item += Number(res.total_score)
+                    return item
+                }, 0)
+                //scorePublic是类型的总分集合
+                this.setState({
+                    list: res.data.list,
+                    scorePublic,
+                    totalNum
+                })
+            })
+        })
+
+    };
+
+    handleCancel = e => {
+        this.setState({
+            visible: false,
+        });
+    };
+    changeTotalNum = (e, id) => {
+        const list = this.state.list
+        const scorePublic = this.state.scorePublic
+        list.forEach((res, index) => {
+            if (res.ques_type_id === id) {
+                scorePublic[index].total_score = e.target.value
+            }
+        })
+        this.setState({
+            scorePublic
+        })
     }
     render() {
         return (
             <div id="m-zujuan" style={{ background: '#F5F5F5', display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
-
                 <div style={{ width: '80%', marginRight: 20 }}>
                     <div className="paper-hd-ctrl">
-                        <Button type="dashed" onClick={this.tixinSet}>题型设置</Button>
+                        <Button type="dashed" onClick={() => this.tixinSet(1)}>题型设置</Button>
                         <Button className="m-left" >添加试题</Button>
                         <Button className="m-left" type="primary">下一步</Button>
                     </div>
@@ -201,13 +307,13 @@ export default class ReactBeautifulDnd extends Component {
                         <h3>{this.state.biaotiTitle}</h3>
                     </div>
                     <div className={this.state.setIndex === 2 ? "paper-hd-title paper-hd-title-active " : 'paper-hd-title active'} style={{ width: '100%', textAlign: 'start', background: '#fff', flex: 1, display: 'flex', justifyContent: 'center' }} onClick={() => this.changeSetIndex(2)}>
-                        <div className="set-item" >总分：<span>1分</span></div>
+                        <div className="set-item" >总分：<span>{this.state.totalNum}分</span></div>
                         <div className="set-item">答题时间：<span>{this.state.datiTime}</span>分钟</div>
                         <div className="set-item" >日期：<span className="line"></span></div>
                         <div className="set-item">班级：<span className="line"></span></div>
                         <div className="set-item">姓名：<span className="line"></span></div>
                     </div>
-                    {this.state.tixinSet ? <SetMain data={this.state.list} setItem={this.setItem} sureInputDefault={this.sureInputDefault} deleteTlei={this.deleteTlei} changeInputDefault={this.changeInputDefault}></SetMain> : <div>
+                    {this.state.tixinSet === 1 ? <SetMain suerEditInput={this.suerEditInput} editInput={this.state.editInput} tixinSet={this.tixinSet} data={this.state.list} setItem={this.setItem} sureInputDefault={this.sureInputDefault} deleteTlei={this.deleteTlei} changeInputDefault={this.changeInputDefault}></SetMain> : <div>
                         {this.state.list.map((res, index) =>
                             <div className="m-zijuan-flex" key={index}>
                                 {this.state.paixuIndex === res.ques_type_id ? <DragDropContext onDragEnd={this.onDragEnd}>
@@ -246,7 +352,6 @@ export default class ReactBeautifulDnd extends Component {
                                                                                 input='tex'
                                                                                 onError={(MathJax, error) => {
                                                                                     console.warn(error);
-                                                                                    console.log("Encountered a MathJax error, re-attempting a typeset!");
                                                                                     MathJax.Hub.Queue(
                                                                                         MathJax.Hub.Typeset()
                                                                                     );
@@ -269,10 +374,10 @@ export default class ReactBeautifulDnd extends Component {
                                                                             </MathJax.Context>
                                                                         </span>
                                                                     </div>
-                                                                    <div className="zujuan-m">
+                                                                    {/* <div className="zujuan-m">
                                                                         <span style={{ width: 100, display: 'inline-block' }}>分值：</span>
                                                                         <Input className="zujuan-m-item-input" defaultValue="0571" onChange={(e, index) => changeValue(e, index)} />
-                                                                    </div>
+                                                                    </div> */}
                                                                 </div>
                                                             )}
                                                         </Draggable>
@@ -296,10 +401,6 @@ export default class ReactBeautifulDnd extends Component {
                         )}
                     </div>}
                 </div>
-
-
-
-
                 <div className="m-right-action">
                     <div className="m-zujuanAction">
                         <div className="m-zujuanAction-content" style={{ marginBottom: 20 }}>
@@ -310,15 +411,33 @@ export default class ReactBeautifulDnd extends Component {
                                 </div>
                                 {this.state.setIndex === 1 ? <div className="bd">
                                     <div className="structure-header">
-                                        <div>总分：1分</div>
+                                        <div>总分：{this.state.totalNum}分<span style={{ marginLeft: 10, color: '#1890ff', cursor: 'pointer' }} onClick={this.showModal}>设置分值</span></div>
+                                        <Modal
+                                            title="分数设置"
+                                            cancelText='取消'
+                                            okText='确认'
+                                            visible={this.state.visible}
+                                            onOk={this.handleOk}
+                                            onCancel={this.handleCancel}
+                                        >
+                                            {this.state.list.map((res, index) =>
+                                                <div key={index} className="m-flex m-bottom" style={{ justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #dfdfdf', boxSizing: 'border-box', paddingBottom: 5 }}>
+                                                    <div className="m-row">
+                                                        {res.ques_type_name}
+                                                    </div>
+                                                    <div>数量:{res.ques_num}</div>
+                                                    <Input value={this.state.scorePublic[index].total_score} style={{ width: 100 }} placeholder={`${res.ques_type_name}分值`} onChange={(e) => this.changeTotalNum(e, res.ques_type_id)}></Input>
+                                                </div>
+                                            )}
+                                        </Modal>
                                     </div>
                                     {this.state.list.map((res, index) =>
                                         <div className="structure-panel" key={index}>
                                             <div className="structure-hd">
-                                                <span>{res.ques_type_name}</span>
+                                                <span>{res.show_type_name}</span>
                                             </div>
                                             <div className="structure-bd">
-                                                {res.ques_list.map((res, index) =>
+                                                {res.ques_list.map((item, index) =>
                                                     <span className="active" key={index}>{index + 1}</span>
                                                 )}
                                             </div>

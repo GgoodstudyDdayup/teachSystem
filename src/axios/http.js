@@ -133,4 +133,19 @@ export const remove_question_type = (params) => {
 export const get_next_cart = () => {
     return instance.get('/api/question/get_next_cart')
 }
-
+//按照类排序
+export const set_ques_type_sort = (params) => {
+    return instance.post('/api/question/set_ques_type_sort',params)
+}
+//按照类里的题目排序
+export const set_ques_sort = (params) => {
+    return instance.post('/api/question/set_ques_sort',params)
+}
+//修改试卷的类名
+export const set_show_type_name = (params) => {
+    return instance.post('/api/question/set_show_type_name',params)
+}
+//批量修改类型分数
+export const set_pager_score = (params) => {
+    return instance.post('/api/question/set_pager_score',params)
+}

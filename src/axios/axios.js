@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { message } from 'antd';
 // import store from '../store'
 axios.defaults.baseURL = 'https://jiaoxueapi.yanuojiaoyu.com'
 axios.defaults.transformRequest = [
@@ -31,6 +32,7 @@ instance.interceptors.response.use(response => {
         return response.data
     }
 }, err => {
+    message.warning('系统繁忙请稍后重试')
     return Promise.reject(err);
 });
 
