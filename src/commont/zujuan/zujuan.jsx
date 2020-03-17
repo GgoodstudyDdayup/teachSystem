@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { Input, Button, message, Modal } from 'antd';
+import { Input, Button, message, Modal, Select, Radio } from 'antd';
 import SetMain from './tixinSet'
 import MathJax from 'react-mathjax3'
-import { get_next_cart, set_ques_type_sort, set_ques_sort, set_show_type_name, remove_question_type, set_pager_score } from '../../axios/http'
+import { get_next_cart, set_ques_type_sort, set_ques_sort, set_show_type_name, remove_question_type, set_pager_score, get_own_subject_list, get_grade_list, set_pager_config } from '../../axios/http'
 import List from './zujuanList'
+const { Option } = Select;
+const { TextArea } = Input;
 // 重新记录数组顺序
 const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
@@ -52,12 +54,24 @@ export default class ReactBeautifulDnd extends Component {
                 total_score: 0
             }],
             visible: false,
+            visible2: false,
             editInput: '',
             setIndex: 1,
-            tixinSet: 1,
+            tixinSet: 0,
             biaotiTitle: '点击修改试卷标题',
             datiTime: '',
-            appear: ''
+            appear: '',
+            saveFile: {
+                grade_id: '',
+                title: '',
+                total_minute: '',
+                remark: '',
+                own_subject_id: '',
+                difficulty_id: '',
+                is_open: ''
+            },
+            subjectchildren: [],
+            grandchildren: [],
         };
         this.onDragEnd = this.onDragEnd.bind(this);
     }
@@ -149,6 +163,24 @@ export default class ReactBeautifulDnd extends Component {
                 list: res.data.list,
                 scorePublic,
                 totalNum
+            })
+        })
+        get_own_subject_list().then(res => {
+            const subjectchildren = res.data.own_subject_list.map((res, index) => {
+                return <Option key={res.name} value={res.name} >{res.name}</Option>
+            })
+            this.setState({
+                subjectchildren,
+                subjectList: res.data.own_subject_list
+            })
+        })
+        get_grade_list().then(res => {
+            const grandchildren = res.data.grade_list.map(res => {
+                return <Option key={res.name} value={res.name} >{res.name}</Option>
+            })
+            this.setState({
+                grandchildren,
+                grandList: res.data.grade_list
             })
         })
     }
@@ -275,12 +307,66 @@ export default class ReactBeautifulDnd extends Component {
         })
 
     };
-
     handleCancel = e => {
         this.setState({
-            visible: false,
+            visible: false
         });
     };
+    next = () => {
+        this.setState({
+            visible2: true,
+        });
+    }
+    //试卷提交
+    sjAction = () => {
+        const biaotiTitle = this.state.biaotiTitle
+        const datiTime = this.state.datiTime
+        const saveFile = this.state.saveFile
+        saveFile.title = biaotiTitle
+        saveFile.total_minute = datiTime
+        if (biaotiTitle === '点击修改试卷标题' || datiTime === '') {
+            message.warning('请检查标题或者考试时间')
+        } else {
+            set_pager_config(saveFile).then(res => {
+                if (res.code === 0) {
+                    message.success(res.message)
+                    this.setState({
+                        visible2: false,
+                        saveFile: {
+                            grade_id: '',
+                            title: '',
+                            total_minute: '',
+                            remark: '',
+                            own_subject_id: '',
+                            difficulty_id: '',
+                            is_open: ''
+                        },
+                        subjectValue: '',
+                        grandValue: ''
+                    });
+                } else {
+                    message.error(res.message)
+                }
+            })
+        }
+
+    }
+    sjCancel = (e) => {
+        this.setState({
+            visible2: false,
+            saveFile: {
+                grade_id: '',
+                title: '',
+                total_minute: '',
+                remark: '',
+                own_subject_id: '',
+                difficulty_id: '',
+                is_open: ''
+            },
+            subjectValue: '',
+            grandValue: ''
+        });
+    }
     changeTotalNum = (e, id) => {
         const list = this.state.list
         const scorePublic = this.state.scorePublic
@@ -293,14 +379,104 @@ export default class ReactBeautifulDnd extends Component {
             scorePublic
         })
     }
+    onChangeState = (e, type) => {
+        const saveFile = { ...this.state.saveFile }
+        if (type === 'difficulty') {
+            saveFile.difficulty_id = e.target.value
+            this.setState({
+                saveFile
+            })
+        } else {
+            saveFile.is_open = e.target.value
+            this.setState({
+                saveFile
+            })
+        }
+        console.log(saveFile)
+    }
+    selsectSubject = (e) => {
+        const subjectList = this.state.subjectList
+        const saveFile = { ...this.state.saveFile }
+        subjectList.forEach(item => {
+            if (e === item.name) {
+                saveFile.own_subject_id = item.id
+            }
+        })
+        this.setState({
+            saveFile,
+            subjectValue: e
+        })
+        console.log(saveFile)
+    }
+    selsectGrand = (e) => {
+        const grandList = this.state.grandList
+        const saveFile = { ...this.state.saveFile }
+        grandList.forEach(item => {
+            if (e === item.name) {
+                saveFile.grade_id = item.id
+            }
+        })
+        this.setState({
+            saveFile,
+            grandListValue: e
+        })
+        console.log(saveFile)
+    }
+    changeTextA = e => {
+        const saveFile = this.state.saveFile
+        saveFile.remark = e.target.value
+        this.setState({
+            saveFile
+        })
+    }
     render() {
         return (
             <div id="m-zujuan" style={{ background: '#F5F5F5', display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
+                <Modal
+                    title="试卷保存设置"
+                    cancelText='取消'
+                    okText='确认'
+                    visible={this.state.visible2}
+                    onOk={this.sjAction}
+                    onCancel={this.sjCancel}
+                >
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', alignItems: 'center' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>学科：</span>
+                        <Select style={{ width: '75%' }} showSearch optionFilterProp="children" onChange={this.selsectSubject} value={this.state.subjectValue} placeholder="请选择学科">
+                            {this.state.subjectchildren}
+                        </Select>
+                    </div>
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', alignItems: 'center' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>年级：</span>
+                        <Select style={{ width: '75%' }} showSearch optionFilterProp="children" onChange={this.selsectGrand} value={this.state.grandValue} placeholder="请选择年级">
+                            {this.state.grandchildren}
+                        </Select>
+                    </div>
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', alignItems: 'center' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>难度：</span>
+                        <Radio.Group onChange={(e) => this.onChangeState(e, 'difficulty')} value={this.state.saveFile.difficulty_id}>
+                            <Radio value={1}>简单</Radio>
+                            <Radio value={2}>中等</Radio>
+                            <Radio value={3}>困难</Radio>
+                        </Radio.Group>
+                    </div>
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', alignItems: 'center' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>公开状态：</span>
+                        <Radio.Group onChange={(e) => this.onChangeState(e, 'is_open')} value={this.state.saveFile.is_open}>
+                            <Radio value={1}>公开试卷</Radio>
+                            <Radio value={-1}>我的试卷</Radio>
+                        </Radio.Group>
+                    </div>
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', alignItems: 'center' }}>
+                        <span style={{ textAlign: 'right', display: 'inline-block', width: 130 }}>备注：</span>
+                        <TextArea value={this.state.saveFile.remark} rows={4} onChange={this.changeTextA} />
+                    </div>
+                </Modal>
                 <div style={{ width: '80%', marginRight: 20 }}>
                     <div className="paper-hd-ctrl">
                         <Button type="dashed" onClick={() => this.tixinSet(1)}>题型设置</Button>
                         <Button className="m-left" >添加试题</Button>
-                        <Button className="m-left" type="primary">下一步</Button>
+                        <Button className="m-left" type="primary" onClick={this.next}>下一步</Button>
                     </div>
 
                     <div className={this.state.setIndex === 3 ? "paper-hd-title paper-hd-title-active " : 'paper-hd-title active'} style={{ background: '#fff', flex: 1 }} onClick={() => this.changeSetIndex(3)}>
@@ -476,7 +652,7 @@ export default class ReactBeautifulDnd extends Component {
 
                 </div>
 
-            </div>
+            </div >
         );
     }
 }

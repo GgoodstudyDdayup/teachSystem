@@ -204,7 +204,7 @@ class tikuguanli4 extends Component {
                     <Badge count={this.state.cardTotal} className="m-shopicon">
                     </Badge>
                 </div>
-                <div className="topic-panel" style={{ display: this.state.clear }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
+                <div className="topic-panel" style={{ display: this.state.clear,zIndex:9999 }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <div className="topic-row header">
                         <div className="topic-col">已选题型</div>
                         <div className="topic-col">数量</div>

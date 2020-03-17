@@ -98,6 +98,11 @@ export const change_password = (params) => {
     return instance.post('/api/user/change_password', params)
 }
 
+//自己重置密码
+export const change_password_byself = (params) => {
+    return instance.post('/api/user/change_password_byself', params)
+}
+
 
 //获取教研组
 export const get_teaching_group = (params) => {
@@ -135,17 +140,29 @@ export const get_next_cart = () => {
 }
 //按照类排序
 export const set_ques_type_sort = (params) => {
-    return instance.post('/api/question/set_ques_type_sort',params)
+    return instance.post('/api/question/set_ques_type_sort', params)
 }
 //按照类里的题目排序
 export const set_ques_sort = (params) => {
-    return instance.post('/api/question/set_ques_sort',params)
+    return instance.post('/api/question/set_ques_sort', params)
 }
 //修改试卷的类名
 export const set_show_type_name = (params) => {
-    return instance.post('/api/question/set_show_type_name',params)
+    return instance.post('/api/question/set_show_type_name', params)
 }
 //批量修改类型分数
 export const set_pager_score = (params) => {
-    return instance.post('/api/question/set_pager_score',params)
+    return instance.post('/api/question/set_pager_score', params)
 }
+export const get_grade_list = () => {
+    return instance.get('/api/system/get_grade_list')
+}
+export const get_own_subject_list = (params) => {
+    return instance.get('/api/system/get_own_subject_list')
+}
+
+//试卷保存设置
+export const set_pager_config = (params) => {
+    return instance.post('/api/question/set_pager_config', params)
+}
+

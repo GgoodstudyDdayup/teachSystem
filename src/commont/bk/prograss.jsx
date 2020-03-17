@@ -356,7 +356,10 @@ class bk extends Component {
                     <div className="m-flex m-bottom">
                         <span className="m-row">课件地址：</span>
                         {this.state.fileList.map((res, index) =>
-                            <div className='linkTab' key={index} onClick={() => this.tabLinkFilePath(res)}>{res}</div>
+                            <div key={index}>
+                                {res === 'undefined' ? '暂未上传课件' : <div className='linkTab' onClick={() => this.tabLinkFilePath(res)}>{res}</div>
+                                }
+                            </div>
                         )}
                     </div>
                     <div className="m-flex m-bottom">

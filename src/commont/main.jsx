@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
-import { Layout, Menu, Icon, Avatar, Dropdown, message } from 'antd';
-import { logout } from '../axios/http'
-import { LogoutOutlined } from '@ant-design/icons'
+import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input } from 'antd';
+import { logout, change_password_byself } from '../axios/http'
+import { LogoutOutlined, EditTwoTone } from '@ant-design/icons'
 import Tk from './tk/index'
 import Tksystem from './tk/index2'
 import Tkown from './tk/index3'
@@ -30,6 +30,9 @@ class main extends Component {
         this.state = {
             height: '',
             collapsed: false,
+            visible: false,
+            newPassword: '',
+            oldPassword: ''
         }
     }
     componentDidMount() {
@@ -65,11 +68,55 @@ class main extends Component {
             message.success(res.data.message)
         })
     }
+    editOwnPassWord = () => {
+        const params = {
+            old_password: this.state.oldPassword,
+            new_password: this.state.newPassword
+        }
+        change_password_byself(params).then(res => {
+            if (res.code === 0) {
+                message.success('修改成功')
+                this.setState({
+                    visible: false,
+                    newPassword: '',
+                    oldPassword: ''
+                })
+            }else{
+                message.error('修改失败')
+            }
+        })
+    }
+    showModal = () => {
+        this.setState({
+            visible: true
+        })
+    }
+    cancel = () => {
+        this.setState({
+            visible: false,
+            newPassword: '',
+            oldPassword: ''
+        })
+    }
+    changePassword = (e, type) => {
+        if (type === 'newPassword') {
+            this.setState({
+                newPassword: e.target.value
+            })
+        } else {
+            this.setState({
+                oldPassword: e.target.value
+            })
+        }
+    }
     render() {
-        const menu2 = (
+        const menu = (
             <Menu>
+                <Menu.Item onClick={this.showModal}>
+                    <EditTwoTone />修改密码
+                </Menu.Item>
                 <Menu.Item onClick={this.logOut}>
-                    <LogoutOutlined />退出登录
+                    <LogoutOutlined twoToneColor='#f40' />退出登录
                 </Menu.Item>
             </Menu>
         )
@@ -98,7 +145,7 @@ class main extends Component {
                                 <Link to="/main/tk/own">机构私库</Link>
                             </Menu.Item>
                             <Menu.Item key="4">
-                                <Link to="/main/tk/mine">知识点</Link>
+                                <Link to="/main/tk/mine">我的题目</Link>
                             </Menu.Item>
                         </SubMenu>
                         <SubMenu
@@ -115,7 +162,7 @@ class main extends Component {
                             <Menu.Item key="6">
                                 <Link to="/main/bk/prograss">审核进度</Link></Menu.Item>
                         </SubMenu>
-                        <SubMenu
+                        {/* <SubMenu
                             key="sub4"
                             title={
                                 <span>
@@ -128,7 +175,7 @@ class main extends Component {
                             <Menu.Item key="8">Option 10</Menu.Item>
                             <Menu.Item key="9">Option 11</Menu.Item>
                             <Menu.Item key="10">Option 12</Menu.Item>
-                        </SubMenu>
+                        </SubMenu> */}
                         {sessionStorage.getItem("permission") === '1' || sessionStorage.getItem("permission") === '2' ? <SubMenu
                             key="sub5"
                             title={
@@ -146,7 +193,7 @@ class main extends Component {
                             </Menu.Item>
                         </SubMenu> : ''}
 
-                        <SubMenu
+                        {/* <SubMenu
                             key="sub6"
                             title={
                                 <span>
@@ -161,7 +208,7 @@ class main extends Component {
                             <Menu.Item key="14">
                                 <Link to="/main/resourceCenter/myresources/wenjianjia">我的资源</Link>
                             </Menu.Item>
-                        </SubMenu>
+                        </SubMenu> */}
                     </Menu>
                 </Sider>
                 <Layout>
@@ -174,11 +221,32 @@ class main extends Component {
                         <div className="m-flex" style={{ alignItems: 'center', justifyContent: 'space-between', marginRight: 50 }}>
                             <Avatar style={{ backgroundColor: '#87d068' }} icon="user"></Avatar>
                             <div style={{ width: 30 }}></div>
-                            <Dropdown overlay={menu2}>
+                            <Dropdown overlay={menu}>
                                 <div>
                                     {sessionStorage.getItem('username')}
                                 </div>
                             </Dropdown>
+                            <Modal
+                                title="修改密码"
+                                cancelText='取消'
+                                okText='确认'
+                                visible={this.state.visible}
+                                onOk={this.editOwnPassWord}
+                                onCancel={this.cancel}
+                            >
+                                <div className="m-flex m-bottom" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div className="m-row">
+                                        老密码：
+                                    </div>
+                                    <Input value={this.state.oldPassword} placeholder='请输入老密码' onChange={(e) => this.changePassword(e, 'oldPassword')}></Input>
+                                </div>
+                                <div className="m-flex m-bottom" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div className="m-row">
+                                        新密码：
+                                    </div>
+                                    <Input value={this.state.newPassword} placeholder='请输入新密码' onChange={(e) => this.changePassword(e, 'newPassword')}></Input>
+                                </div>
+                            </Modal>
                         </div>
                     </Header>
                     <Content

@@ -53,20 +53,10 @@ class tikuguanli extends Component {
                 list: [{ id: 16, title: '不限' }, { id: 10, title: '999' }, { id: 11, title: '999' }, { id: 12, title: '999' }]
             }],
             tree: [{
-                title: '1',
-                aitifen_id: '1',
+                title: '',
+                aitifen_id: '',
                 children: [
-                    {
-                        title: '2', aitifen_id: '2', children: [
-                            {
-                                title: '3', aitifen_id: '3', children: [
-                                    {
-                                        title: '4', aitifen_id: '4', children: []
-                                    }
-                                ]
-                            }
-                        ]
-                    }
+                    
                 ]
             }
             ],
@@ -437,7 +427,7 @@ class tikuguanli extends Component {
                     <Badge count={this.state.cardTotal} className="m-shopicon">
                     </Badge>
                 </div>
-                <div className="topic-panel" style={{ display: this.state.clear }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
+                <div className="topic-panel" style={{ display: this.state.clear,zIndex:9999 }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <div className="topic-row header">
                         <div className="topic-col">已选题型</div>
                         <div className="topic-col">数量</div>
