@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Input, Button, message, Modal, Select, Radio } from 'antd';
 import SetMain from './tixinSet'
 import MathJax from 'react-mathjax3'
-import { get_next_cart, set_ques_type_sort, set_ques_sort, set_show_type_name, remove_question_type, set_pager_score, get_own_subject_list, get_grade_list, set_pager_config } from '../../axios/http'
+import { get_next_cart, set_ques_type_sort, set_ques_sort, set_show_type_name, remove_question_type, set_pager_score, get_own_subject_list, get_grade_list, set_self_pager } from '../../axios/http'
 import List from './zujuanList'
 const { Option } = Select;
 const { TextArea } = Input;
@@ -40,7 +40,6 @@ const getListStyle = () => ({
     padding: grid,
     width: '100%'
 });
-
 export default class ReactBeautifulDnd extends Component {
     constructor(props) {
         super(props);
@@ -184,6 +183,7 @@ export default class ReactBeautifulDnd extends Component {
             })
         })
     }
+    
     changeSetIndex(e) {
         this.setState({
             setIndex: e
@@ -327,7 +327,7 @@ export default class ReactBeautifulDnd extends Component {
         if (biaotiTitle === '点击修改试卷标题' || datiTime === '') {
             message.warning('请检查标题或者考试时间')
         } else {
-            set_pager_config(saveFile).then(res => {
+            set_self_pager(saveFile).then(res => {
                 if (res.code === 0) {
                     message.success(res.message)
                     this.setState({
@@ -344,6 +344,10 @@ export default class ReactBeautifulDnd extends Component {
                         subjectValue: '',
                         grandValue: ''
                     });
+                    setTimeout(() => {
+                        this.props.history.push('/main')
+                    }, 2000);
+                    
                 } else {
                     message.error(res.message)
                 }
@@ -406,7 +410,6 @@ export default class ReactBeautifulDnd extends Component {
             saveFile,
             subjectValue: e
         })
-        console.log(saveFile)
     }
     selsectGrand = (e) => {
         const grandList = this.state.grandList
@@ -418,9 +421,8 @@ export default class ReactBeautifulDnd extends Component {
         })
         this.setState({
             saveFile,
-            grandListValue: e
+            grandValue: e
         })
-        console.log(saveFile)
     }
     changeTextA = e => {
         const saveFile = this.state.saveFile
@@ -428,6 +430,9 @@ export default class ReactBeautifulDnd extends Component {
         this.setState({
             saveFile
         })
+    }
+    addQuestion = e => {
+        this.props.history.replace('/main')
     }
     render() {
         return (
@@ -475,7 +480,7 @@ export default class ReactBeautifulDnd extends Component {
                 <div style={{ width: '80%', marginRight: 20 }}>
                     <div className="paper-hd-ctrl">
                         <Button type="dashed" onClick={() => this.tixinSet(1)}>题型设置</Button>
-                        <Button className="m-left" >添加试题</Button>
+                        <Button className="m-left" onClick={this.addQuestion}>添加试题</Button>
                         <Button className="m-left" type="primary" onClick={this.next}>下一步</Button>
                     </div>
 

@@ -161,8 +161,26 @@ export const get_own_subject_list = (params) => {
     return instance.get('/api/system/get_own_subject_list')
 }
 
-//试卷保存设置
+//试卷保存设置用于单个数据上传
 export const set_pager_config = (params) => {
     return instance.post('/api/question/set_pager_config', params)
 }
 
+//试卷保存设置(一起上传)
+export const set_self_pager = (params) => {
+    return instance.post('/api/question/set_self_pager', params)
+}
+
+
+//获取可以设置跨校区的用户
+export const get_user_by_set = () => {
+    return instance.get('/api/user/get_user_by_set')
+}
+//获取公司列表
+export const get_company_list = () => {
+    return instance.get('/api/system/get_company_list')
+}
+//多校区设置
+export const set_user_school_rela = (params) => {
+    return instance.post('/api/user/set_user_school_rela', params)
+}

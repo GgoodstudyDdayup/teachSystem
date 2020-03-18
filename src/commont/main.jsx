@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
-import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input } from 'antd';
+import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input, Select } from 'antd';
 import { logout, change_password_byself } from '../axios/http'
 import { LogoutOutlined, EditTwoTone } from '@ant-design/icons'
 import Tk from './tk/index'
@@ -23,6 +23,7 @@ import ZY from './zy'
 import Tkquestion from './tk/braftEditor'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
+const { Option } = Select
 
 class main extends Component {
     constructor(opt) {
@@ -32,18 +33,26 @@ class main extends Component {
             collapsed: false,
             visible: false,
             newPassword: '',
-            oldPassword: ''
+            oldPassword: '',
+            company_list: JSON.parse(sessionStorage.getItem('company_list')),
+            company_name: sessionStorage.getItem('company')
         }
     }
     componentDidMount() {
         window.addEventListener('resize', this.handleSize);
         this.handleSize()
+        const children = this.state.company_list.map((res, index) => {
+            return <Option key={res.company} value={res.company} >{res.company}</Option>
+        })
+        this.setState({
+            children
+        })
     }
     componentWillUnmount() {
         // 移除监听事件
         window.removeEventListener('resize', this.handleSize);
-    }
 
+    }
     // 自适应浏览器的高度
     handleSize = () => {
         this.setState({
@@ -81,7 +90,7 @@ class main extends Component {
                     newPassword: '',
                     oldPassword: ''
                 })
-            }else{
+            } else {
                 message.error('修改失败')
             }
         })
@@ -106,6 +115,21 @@ class main extends Component {
         } else {
             this.setState({
                 oldPassword: e.target.value
+            })
+        }
+    }
+    selsectCompany = e => {
+        const company_list = this.state.company_list
+        if (e) {
+            company_list.forEach((res) => {
+                if (res.company === e) {
+                    sessionStorage.setItem('company_id', res.company_id)
+                    sessionStorage.setItem('company', res.company)
+                    window.location.reload()
+                }
+            })
+            this.setState({
+                company_name: e
             })
         }
     }
@@ -213,11 +237,25 @@ class main extends Component {
                 </Sider>
                 <Layout>
                     <Header style={{ background: '#fff', padding: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Icon
-                            className="trigger"
-                            type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
-                            onClick={this.toggle}
-                        />
+                        <div>
+                            <Icon
+                                className="trigger"
+                                type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
+                                onClick={this.toggle}
+                            />
+                            {sessionStorage.getItem("permission") === '1' || sessionStorage.getItem("permission") === '2' ?
+                                <span>
+                                    <Select style={{ width: 170 }} showSearch optionFilterProp="children" onChange={this.selsectCompany} value={this.state.company_name} placeholder="请选择校区" >
+                                        {this.state.children}
+                                    </Select>
+                                    <span style={{ marginLeft: 10 }}>教学系统</span>
+                                </span>
+                                :
+                                <span>
+                                    {this.state.company_name}教学系统
+                                </span>
+                            }
+                        </div>
                         <div className="m-flex" style={{ alignItems: 'center', justifyContent: 'space-between', marginRight: 50 }}>
                             <Avatar style={{ backgroundColor: '#87d068' }} icon="user"></Avatar>
                             <div style={{ width: 30 }}></div>
@@ -289,7 +327,7 @@ class main extends Component {
                         <Route path="/main/zujuan" component={Zujuan} />
                     </div>
                 </Layout>
-            </Layout>
+            </Layout >
 
         );
     }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { login } from '../axios/http'
+import { login, get_company_list } from '../axios/http'
 import { message } from 'antd'
 //定义组件内部私有的状态
 class Login extends Component {
@@ -47,7 +47,30 @@ class Login extends Component {
                         sessionStorage.setItem("username", params.username)
                         sessionStorage.setItem("teacher_type", res.data.data.user_info.teacher_type)
                         sessionStorage.setItem("permission", res.data.data.user_info.permission)
-                        this.props.history.push("/main")
+                        if (res.data.data.company_list !== null && res.data.data.company_list.length > 0) {
+                            sessionStorage.setItem("company_list", JSON.stringify(res.data.data.company_list))
+                            sessionStorage.setItem('company', res.data.data.company_list[0].company)
+                            sessionStorage.setItem('company_id', res.data.data.company_list[0].company_id || res.data.data.user_info.company_id)
+                            this.props.history.push("/main")
+                        } else {
+                            get_company_list().then(l1 => {
+                                if (l1.code === 0) {
+                                    const company_list = l1.data.company_list.reduce((item, rsq) => {
+                                        if (res.data.data.user_info.company_id === rsq.id) {
+                                            item.push(rsq)
+                                        }
+                                        return item
+                                    }, [])
+                                    sessionStorage.setItem("company_list", JSON.stringify(company_list))
+                                    sessionStorage.setItem('company', company_list[0].company)
+                                    sessionStorage.setItem('company_id', company_list[0].id)
+                                    this.props.history.push("/main")
+                                }else{
+                                    message.warning('系统繁忙请重试')
+                                }
+
+                            })
+                        }
                     },
                     duration: 1
                 })

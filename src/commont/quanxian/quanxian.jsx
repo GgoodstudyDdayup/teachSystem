@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Table, Button, Modal, Radio, Pagination, message, Input, Checkbox, Tag } from 'antd';
-import { add_user, quanxianList, loginUserList, grade_id_List, object_id_List, delete_user, get_user_detail, edit_user, change_password } from '../../axios/http'
+import { Table, Button, Modal, Radio, Pagination, message, Input, Checkbox, Tag, Select } from 'antd';
+import { add_user, quanxianList, loginUserList, grade_id_List, object_id_List, delete_user, get_user_detail, edit_user, change_password, get_user_by_set, get_company_list,set_user_school_rela } from '../../axios/http'
 const { confirm } = Modal;
-
+const { Option } = Select
 
 class bk extends Component {
     constructor(props) {
@@ -32,6 +32,10 @@ class bk extends Component {
                 grade_ids: '',
                 own_subject_ids: ''
             },
+            schoolParmas: {
+                user_id: '',
+                company_ids: ''
+            },
             check: [],
             check2: [],
             grade_list: [],
@@ -50,7 +54,7 @@ class bk extends Component {
             visible: false,
             visible3: false,
             permission: [],
-            permission2:[],
+            permission2: [],
             data: [
                 {
                     key: '11',
@@ -67,7 +71,8 @@ class bk extends Component {
                     time: 32,
                     endtime: 'Sidney No. 1 Lake Park',
                 },
-            ]
+            ],
+            selsectSchool: []
         }
     }
     componentDidMount() {
@@ -91,7 +96,7 @@ class bk extends Component {
                     })
                     this.setState({
                         permission: newPermission,
-                        permission2:permission
+                        permission2: permission
                     })
                 } else {
                     const newPermission = permission.reduce((item, res) => {
@@ -106,7 +111,7 @@ class bk extends Component {
                     })
                     this.setState({
                         permission: newPermission,
-                        permission2:permission
+                        permission2: permission
                     })
                 }
 
@@ -140,6 +145,27 @@ class bk extends Component {
                     own_subject_list2
                 })
             })
+            get_user_by_set().then(res => {
+                console.log(res)
+
+                const user_byCanSet = res.data.list.map((res, index) => {
+                    return <Option key={res.name} value={res.name} >{res.name}</Option>
+                })
+                this.setState({
+                    user_byCanSet,
+                    userbyCanSetList: res.data.list
+                })
+            })
+            get_company_list().then(res => {
+                console.log(res)
+                const company_list = res.data.company_list.map((res, index) => {
+                    return <Option key={res.company} value={res.company} >{res.company}</Option>
+                })
+                this.setState({
+                    company_list,
+                    companyList: res.data.company_list
+                })
+            })
         } else {
             this.props.history.push("/main")
             message.error('暂时无权限')
@@ -165,6 +191,11 @@ class bk extends Component {
             visible: true
         });
     };
+    schoolSet = () => {
+        this.setState({
+            schoolSet: true
+        });
+    }
     handleOk = () => {
         const upParmas = { ...this.state.upParmas }
         const parmas = { ...this.state.parmas }
@@ -281,6 +312,18 @@ class bk extends Component {
             }
         })
     };
+    schoolSetOk = ()=>{
+        const schoolParmas = {...this.state.schoolParmas}
+        set_user_school_rela(schoolParmas).then(res=>{
+            if(res.code === 0){
+                this.schoolSetCancel()
+                message.success(res.message)
+            }else{
+                this.schoolSetCancel()
+                message.error(res.message)
+            }
+        })
+    }
     handleCancel = e => {
         this.setState({
             visible: false,
@@ -301,6 +344,33 @@ class bk extends Component {
             },
         });
     };
+    schoolSetCancel = e => {
+        this.setState({
+            visible: false,
+            visible2: false,
+            visible3: false,
+            schoolSet: false,
+            fileList: [],
+            title: '',
+            checkList: [],
+            textArea: '',
+            check: [],
+            check2: [],
+            value: '',
+            value3: '',
+            schoolParmas: {
+                user_id: '',
+                company_ids: ''
+            },
+            upParmas: {
+                id: '',
+                status: null,
+                comment: ''
+            },
+            selsectWatchUser:'',
+            selsectSchool:[]
+        });
+    }
     handleChange = info => {
         let fileList = [...info.fileList];
         // 1. Limit the number of uploaded files
@@ -591,6 +661,7 @@ class bk extends Component {
             if (e.permission === '1') {
                 const btnPermission = (
                     <div>
+                        {/* <Button className="m-left" type="primary" onClick={() => this.detail(e)}>修改</Button> */}
                         <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
                     </div>
                 )
@@ -629,6 +700,39 @@ class bk extends Component {
             }
 
         }
+    }
+    selsectSchool = (e) => {
+        const companyList = this.state.companyList
+        const schoolParmas = { ...this.state.schoolParmas }
+        let company_ids = ''
+        e.forEach(res => {
+            companyList.forEach(item => {
+                if (res === item.company) {
+                    company_ids += `${item.id},`
+                }
+            })
+        })
+        schoolParmas.company_ids = company_ids
+        this.setState({
+            schoolParmas,
+            selsectSchool: e
+        })
+        console.log(schoolParmas)
+    }
+    selsectWatchUser = (e) => {
+        const userbyCanSetList = this.state.userbyCanSetList
+        const schoolParmas = { ...this.state.schoolParmas }
+        let user_id = ''
+        userbyCanSetList.forEach(item => {
+            if (e === item.name) {
+                user_id += `${item.id},`
+            }
+        })
+        schoolParmas.user_id = user_id
+        this.setState({
+            schoolParmas,
+            selsectWatchUser: e
+        })
     }
     render() {
         const columns = [
@@ -824,6 +928,27 @@ class bk extends Component {
                     </div>
                 </Modal>
 
+                <Modal
+                    title="跨校区设置"
+                    visible={this.state.schoolSet}
+                    onOk={this.schoolSetOk}
+                    onCancel={this.schoolSetCancel}
+                    okText='确认'
+                    cancelText='取消'
+                >
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>查看者：</span>
+                        <Select style={{ width: '100%' }} showSearch optionFilterProp="children" onChange={this.selsectWatchUser} value={this.state.selsectWatchUser} placeholder="点击添加跨校区查看者(单选)">
+                            {this.state.user_byCanSet}
+                        </Select>
+                    </div>
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>校区选择：</span>
+                        <Select mode="multiple" style={{ width: '100%' }} onChange={this.selsectSchool} value={this.state.selsectSchool} tokenSeparators={[',']} placeholder="点击添加校区选择可多选O(∩_∩)O">
+                            {this.state.company_list}
+                        </Select>
+                    </div>
+                </Modal>
                 <div className="m-bottom m-flex" style={{ alignItems: 'center' }}>
                     <div >
                         <Input value={this.state.name} onChange={this.changName} placeholder="请输入要查询的老师"></Input>
@@ -841,14 +966,14 @@ class bk extends Component {
                         查询
                     </Button>
                 </div>
-                <div className="m-bottom">
+                <div className="m-bottom m-flex">
                     <Button type="primary" onClick={this.showModal}>添加账号</Button>
+                    {sessionStorage.getItem('permission') === '1' ? <Button className="m-left" type="primary" onClick={this.schoolSet}>跨校区账号设置</Button> : ''}
                 </div>
                 <Table rowKey={record => record.key} columns={columns} dataSource={this.state.data} pagination={false} scroll={{ y: 500 }} />
                 <Pagination className="m-Pleft" current={this.state.parmas.page} onChange={this.changePage} total={this.state.totalCount} />
             </div>
         );
     }
-
 }
 export default bk;
