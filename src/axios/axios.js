@@ -2,9 +2,9 @@ import axios from 'axios'
 import { message } from 'antd';
 // import store from '../store'
 // 线上环境域名
-// axios.defaults.baseURL = 'https://jiaoxueapi.yanuojiaoyu.com/'
+axios.defaults.baseURL = 'https://jiaoxueapi.yanuojiaoyu.com/'
 //开发环境域名
-axios.defaults.baseURL = 'https://devjiaoxueapi.yanuojiaoyu.com/'
+// axios.defaults.baseURL = 'https://devjiaoxueapi.yanuojiaoyu.com/'
 axios.defaults.transformRequest = [
     function (data) {
         let ret = "";
@@ -23,7 +23,7 @@ const instance = axios.create({
 instance.interceptors.request.use(function (config) {
     config.headers['username'] = sessionStorage.getItem("username")
     config.headers['token'] = sessionStorage.getItem("token")
-    config.headers['company_id'] = sessionStorage.getItem("company_id")
+    config.headers['companyid'] = sessionStorage.getItem("company_id")
     return config
 }, function (error) {
     return Promise.reject(error);

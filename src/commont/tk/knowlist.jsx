@@ -36,7 +36,9 @@ const Knowlage = (props) => {
                     dataSource={shijuanList}
                     size='small'
                     renderItem={item => (
-                        <List.Item>
+                        <List.Item
+                            onClick={() => props.listView(item.aitifen_id)}
+                        >
                             <List.Item.Meta
                                 avatar={<Avatar src={require('../../img/shijuan.png')} />}
                                 description={item.show_name}

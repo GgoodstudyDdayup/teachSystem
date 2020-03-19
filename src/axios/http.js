@@ -31,6 +31,10 @@ export const get_ques_ids_cart = () => {
 export const ztshijuan = (params) => {
     return instance.post('/api/paper/get_paper_list', params)
 }
+//获取真题试卷
+export const get_paper_info = (params) => {
+    return instance.post('/api/paper/get_paper_info', params)
+}
 //添加到试题篮
 export const add_question_cart = (params) => {
     return instance.post('/api/question/add_question_cart', params)

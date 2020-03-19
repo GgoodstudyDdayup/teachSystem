@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal, Radio, Pagination, message, Input, Checkbox, Tag, Select } from 'antd';
-import { add_user, quanxianList, loginUserList, grade_id_List, object_id_List, delete_user, get_user_detail, edit_user, change_password, get_user_by_set, get_company_list,set_user_school_rela } from '../../axios/http'
+import { add_user, quanxianList, loginUserList, grade_id_List, object_id_List, delete_user, get_user_detail, edit_user, change_password, get_user_by_set, get_company_list, set_user_school_rela } from '../../axios/http'
 const { confirm } = Modal;
 const { Option } = Select
 
@@ -56,21 +56,6 @@ class bk extends Component {
             permission: [],
             permission2: [],
             data: [
-                {
-                    key: '11',
-                    time: 32,
-                    endtime: 'New York No. 1 Lake Park',
-                },
-                {
-                    key: '2',
-                    time: 42,
-                    endtime: 'London No. 1 Lake Park',
-                },
-                {
-                    key: '3',
-                    time: 32,
-                    endtime: 'Sidney No. 1 Lake Park',
-                },
             ],
             selsectSchool: []
         }
@@ -117,14 +102,24 @@ class bk extends Component {
 
                 // store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
             })
-            loginUserList(parmas).then(res => {
-                const list = res.data.list.map((res, index) => {
-                    res.key = `${index}`
-                    return res
+            get_company_list().then(res => {
+                console.log(res)
+                const company_list = res.data.company_list.map((res, index) => {
+                    return <Option key={res.company} value={res.company} >{res.company}</Option>
                 })
                 this.setState({
-                    data: list,
-                    totalCount: Number(res.data.total_count)
+                    companyList: res.data.company_list,
+                    company_list
+                })
+                loginUserList(parmas).then(res => {
+                    const list = res.data.list.map((res, index) => {
+                        res.key = `${index}`
+                        return res
+                    })
+                    this.setState({
+                        data: list,
+                        totalCount: Number(res.data.total_count)
+                    })
                 })
             })
             grade_id_List().then(res => {
@@ -146,24 +141,12 @@ class bk extends Component {
                 })
             })
             get_user_by_set().then(res => {
-                console.log(res)
-
                 const user_byCanSet = res.data.list.map((res, index) => {
                     return <Option key={res.name} value={res.name} >{res.name}</Option>
                 })
                 this.setState({
                     user_byCanSet,
                     userbyCanSetList: res.data.list
-                })
-            })
-            get_company_list().then(res => {
-                console.log(res)
-                const company_list = res.data.company_list.map((res, index) => {
-                    return <Option key={res.company} value={res.company} >{res.company}</Option>
-                })
-                this.setState({
-                    company_list,
-                    companyList: res.data.company_list
                 })
             })
         } else {
@@ -312,13 +295,13 @@ class bk extends Component {
             }
         })
     };
-    schoolSetOk = ()=>{
-        const schoolParmas = {...this.state.schoolParmas}
-        set_user_school_rela(schoolParmas).then(res=>{
-            if(res.code === 0){
+    schoolSetOk = () => {
+        const schoolParmas = { ...this.state.schoolParmas }
+        set_user_school_rela(schoolParmas).then(res => {
+            if (res.code === 0) {
                 this.schoolSetCancel()
                 message.success(res.message)
-            }else{
+            } else {
                 this.schoolSetCancel()
                 message.error(res.message)
             }
@@ -367,8 +350,8 @@ class bk extends Component {
                 status: null,
                 comment: ''
             },
-            selsectWatchUser:'',
-            selsectSchool:[]
+            selsectWatchUser: '',
+            selsectSchool: []
         });
     }
     handleChange = info => {
@@ -556,6 +539,28 @@ class bk extends Component {
         }
         return <Tag color='geekblue' >{name}</Tag>
     }
+    own_school = e => {
+        const companyList = this.state.companyList
+        const list = []
+        if (e.mul_company_ids) {
+            e.mul_company_ids.split(',').forEach((res, index) => {
+                companyList.forEach((l1, index) => {
+                    if (res === l1.id) {
+                        list.push(<Tag color='geekblue' key={index}>{l1.company}</Tag>)
+                    }
+                })
+            })
+            return list
+        } else {
+            let company = ''
+            companyList.forEach((l1) => {
+                if (l1.id === e.company_id) {
+                    company = l1.company
+                }
+            })
+            return <Tag color='geekblue'>{company}</Tag>
+        }
+    }
     detail = e => {
         let user_id = { user_id: e.id }
         const grade_list = this.state.grade_list
@@ -692,8 +697,8 @@ class bk extends Component {
                 const btnPermission = (
                     <div>
                         <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
-                        <Button className="m-left" type="primary" onClick={() => this.detail(e)}>修改</Button>
-                        <Button className="m-left" type="danger" onClick={() => this.delete(e)}>删除</Button>
+                        <Button className="m-left " type="primary" onClick={() => this.detail(e)}>修改</Button>
+                        <Button className="m-left " type="danger" onClick={() => this.delete(e)}>删除</Button>
                     </div>
                 )
                 return btnPermission
@@ -740,6 +745,7 @@ class bk extends Component {
                 title: '姓名',
                 dataIndex: 'name',
                 key: 'name',
+                align: 'center',
                 render: (text) => (
                     <span>
                         {text ? text : 'null'}
@@ -750,6 +756,7 @@ class bk extends Component {
                 title: '用户名',
                 dataIndex: 'username',
                 key: 'username',
+                align: 'center',
                 render: (text) => (
                     <span>
                         {text ? text : 'null'}
@@ -760,6 +767,7 @@ class bk extends Component {
                 title: '拥有权限',
                 dataIndex: 'permission',
                 key: 'permission',
+                align: 'center',
                 render: (text) => (
                     <span>
                         {this.quanxianTag(text)}
@@ -770,6 +778,7 @@ class bk extends Component {
                 title: '老师类型',
                 dataIndex: 'teacher_type',
                 key: 'teacher_type',
+                align: 'center',
                 render: (text) => (
                     <span>
                         {this.teachTag(text)}
@@ -777,9 +786,20 @@ class bk extends Component {
                 ),
             },
             {
+                title: '归属校区',
+                key: 'mul_company_ids',
+                align: 'center',
+                render: (text) => (
+                    <span>
+                        {this.own_school(text)}
+                    </span>
+                ),
+            },
+            {
                 title: '年级和学科',
                 dataIndex: 'tags',
                 key: 'tags',
+                align: 'center',
                 render: (text) => (
                     <span>
                         {this.tagC(text)}
@@ -789,6 +809,8 @@ class bk extends Component {
             {
                 title: '操作',
                 key: 'action',
+                align: 'center',
+                width: 300,
                 render: (text) => (
                     <span>
                         {this.quanxianAction(text)}

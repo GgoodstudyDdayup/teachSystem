@@ -150,7 +150,7 @@ class main extends Component {
                     <div className="logoicon">
                     </div>
                     <Menu onClick={this.handleClick} mode="vertical" theme="dark">
-                        <SubMenu
+                        {/* <SubMenu
                             key="sub1"
                             title={
                                 <span>
@@ -171,7 +171,7 @@ class main extends Component {
                             <Menu.Item key="4">
                                 <Link to="/main/tk/mine">我的题目</Link>
                             </Menu.Item>
-                        </SubMenu>
+                        </SubMenu> */}
                         <SubMenu
                             key="sub2"
                             title={
@@ -249,10 +249,12 @@ class main extends Component {
                                         {this.state.children}
                                     </Select>
                                     <span style={{ marginLeft: 10 }}>教学系统</span>
+                                    <span style={{fontSize:8,marginLeft: 10}}>V 1.0.0</span>
                                 </span>
                                 :
                                 <span>
                                     {this.state.company_name}教学系统
+                                    <span style={{fontSize:10,marginLeft: 10}}>V 1.0.0</span>
                                 </span>
                             }
                         </div>

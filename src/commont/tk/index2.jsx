@@ -4,7 +4,7 @@ import Select from './selection'
 import Know from './knowlist'
 import List from './list'
 import Searchbtn from './searchbtn'
-import { tkList, subjectList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../axios/http'
+import { tkList, subjectList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type, get_paper_info } from '../../axios/http'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
 const { Search } = Input
@@ -270,7 +270,7 @@ class tikuguanli2 extends Component {
                 params
             })
         })
-        
+
         tkList({ subject_id: params.subject_id }).then(res => {
             this.shaixuanName(res.data)
         })
@@ -362,6 +362,12 @@ class tikuguanli2 extends Component {
             message.error(err)
         })
     }
+    listView = e => {
+        console.log(e)
+        get_paper_info({paper_id:e}).then(res=>{
+            console.log(res)
+        })
+    }
     render() {
         return (
             <div>
@@ -373,7 +379,7 @@ class tikuguanli2 extends Component {
                     <Badge count={this.state.cardTotal} className="m-shopicon">
                     </Badge>
                 </div>
-                <div className="topic-panel" style={{ display: this.state.clear,zIndex:9999 }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
+                <div className="topic-panel" style={{ display: this.state.clear, zIndex: 9999 }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <div className="topic-row header">
                         <div className="topic-col">已选题型</div>
                         <div className="topic-col">数量</div>
@@ -407,7 +413,7 @@ class tikuguanli2 extends Component {
                     <TabPane tab="真题试卷" key="2" >
                         <div className="knowlage">
                             <div className="tree">
-                                <Know params={this.state.params}></Know>
+                                <Know params={this.state.params} listView={this.listView}></Know>
                             </div>
                             <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
                                 <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
