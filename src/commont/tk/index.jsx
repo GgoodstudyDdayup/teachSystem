@@ -56,7 +56,7 @@ class tikuguanli extends Component {
                 title: '',
                 aitifen_id: '',
                 children: [
-                    
+
                 ]
             }
             ],
@@ -291,8 +291,19 @@ class tikuguanli extends Component {
         this.props.history.push('/main/zujuan')
     }
     selectonChange = (value) => {
-        const params = { ...this.state.params }
-        params.subject_id = value[1]
+        const params = {
+            subject_id: value[1],
+            knowledge_id: '',
+            ques_type_id: '',
+            province_id: '',
+            year: '',
+            difficulty_id: '',
+            source_id: '',
+            grade_id: '',
+            key_words: '',
+            page: 1,
+            page_size: 20
+        }
         question(params).then(res => {
             this.setState({
                 list: res.data.list,
@@ -415,6 +426,15 @@ class tikuguanli extends Component {
             message.error(err)
         })
     }
+    keyWord = e => {
+        const params = { ...this.state.params }
+        params.key_words = e
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list
+            })
+        })
+    }
     render() {
         return (
             <div>
@@ -427,7 +447,7 @@ class tikuguanli extends Component {
                     <Badge count={this.state.cardTotal} className="m-shopicon">
                     </Badge>
                 </div>
-                <div className="topic-panel" style={{ display: this.state.clear,zIndex:9999 }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
+                <div className="topic-panel" style={{ display: this.state.clear, zIndex: 9999 }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <div className="topic-row header">
                         <div className="topic-col">已选题型</div>
                         <div className="topic-col">数量</div>
@@ -461,7 +481,7 @@ class tikuguanli extends Component {
                             </div>
                             <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
                                 <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
-                                <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
+                                <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton />
                                 {/* <div className="m-scroll-list"> */}
                                 <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}>
                                 </List>

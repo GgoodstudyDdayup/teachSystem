@@ -28,7 +28,6 @@ export default class EditorDemo extends React.Component {
     }
     render() {
         const { editorState } = this.state.editorState
-        const { editorState2 } = this.state.editorState2
         return (
             <div>
                 <div className="my-component my-editor-component">
@@ -39,14 +38,7 @@ export default class EditorDemo extends React.Component {
                         contentStyle={{ height: 200 }}
                     />
                 </div>
-                <div className="my-component my-editor-component">
-                    <BraftEditor
-                        contentStyle={{ height: 200 }}
-                        value={editorState2}
-                        onChange={this.handleEditorChange}
-                        onSave={this.submitContent}
-                    />
-                </div>
+                <div>math</div>
             </div>
 
         )

@@ -364,8 +364,20 @@ class tikuguanli2 extends Component {
     }
     listView = e => {
         console.log(e)
-        get_paper_info({paper_id:e}).then(res=>{
+        get_paper_info({ paper_id: e }).then(res => {
             console.log(res)
+            this.setState({
+                list: res.data.ques_list
+            })
+        })
+    }
+    keyWord = e => {
+        const params = { ...this.state.params }
+        params.key_words = e
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list
+            })
         })
     }
     render() {
@@ -417,7 +429,7 @@ class tikuguanli2 extends Component {
                             </div>
                             <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
                                 <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
-                                <Search className="m-bottom" placeholder="试题内容搜索" onSearch={value => console.log(value)} enterButton />
+                                <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton />
                                 {/* <div className="m-scroll-list"> */}
                                 <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
                                 {/* </div> */}

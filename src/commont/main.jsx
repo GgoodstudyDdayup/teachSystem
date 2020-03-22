@@ -150,7 +150,7 @@ class main extends Component {
                     <div className="logoicon">
                     </div>
                     <Menu onClick={this.handleClick} mode="vertical" theme="dark">
-                        {/* <SubMenu
+                        <SubMenu
                             key="sub1"
                             title={
                                 <span>
@@ -171,7 +171,7 @@ class main extends Component {
                             <Menu.Item key="4">
                                 <Link to="/main/tk/mine">我的题目</Link>
                             </Menu.Item>
-                        </SubMenu> */}
+                        </SubMenu>
                         <SubMenu
                             key="sub2"
                             title={

@@ -103,7 +103,6 @@ class bk extends Component {
                 // store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
             })
             get_company_list().then(res => {
-                console.log(res)
                 const company_list = res.data.company_list.map((res, index) => {
                     return <Option key={res.company} value={res.company} >{res.company}</Option>
                 })
@@ -499,6 +498,7 @@ class bk extends Component {
         }
     }
     quanxianTag = (e) => {
+        console.log(e)
         const permission = [{
             id: '1',
             name: "系统管理员"

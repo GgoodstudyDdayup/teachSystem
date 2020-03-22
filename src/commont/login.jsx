@@ -51,7 +51,7 @@ class Login extends Component {
                             sessionStorage.setItem("company_list", JSON.stringify(res.data.data.company_list))
                             sessionStorage.setItem('company', res.data.data.company_list[0].company)
                             sessionStorage.setItem('company_id', res.data.data.company_list[0].company_id || res.data.data.user_info.company_id)
-                            this.props.history.push("/main/bk")
+                            this.props.history.push("/main")
                         } else {
                             get_company_list().then(l1 => {
                                 if (l1.code === 0) {
@@ -64,7 +64,7 @@ class Login extends Component {
                                     sessionStorage.setItem("company_list", JSON.stringify(company_list))
                                     sessionStorage.setItem('company', company_list[0].company)
                                     sessionStorage.setItem('company_id', company_list[0].id)
-                                    this.props.history.push("/main/bk")
+                                    this.props.history.push("/main")
                                 }else{
                                     message.warning('系统繁忙请重试')
                                 }

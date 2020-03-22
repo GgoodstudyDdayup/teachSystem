@@ -194,8 +194,9 @@
 .know-title {
   font-size: 12px;
   color: #69f;
-  display: inline-block;
   vertical-align: middle;
+  display: flex;
+  align-items: center;
 }
 
 .know-title:nth-child(2) {

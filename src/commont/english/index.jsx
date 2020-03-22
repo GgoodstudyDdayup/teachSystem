@@ -9,7 +9,8 @@ export default class EditorDemo extends React.Component {
         this.state = {
             // 创建一个空的editorState作为初始值
             editorState: BraftEditor.createEditorState(null),
-            editorState2: BraftEditor.createEditorState(null)
+            editorState2: BraftEditor.createEditorState(null),
+            editorState3: BraftEditor.createEditorState(null)
         }
     }
     componentDidMount() {
@@ -26,25 +27,49 @@ export default class EditorDemo extends React.Component {
         console.log(editorState.toHTML())
         this.setState({ editorState })
     }
+    handleEditorChange2 = (editorState2) => {
+        console.log(editorState2.toHTML())
+        this.setState({ editorState2 })
+    }
+    handleEditorChange3 = (editorState3) => {
+        console.log(editorState3.toHTML())
+        this.setState({ editorState3 })
+    }
     render() {
+        const controls = ['bold', 'italic', 'font-size','underline', 'text-color', 'separator']
         const { editorState } = this.state.editorState
         const { editorState2 } = this.state.editorState2
+        const { editorState3 } = this.state.editorState3
         return (
             <div>
+                <div style={{ padding: '8px 0', fontSize: 16, fontWeight: 'bold' }}>填空题</div>
                 <div className="my-component my-editor-component">
                     <BraftEditor
                         value={editorState}
                         onChange={this.handleEditorChange}
+                        controls={controls}
                         onSave={this.submitContent}
                         contentStyle={{ height: 200 }}
                     />
                 </div>
+                <div style={{ padding: '8px 0', fontSize: 16, fontWeight: 'bold' }}>答案</div>
                 <div className="my-component my-editor-component">
                     <BraftEditor
-                        contentStyle={{ height: 200 }}
                         value={editorState2}
-                        onChange={this.handleEditorChange}
+                        onChange={this.handleEditorChange2}
+                        controls={controls}
                         onSave={this.submitContent}
+                        contentStyle={{ height: 100 }}
+                    />
+                </div>
+                <div style={{ padding: '8px 0', fontSize: 16, fontWeight: 'bold' }}>解析</div>
+                <div className="my-component my-editor-component">
+                    <BraftEditor
+                        value={editorState3}
+                        onChange={this.handleEditorChange3}
+                        controls={controls}
+                        onSave={this.submitContent}
+                        contentStyle={{ height: 100 }}
                     />
                 </div>
             </div>
