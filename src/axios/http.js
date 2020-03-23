@@ -194,3 +194,9 @@ export const set_user_school_rela = (params) => {
 export const get_ques_type_list = (params) => {
     return instance.post('/api/system/get_ques_type_list', params)
 }
+
+//创建自己的试题
+export const add_question = (params) => {
+    return instance.post('/api/question/add_question', params)
+}
+

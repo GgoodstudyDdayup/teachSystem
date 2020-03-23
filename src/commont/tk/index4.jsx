@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon } from 'antd';
+import { Tabs, Spin, Badge, Icon, Button, Divider } from 'antd';
 import Select from './selection'
 import Searchbtn from './searchbtn'
 import Empty2 from './mysiku'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
-import { tkList, subjectList,get_question_cart } from '../../axios/http'
+import { tkList, subjectList, get_question_cart } from '../../axios/http'
 
 const { TabPane } = Tabs;
 class tikuguanli4 extends Component {
@@ -13,8 +13,7 @@ class tikuguanli4 extends Component {
         super(props)
         this.state = {
             list: [
-                { appear: false, btnc: true },
-                { appear: true, btnc: true }
+
             ],
             searchList: [{
                 name: '题型',
@@ -204,7 +203,7 @@ class tikuguanli4 extends Component {
                     <Badge count={this.state.cardTotal} className="m-shopicon">
                     </Badge>
                 </div>
-                <div className="topic-panel" style={{ display: this.state.clear,zIndex:9999 }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
+                <div className="topic-panel" style={{ display: this.state.clear, zIndex: 9999 }} onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <div className="topic-row header">
                         <div className="topic-col">已选题型</div>
                         <div className="topic-col">数量</div>
@@ -242,8 +241,14 @@ class tikuguanli4 extends Component {
 
                     </TabPane>
                     <TabPane tab="我的题目" key="4">
+                        {this.state.list.length > 0 ?
+                            <div>
+                                <Button type="primary" onClick={this.creatT}>创建试题</Button>
+                                <Divider dashed />
+                            </div>
+                            : ''}
                         <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
-                        <Empty2 funt={this.creatT}></Empty2>
+                        {this.state.list.length > 0 ? '' : <Empty2 funt={this.creatT}></Empty2>}
                     </TabPane>
                 </Tabs>
             </div >

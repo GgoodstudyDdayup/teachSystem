@@ -3397,7 +3397,12 @@ braft-finder@^0.0.19:
   resolved "https://registry.yarnpkg.com/braft-finder/-/braft-finder-0.0.19.tgz#c324d82526ed3476a93de86cc9b407f4e188bc8d"
   integrity sha512-0kzI6/KbomJJhYX1hpjn4edCKhblyUyWdUrsgBmOrwy0vrj+pPkm69+Uf8Uj6KGAULM6LF0ooC++p7fqUGgFHw==
 
-braft-utils@^3.0.8:
+braft-finder@^0.0.21:
+  version "0.0.21"
+  resolved "https://registry.yarnpkg.com/braft-finder/-/braft-finder-0.0.21.tgz#c64508f13ce04a53a5efcd708dc69b868428a284"
+  integrity sha512-EYfmFKrH20t36jPlNbYFEOzkcXoGAYNRG2nbrrvLqsvAbuRTPbuQzKxa4fG7iKn2RuP3kKng9uafdA+GBM90HQ==
+
+braft-utils@^3.0.12, braft-utils@^3.0.8:
   version "3.0.12"
   resolved "https://registry.yarnpkg.com/braft-utils/-/braft-utils-3.0.12.tgz#2b755ce1d8397d96b627b6767f74d07f25729d85"
   integrity sha512-O2cKysURNC4HSEMKgNmQ2RluwcrxvYrztlEmyPN5SzktiNX3vaLFQoo0Ez3PlIhvjaGrIBSIT2Oyh2N6mn6TFg==
