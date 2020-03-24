@@ -26,7 +26,7 @@ export default class EditorDemo extends React.Component {
     // }
 
     //这个是内容
-    handleEditorChange = (editorState) => {
+    handleChange = (editorState) => {
         this.props.ques_content(editorState.toHTML())
         this.setState({ editorState })
     }
@@ -42,52 +42,32 @@ export default class EditorDemo extends React.Component {
         this.props.ques_analysis(editorState3.toHTML())
         this.setState({ editorState3 })
     }
-    handleChange = info => {
-        let fileList = [...info.fileList];
-        // 1. Limit the number of uploaded files
-        // Only to show two recent uploaded files, and old ones will be replaced by the new
-        fileList = fileList.slice(-2);
-        // 2. Read from response and show file link
-        fileList = fileList.map(file => {
-            if (file.response) {
-                if (file.response.data.code !== 106) {
-                    file.url = file.response.data.full_path;
-                } else {
-                    return false
-                }
-            }
-            // Component will show file.url as link
-            return file
-        })
-        console.log(fileList)
+    uploadHandler = (param) => {
+        console.log(param)
+        if (!param.file) {
+            return false
+        }
+
         this.setState({
             editorState: ContentUtils.insertMedias(this.state.editorState, [{
                 type: 'IMAGE',
-                url: URL.createObjectURL
+                url: 'https://devjiaoxueapi.yanuojiaoyu.com/upload/self_lecture/202003241722206911.jpg'
             }])
-        });
+        })
+
     }
 
     render() {
-        const props = {
-            action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
-            onChange: this.handleChange,
-            showUploadList: false,
-            headers: {
-                username: sessionStorage.getItem('username'),
-                token: sessionStorage.getItem('token'),
-                companyid: sessionStorage.getItem('company_id'),
-            },
-            name: 'upload_control'
-        };
-        const controls = ['bold', 'italic', 'underline', 'text-color', 'separator']
+        const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
         const extendControls = [
             {
                 key: 'antd-uploader',
                 type: 'component',
                 component: (
                     <Upload
-                        {...props}
+                        accept="image/*"
+                        showUploadList={false}
+                        customRequest={this.uploadHandler}
                     >
                         {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
                         <button type="button" className="control-item button upload-button" data-title="插入图片">
@@ -97,23 +77,21 @@ export default class EditorDemo extends React.Component {
                 )
             }
         ]
-        const { editorState } = this.state.editorState
         const { editorState3 } = this.state.editorState3
         return (
             <div>
-                <div style={{ padding: '8px 0', fontSize: 16, fontWeight: 'bold' }}>判断题</div>
+                <div className="m-row" style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }}>题目</div>
                 <div className="my-component my-editor-component">
                     <BraftEditor
-                        value={editorState}
-                        onChange={this.handleEditorChange}
+                        value={this.state.editorState}
+                        onChange={this.handleChange}
                         controls={controls}
+                        contentStyle={{ height: 300 }}
                         extendControls={extendControls}
-                        onSave={this.submitContent}
-                        contentStyle={{ height: 200 }}
                     />
                 </div>
                 <div className="m-flex m-bottom" style={{ alignItems: 'center' }}>
-                    <span style={{ padding: '8px 0', fontSize: 16, fontWeight: 'bold' }}>答案</span>
+                    <span style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }}>答案</span>
                     <div className="m-left">
                         <Radio.Group onChange={this.onchange} value={this.state.panduan}>
                             <Radio value='是'>是</Radio>
@@ -121,7 +99,7 @@ export default class EditorDemo extends React.Component {
                         </Radio.Group>
                     </div>
                 </div>
-                <div style={{ padding: '8px 0', fontSize: 16, fontWeight: 'bold' }}>解析</div>
+                <div style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }}>解析</div>
                 <div className="my-component my-editor-component">
                     <BraftEditor
                         value={editorState3}

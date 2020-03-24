@@ -151,6 +151,16 @@ class main extends Component {
                     </div>
                     <Menu onClick={this.handleClick} mode="vertical" theme="dark">
                         <SubMenu
+                            key=""
+                            title={
+                                <span>
+                                    <Icon type="mail" />
+                                    <span>测评系统</span>
+                                </span>
+                            }
+                        >
+                        </SubMenu>
+                        <SubMenu
                             key="sub1"
                             title={
                                 <span>
@@ -185,6 +195,56 @@ class main extends Component {
                                 <Link to="/main/bk">课程表</Link></Menu.Item>
                             <Menu.Item key="6">
                                 <Link to="/main/bk/prograss">审核进度</Link></Menu.Item>
+                        </SubMenu>
+                        <SubMenu
+                            key="55"
+                            title={
+                                <span>
+                                    <Icon type="mail" />
+                                    <span>授课系统</span>
+                                </span>
+                            }
+                        >
+                        </SubMenu>
+                        <SubMenu
+                            key="44"
+                            title={
+                                <span>
+                                    <Icon type="mail" />
+                                    <span>课后练习</span>
+                                </span>
+                            }
+                        >
+                        </SubMenu>
+                        <SubMenu
+                            key="33"
+                            title={
+                                <span>
+                                    <Icon type="mail" />
+                                    <span>自适应训练</span>
+                                </span>
+                            }
+                        >
+                        </SubMenu>
+                        <SubMenu
+                            key="22"
+                            title={
+                                <span>
+                                    <Icon type="mail" />
+                                    <span>资源管理</span>
+                                </span>
+                            }
+                        >
+                        </SubMenu>
+                        <SubMenu
+                            key="ss"
+                            title={
+                                <span>
+                                    <Icon type="mail" />
+                                    <span>REP行为</span>
+                                </span>
+                            }
+                        >
                         </SubMenu>
                         {/* <SubMenu
                             key="sub4"
@@ -249,12 +309,12 @@ class main extends Component {
                                         {this.state.children}
                                     </Select>
                                     <span style={{ marginLeft: 10 }}>教学系统</span>
-                                    <span style={{fontSize:8,marginLeft: 10}}>V 1.0.0</span>
+                                    <span style={{ fontSize: 8, marginLeft: 10 }}>V 1.0.0</span>
                                 </span>
                                 :
                                 <span>
                                     {this.state.company_name}教学系统
-                                    <span style={{fontSize:10,marginLeft: 10}}>V 1.0.0</span>
+                                    <span style={{ fontSize: 10, marginLeft: 10 }}>V 1.0.0</span>
                                 </span>
                             }
                         </div>

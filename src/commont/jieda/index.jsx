@@ -1,31 +1,19 @@
+import 'braft-editor/dist/index.css'
 import React from 'react'
+import BraftEditor from 'braft-editor'
 import { ContentUtils } from 'braft-utils'
 import { Upload, Icon } from 'antd'
-// 引入编辑器组件
-import BraftEditor from 'braft-editor'
-// 引入编辑器样式
-import 'braft-editor/dist/index.css'
-export default class EditorDemo extends React.Component {
+
+export default class UploadDemo extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            // 创建一个空的editorState作为初始值
             editorState: BraftEditor.createEditorState(null),
             editorState2: BraftEditor.createEditorState(null),
             editorState3: BraftEditor.createEditorState(null)
         }
     }
-    componentDidMount() {
-        // 使用BraftEditor.createEditorState将html字符串转换为编辑器需要的editorStat
-    }
-    // submitContent = async () => {
-    //     // 在编辑器获得焦点时按下ctrl+s会执行此方法
-    //     // 编辑器内容提交到服务端之前，可直接调用editorState.toHTML()来获取HTML格式的内容
-    //     const htmlContent = this.state.editorState.toHTML()
-    //     const result = await saveEditorContent(htmlContent)
-    // }
-    //这个是内容
-    handleEditorChange = (editorState) => {
+    handleChange = (editorState) => {
         this.props.ques_content(editorState.toHTML())
         this.setState({ editorState })
     }
@@ -39,51 +27,33 @@ export default class EditorDemo extends React.Component {
         this.props.ques_analysis(editorState3.toHTML())
         this.setState({ editorState3 })
     }
-    handleChange = info => {
-        let fileList = [...info.fileList];
-        // 1. Limit the number of uploaded files
-        // Only to show two recent uploaded files, and old ones will be replaced by the new
-        fileList = fileList.slice(-2);
-        // 2. Read from response and show file link
-        fileList = fileList.map(file => {
-            if (file.response) {
-                if (file.response.data.code !== 106) {
-                    file.url = file.response.data.full_path;
-                } else {
-                    return false
-                }
-            }
-            // Component will show file.url as link
-            return file
-        })
-        console.log(fileList)
+    uploadHandler = (param) => {
+        console.log(param)
+        if (!param.file) {
+            return false
+        }
+
         this.setState({
             editorState: ContentUtils.insertMedias(this.state.editorState, [{
                 type: 'IMAGE',
-                url: URL.createObjectURL
+                url: 'https://devjiaoxueapi.yanuojiaoyu.com/upload/self_lecture/202003241722206911.jpg'
             }])
-        });
+        })
+
     }
+
     render() {
-        const props = {
-            action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
-            onChange: this.handleChange,
-            showUploadList: false,
-            headers: {
-                username: sessionStorage.getItem('username'),
-                token: sessionStorage.getItem('token'),
-                companyid: sessionStorage.getItem('company_id'),
-            },
-            name: 'upload_control'
-        };
-        const controls = ['bold', 'italic', 'underline', 'text-color', 'separator']
+
+        const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
         const extendControls = [
             {
                 key: 'antd-uploader',
                 type: 'component',
                 component: (
                     <Upload
-                        {...props}
+                        accept="image/*"
+                        showUploadList={false}
+                        customRequest={this.uploadHandler}
                     >
                         {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
                         <button type="button" className="control-item button upload-button" data-title="插入图片">
@@ -93,36 +63,33 @@ export default class EditorDemo extends React.Component {
                 )
             }
         ]
-        const { editorState } = this.state.editorState
-        const { editorState2 } = this.state.editorState2
-        const { editorState3 } = this.state.editorState3
+
         return (
             <div>
-                <div style={{ padding: '8px 0', fontSize: 16, fontWeight: 'bold' }}>解答题</div>
-                <div className="my-component my-editor-component">
+                <div className="m-row" style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }}>题目</div>
+                <div className="editor-wrapper my-component my-editor-component">
                     <BraftEditor
-                        value={editorState}
-                        onChange={this.handleEditorChange}
+                        value={this.state.editorState}
+                        onChange={this.handleChange}
                         controls={controls}
+                        contentStyle={{ height: 300 }}
                         extendControls={extendControls}
-                        onSave={this.submitContent}
-                        contentStyle={{ height: 200 }}
                     />
                 </div>
-                <div style={{ padding: '8px 0', fontSize: 16, fontWeight: 'bold' }}>答案</div>
+                <div style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }}>答案</div>
                 <div className="my-component my-editor-component">
                     <BraftEditor
-                        value={editorState2}
+                        value={this.state.editorState2}
                         onChange={this.handleEditorChange2}
                         controls={controls}
                         onSave={this.submitContent}
                         contentStyle={{ height: 100 }}
                     />
                 </div>
-                <div style={{ padding: '8px 0', fontSize: 16, fontWeight: 'bold' }}>解析</div>
+                <div style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }}>解析</div>
                 <div className="my-component my-editor-component">
                     <BraftEditor
-                        value={editorState3}
+                        value={this.state.editorState3}
                         onChange={this.handleEditorChange3}
                         controls={controls}
                         onSave={this.submitContent}
@@ -130,7 +97,6 @@ export default class EditorDemo extends React.Component {
                     />
                 </div>
             </div>
-
         )
 
     }
