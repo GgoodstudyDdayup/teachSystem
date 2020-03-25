@@ -4,7 +4,7 @@ const { TreeNode } = Tree;
 const TreeMain = (props) => {
     return (
         <div>
-            <TreeList tree={props.data} funt={props.funt} know_lageId={props.know_lageId}></TreeList>
+            <TreeList tree={props.data} funt={props.funt} know_lageId={props.know_lageId} know_lageName={props.know_lageName}></TreeList>
         </div>
     )
 }
@@ -25,6 +25,7 @@ const TreeList = (props) => {
             resolve(result)
         }).then(res => {
             const result = res
+            const resultKnowLage = []
             result.forEach((l1, index) => {
                 props.tree.forEach((res2) => {
                     if (res2.children !== null) {
@@ -34,6 +35,7 @@ const TreeList = (props) => {
                                     if (res4.children !== null) {
                                         res4.children.forEach(res5 => {
                                             if (res5.aitifen_id === result[index].ques_knowledge_id) {
+                                                resultKnowLage.push(res5.title)
                                                 result[index].ques_knowledge_three_id = res4.aitifen_id
                                                 result[index].ques_knowledge_second_id = res3.aitifen_id
                                                 result[index].ques_knowledge_first_id = res2.aitifen_id
@@ -41,6 +43,7 @@ const TreeList = (props) => {
                                         })
                                     } else {
                                         if (res4.aitifen_id === result[index].ques_knowledge_id) {
+                                            resultKnowLage.push(res4.title)
                                             result[index].ques_knowledge_second_id = res3.aitifen_id
                                             result[index].ques_knowledge_first_id = res2.aitifen_id
                                         }
@@ -48,6 +51,7 @@ const TreeList = (props) => {
                                 })
                             } else {
                                 if (res3.aitifen_id === result[index].ques_knowledge_id) {
+                                    resultKnowLage.push(res3.title)
                                     result[index].ques_knowledge_first_id = res2.aitifen_id
                                 }
                             }
@@ -55,9 +59,14 @@ const TreeList = (props) => {
                     }
                 })
             })
-            return result
+            const obj = {
+                resultKnowLage,
+                result
+            }
+            return obj
         }).then(res => {
-            props.know_lageId(res)
+            props.know_lageId(res.result)
+            props.know_lageName(res.resultKnowLage)
         })
     };
     const l1 = props.tree.map((res) =>

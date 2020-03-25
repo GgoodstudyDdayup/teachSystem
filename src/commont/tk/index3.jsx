@@ -5,7 +5,7 @@ import Searchbtn from './searchbtn'
 import Empty from './siku'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
-import { tkList,subjectList,get_question_cart } from '../../axios/http'
+import { tkList,subjectList,get_question_cart ,question} from '../../axios/http'
 
 const { TabPane } = Tabs;
 class tikuguanli3 extends Component {
@@ -57,14 +57,76 @@ class tikuguanli3 extends Component {
             cardTotal: 10
         }
     }
-    //更改筛选id
+    //更改筛选筛选条件查询更改params
     changeSearchId = (e, index) => {
-        console.log(e, index)
-        const that = this
-        let searchList = that.state.searchList
-        searchList[index].h = e
-        that.setState({
-            searchList
+        const params = this.state.params
+        const searchList = this.state.searchList
+        switch (searchList[index].name) {
+            case '地区':
+                searchList[index].list.forEach((res) => {
+                    if (res.name === e) {
+                        params['province_id'] = res.province_id
+                        this.setState({
+                            params
+                        })
+                    }
+                })
+                break
+            case '难度':
+                searchList[index].list.forEach((res) => {
+                    if (res.name === e) {
+                        params['difficulty_id'] = res.difficulty_id
+                        this.setState({
+                            params
+                        })
+                    }
+                })
+                break
+            case '年份':
+                searchList[index].list.forEach((res) => {
+                    if (res.name === e) {
+                        params['year'] = res.year
+                        this.setState({
+                            params
+                        })
+                    }
+                })
+                break
+            case '题型':
+                searchList[index].list.forEach((res) => {
+                    if (res.name === e) {
+                        params['ques_type_id'] = res.ques_type_id
+                        this.setState({
+                            params
+                        })
+                    }
+                })
+                break
+            case '来源':
+                searchList[index].list.forEach((res) => {
+                    if (res.name === e) {
+                        params['source_id'] = res.source_id
+                        this.setState({
+                            params
+                        })
+                    }
+                })
+                break
+            default:
+                searchList[index].list.forEach((res) => {
+                    if (res.name === e) {
+                        params['grade_id'] = res.grade_id
+                        this.setState({
+                            params
+                        })
+                    }
+                })
+                break
+        }
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list
+            })
         })
     }
     //查看答案的伸缩
