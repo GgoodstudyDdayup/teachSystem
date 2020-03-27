@@ -17,7 +17,7 @@ class tikuguanli extends Component {
 
             ],
             params: {
-                subject_id: 38,
+                subject_id: 39,
                 knowledge_id: '',
                 ques_type_id: '',
                 province_id: '',
@@ -26,6 +26,7 @@ class tikuguanli extends Component {
                 source_id: '',
                 grade_id: '',
                 key_words: '',
+                is_old: 1,
                 page: 1,
                 page_size: 20
             },
@@ -52,14 +53,9 @@ class tikuguanli extends Component {
                 h: 16,
                 list: [{ id: 16, title: '不限' }, { id: 10, title: '999' }, { id: 11, title: '999' }, { id: 12, title: '999' }]
             }],
-            tree: [{
-                title: '',
-                aitifen_id: '',
-                children: [
-
-                ]
-            }
+            tree: [
             ],
+            selectValue: [],
             cart_ques_ids: [],
             spin: false,
             clear: 'none',
@@ -300,6 +296,7 @@ class tikuguanli extends Component {
             difficulty_id: '',
             source_id: '',
             grade_id: '',
+            is_old:1,
             key_words: '',
             page: 1,
             page_size: 20
@@ -307,7 +304,8 @@ class tikuguanli extends Component {
         question(params).then(res => {
             this.setState({
                 list: res.data.list,
-                params
+                params,
+                selectValue:value
             })
         })
         tree({ subject_id: params.subject_id }).then(res => {
@@ -440,7 +438,7 @@ class tikuguanli extends Component {
             <div>
 
                 <Spin tip="加载中..." size="large" className={this.state.spin ? 'm-spin' : 'm-spin-dis'} />
-                <Select selectonChange={this.selectonChange} data={this.state.options}></Select>
+                <Select selectonChange={this.selectonChange} data={this.state.options} value={this.state.selectValue}></Select>
                 <div className="m-shopcar" onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <Icon type="container" style={{ margin: `0 15px 0 0` }} />
                     我的试题篮

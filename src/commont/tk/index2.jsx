@@ -43,9 +43,11 @@ class tikuguanli2 extends Component {
                 grade_id: '',
                 difficulty_id: '',
                 key_words: '',
+                is_old: 1,
                 page: 1,
                 page_size: 20
             },
+            selectValue:[],
             cart_ques_ids: '',
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
@@ -262,7 +264,8 @@ class tikuguanli2 extends Component {
         const params = { ...this.state.params }
         params.subject_id = Number(e[1])
         this.setState({
-            params
+            params,
+            selectValue:e
         })
         question(params).then(res => {
             this.setState({
@@ -384,7 +387,7 @@ class tikuguanli2 extends Component {
         return (
             <div>
                 <Spin tip="加载中..." size="large" className={this.state.spin ? 'm-spin' : 'm-spin-dis'} />
-                <Select selectonChange={this.selectonChange} data={this.state.options}></Select>
+                <Select selectonChange={this.selectonChange} data={this.state.options} value={this.state.selectValue}></Select>
                 <div className="m-shopcar" onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <Icon type="container" style={{ margin: `0 15px 0 0` }} />
                     我的试题篮

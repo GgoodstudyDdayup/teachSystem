@@ -21,6 +21,7 @@ import Jiaoyanzu from './quanxian/jiaoyanzuquanxian'
 import CP from './cp'
 import ZY from './zy'
 import Tkquestion from './tk/braftEditor'
+import Test from '../commont/tset/test'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 const { Option } = Select
@@ -150,7 +151,7 @@ class main extends Component {
                     <div className="logoicon">
                     </div>
                     <Menu onClick={this.handleClick} mode="vertical" theme="dark">
-                        <SubMenu
+                        {/* <SubMenu
                             key=""
                             title={
                                 <span>
@@ -159,7 +160,7 @@ class main extends Component {
                                 </span>
                             }
                         >
-                        </SubMenu>
+                        </SubMenu> */}
                         <SubMenu
                             key="sub1"
                             title={
@@ -196,7 +197,7 @@ class main extends Component {
                             <Menu.Item key="6">
                                 <Link to="/main/bk/prograss">审核进度</Link></Menu.Item>
                         </SubMenu>
-                        <SubMenu
+                        {/* <SubMenu
                             key="55"
                             title={
                                 <span>
@@ -245,7 +246,7 @@ class main extends Component {
                                 </span>
                             }
                         >
-                        </SubMenu>
+                        </SubMenu> */}
                         {/* <SubMenu
                             key="sub4"
                             title={
@@ -365,7 +366,7 @@ class main extends Component {
                             <Route path="/main/tk/own" component={Tkown} />
                             <Route path="/main/tk/mine" component={Tkmine} />
                             <Route path="/main/question" component={Tkquestion} />
-
+                            <Route path="/main/test" component={Test}/>
 
                             {/* 资源中心的推荐资源 */}
                             <Route path="/main/resourceCenter/recommended" exact component={Recommended}></Route>

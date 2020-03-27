@@ -45,6 +45,7 @@ class tikuguanli3 extends Component {
                 page: 1,
                 page_size: 10
             },
+            selectValue:[],
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
                 this.setState({
@@ -145,17 +146,6 @@ class tikuguanli3 extends Component {
             list
         })
     }
-    //spin加载效果
-    // spin = () => {
-    //     this.setState({
-    //         spin: true
-    //     })
-    //     setTimeout(() => {
-    //         this.setState({
-    //             spin: false
-    //         })
-    //     }, 1500);
-    // }
     mouse = (e) => {
         if (e) {
             this.setState({
@@ -199,7 +189,8 @@ class tikuguanli3 extends Component {
         const params = { ...this.state.params }
         params.subject_id = Number(e[1])
         this.setState({
-            params
+            params,
+            selectValue:e
         })
     }
     shaixuanName = (...e) => {
@@ -256,7 +247,7 @@ class tikuguanli3 extends Component {
         return (
             <div>
                 <Spin tip="加载中..." size="large" className={this.state.spin ? 'm-spin' : 'm-spin-dis'} />
-                <Select selectonChange={this.selectonChange} data={this.state.options}></Select>
+                <Select selectonChange={this.selectonChange} data={this.state.options} value={this.state.selectValue}></Select>
                 <div className="m-shopcar" onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <Icon type="container" style={{ margin: `0 15px 0 0` }} />
                     我的试题篮

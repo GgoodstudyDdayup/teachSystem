@@ -8,7 +8,7 @@ import SelectA from './selection'
 import store from '../../store/index'
 import Tree from './editorTree'
 import { XueKeActionCreators } from '../../actions/XueKeList'
-import { subjectList, tkList, tree, add_question } from '../../axios/http'
+import { subjectList, tkList, tree, add_question, get_questioninfo } from '../../axios/http'
 import { Select, Divider, Radio, Input, Modal, Button, message } from 'antd'
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 const { Option } = Select
@@ -35,6 +35,7 @@ export default class EditorDemo extends React.Component {
             disabled: true,
             visible: false,
             value: '',
+            selectValue: [],
             panduanState: '',
             chooseState: '',
             sourceName: '',
@@ -43,49 +44,169 @@ export default class EditorDemo extends React.Component {
             typeName: '',
             gradeName: '',
             know_lageNameList: [],
+            ques_knowledge_idList: [],
+            sbjArray: [],
             params: {
                 course_type_id: 1,
-                ques_type_id: '',//问题类型id
+                ques_type_id: [],//问题类型id
                 ques_knowledge_ids: '',//知识点id
                 ques_source: '',//试卷来源 
-                ques_grade_id: '',//年级id
-                ques_subject_id: '',//科目id
+                ques_grade_id: [],//年级id
+                ques_subject_id: [],//科目id
                 ques_difficulty: '',//难易程度id
                 ques_answer: '',//答案
                 ques_content: '',//内容
                 ques_analysis: '',//解析
                 ques_school: '',
                 ques_options: '',
-                ques_source_type_id: '',
-                ques_year: ''
+                ques_source_type_id: [],
+                ques_year: []
             }
         }
     }
     componentDidMount() {
-        //获取科目的数据
-        subjectList().then(res => {
-            store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
-            this.setState({
-                subject_list: res.data.subject_list
+        const params = { ...this.state.params }
+        if (this.props.location.state) {
+            subjectList().then(res => {
+                store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
+                this.setState({
+                    subject_list: res.data.subject_list
+                })
+            }).then(() => {
+                get_questioninfo({ ques_id: this.props.location.state.ques_id }).then(res => {
+                    params.ques_content = res.data.model.ques_content
+                    params.ques_subject_id = res.data.model.ques_subject_id
+                    params.ques_answer = res.data.model.ques_answer
+                    params.ques_analysis = res.data.model.ques_analysis
+                    params.ques_difficulty = res.data.model.ques_difficulty
+                    params.ques_type_id = res.data.model.ques_type_id
+                    params.ques_grade_id = res.data.model.ques_grade_id
+                    params.ques_source = res.data.model.ques_source
+                    params.ques_year = res.data.model.ques_year
+                    params.course_type_id = res.data.model.course_type_id
+                    params.ques_school = res.data.model.ques_school
+                    params.ques_options = res.data.model.ques_options
+                    params.ques_source_type_id = res.data.model.ques_source_type_id
+                    let newSelectArray = [this.props.location.state.sbjArray[0].split('')[0] + this.props.location.state.sbjArray[0].split('')[1], this.props.location.state.sbjArray[1]]
+                    const know_lageNameList = res.data.question_tree_rela_list.map(res => {
+                        return res.title
+                    })
+                    const ques_knowledge_idList = res.data.question_tree_rela_list.map(res => {
+                        return res.ques_knowledge_id
+                    })
+                    this.setState({
+                        selectValue: newSelectArray,
+                        params,
+                        disabled: false,
+                        know_lageNameList,
+                        ques_knowledge_idList,
+                        sbjArray: this.props.location.state.sbjArray
+                    })
+                    return params.ques_subject_id
+                }).then((id) => {
+                    tkList({ subject_id: id }).then(res => {
+                        const tixingOptions = res.data.ques_type_rela_list.map((res, index) => {
+                            return <Option key={index} value={res.ques_type_id} >{res.name}</Option>
+                        })
+                        const grandOptions = res.data.grade_rela_list.map((res, index) => {
+                            return <Option key={index} value={res.grade_id} >{res.name}</Option>
+                        })
+                        const difficultyOptions = res.data.difficulty_rela_list.map((res, index) => {
+                            return <Radio key={index} value={res.difficulty_id}>{res.name}</Radio>
+                        })
+                        const sourceOptions = res.data.source_rela_list.map((res, index) => {
+                            return <Option key={index} value={res.source_id} >{res.name}</Option>
+                        })
+                        const yearOptions = res.data.year_rela_list.map((res, index) => {
+                            return <Option key={index} value={res.year}>{res.name}</Option>
+                        })
+                        const string = this.state.subject_list.reduce((item, res) => {
+                            if (id === res.subject_id) {
+                                item = res.name
+                            }
+                            return item
+                        }, '')
+                        const string5 = res.data.ques_type_rela_list.reduce((item, res) => {
+                            if (params.ques_type_id === res.ques_type_id) {
+                                item = res.name
+                            }
+                            return item
+                        }, '')
+                        const string2 = res.data.grade_rela_list.reduce((item, res) => {
+                            if (params.ques_grade_id === res.grade_id) {
+                                item = res.name
+                            }
+                            return item
+                        }, '')
+                        const string3 = res.data.year_rela_list.reduce((item, res) => {
+                            if (params.ques_year === res.year) {
+                                item = res.name
+                            }
+                            return item
+                        }, '')
+                        const string4 = res.data.source_rela_list.reduce((item, res) => {
+                            if (params.ques_source_type_id === res.source_id) {
+                                item = res.name
+                            }
+                            return item
+                        }, '')
+                        tree({ subject_id: id }).then(tree => {
+                            this.setState({
+                                tixingOptions,
+                                grandOptions,
+                                difficultyOptions,
+                                sourceOptions,
+                                yearOptions,
+                                params,
+                                tree: tree.data.list,
+                                disabled: false,
+                                subjectName: string,
+                                sourceName: string4,
+                                yearName: string3,
+                                typeName: string5,
+                                gradeName: string2,
+                                year_rela_list: res.data.year_rela_list,
+                                grade_rela_list: res.data.grade_rela_list,
+                                ques_type_rela_list: res.data.ques_type_rela_list,
+                                source_rela_list: res.data.source_rela_list
+                            })
+                        })
+
+                    })
+                })
             })
-        })
+        } else {
+            //获取科目的数据
+            subjectList().then(res => {
+                store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
+                this.setState({
+                    subject_list: res.data.subject_list
+                })
+            })
+        }
+
+    }
+    componentWillUnmount() {
+        this.setState = (state, callback) => {
+            return
+        }
     }
     selectonChange = e => {
         const params = {
             course_type_id: 1,
-            ques_type_id: '',//问题类型id
+            ques_type_id: [],//问题类型id
             ques_knowledge_ids: '',//知识点id
             ques_source: '',//试卷来源 
-            ques_grade_id: '',//年级id
-            ques_subject_id: '',//科目id
+            ques_grade_id: [],//年级id
+            ques_subject_id: [],//科目id
             ques_difficulty: '',//难易程度id
             ques_answer: '',//答案
             ques_content: '',//内容
             ques_analysis: '',//解析
             ques_options: '',
             ques_school: '',
-            ques_source_type_id: '',
-            ques_year: ''
+            ques_source_type_id: [],
+            ques_year: []
         }
         tkList({ subject_id: e[1] }).then(res => {
             const tixingOptions = res.data.ques_type_rela_list.map((res, index) => {
@@ -118,6 +239,8 @@ export default class EditorDemo extends React.Component {
                     sourceOptions,
                     yearOptions,
                     params,
+                    sbjArray: e,
+                    selectValue: e,
                     tree: tree.data.list,
                     disabled: false,
                     subjectName: string,
@@ -146,10 +269,8 @@ export default class EditorDemo extends React.Component {
         })
     }
     grandhandleChange = e => {
-        console.log(e)
         const params = { ...this.state.params }
         const grade_rela_list = this.state.grade_rela_list
-        console.log(grade_rela_list)
         params.ques_grade_id = e
         const string = grade_rela_list.reduce((item, res) => {
             if (e === res.grade_id) {
@@ -259,7 +380,6 @@ export default class EditorDemo extends React.Component {
             this.setState({
                 params
             })
-            console.log(params)
         } else {
             params.ques_answer = e
             this.setState({
@@ -281,10 +401,8 @@ export default class EditorDemo extends React.Component {
         this.setState({
             params
         })
-        console.log(params)
     }
     quesAnswer = e => {
-        console.log(e)
         const params = { ...this.state.params }
         params.ques_answer = e
         this.setState({
@@ -303,7 +421,6 @@ export default class EditorDemo extends React.Component {
         }
     };
     handleOk = e => {
-        console.log(e);
         this.setState({
             visible: false,
         });
@@ -313,7 +430,9 @@ export default class EditorDemo extends React.Component {
         params.ques_knowledge_ids = ''
         this.setState({
             visible: false,
-            params
+            params,
+            know_lageNameList: [],
+            ques_knowledge_idList: [],
         });
     };
     know_lageId = e => {
@@ -328,9 +447,13 @@ export default class EditorDemo extends React.Component {
             know_lageNameList: e
         })
     }
+    know_lagechangeList = (e) => {
+        this.setState({
+            ques_knowledge_idList: e
+        })
+    }
     tijiaoshiti = () => {
         const params = { ...this.state.params }
-        console.log(params)
         const that = this
         if (params.ques_type_id === '' || params.ques_knowledge_ids === '' || params.ques_grade_id === '' || params.ques_subject_id === '' || params.ques_difficulty === '' || params.ques_answer === '' || params.ques_content === '' || params.ques_analysis === '' || params.ques_source_type_id === '' || params.ques_year === '') {
             message.warning('请填写必填项')
@@ -343,10 +466,13 @@ export default class EditorDemo extends React.Component {
                 cancelText: '取消',
                 onOk() {
                     add_question(params).then(res => {
-                        console.log(res)
                         if (res.code === 0) {
-                            message.success(res.message)
-                            that.props.history.push("/main/tk/mine")
+                            message.success({
+                                content: res.message,
+                                onClose: () => {
+                                    that.props.history.push({ pathname: "/main/tk/mine", state: { subject_id: that.state.params.ques_subject_id, sbjArray: that.state.sbjArray } })
+                                }
+                            })
                         } else {
                             message.error(res.message)
                         }
@@ -373,25 +499,25 @@ export default class EditorDemo extends React.Component {
                     <Divider dashed />
                     <div className="m-flex m-bottom">
                         <div className=" m-bottom">
-                            <SelectA selectonChange={this.selectonChange} data={this.state.options}></SelectA>
+                            <SelectA selectonChange={this.selectonChange} data={this.state.options} value={this.state.selectValue}></SelectA>
                         </div>
                         <div className="m-left m-bottom">
-                            <Select style={{ width: 150 }} className='m-left' onChange={this.handleChange} placeholder="选择题型" disabled={this.state.disabled}>
+                            <Select style={{ width: 150 }} className='m-left' onChange={this.handleChange} placeholder="选择题型" value={this.state.params.ques_type_id} disabled={this.state.disabled}>
                                 {this.state.tixingOptions}
                             </Select>
                         </div>
                         <div className="m-left m-bottom">
-                            <Select style={{ width: 150 }} className='m-left' onChange={this.grandhandleChange} placeholder="选择年级" disabled={this.state.disabled}>
+                            <Select style={{ width: 150 }} className='m-left' onChange={this.grandhandleChange} placeholder="选择年级" value={this.state.params.ques_grade_id} disabled={this.state.disabled}>
                                 {this.state.grandOptions}
                             </Select>
                         </div>
                         <div className="m-left m-bottom">
-                            <Select style={{ width: 150 }} className='m-left' onChange={this.yearhandleChange} placeholder="年份" disabled={this.state.disabled}>
+                            <Select style={{ width: 150 }} className='m-left' onChange={this.yearhandleChange} placeholder="年份" value={this.state.params.ques_year} disabled={this.state.disabled}>
                                 {this.state.yearOptions}
                             </Select>
                         </div>
                         <div className="m-left m-bottom">
-                            <Select style={{ width: 150 }} className='m-left' onChange={this.sourcehandleChange} placeholder="来源类型" disabled={this.state.disabled}>
+                            <Select style={{ width: 150 }} className='m-left' onChange={this.sourcehandleChange} placeholder="来源类型" value={this.state.params.ques_source_type_id} disabled={this.state.disabled}>
                                 {this.state.sourceOptions}
                             </Select>
                         </div>
@@ -427,14 +553,14 @@ export default class EditorDemo extends React.Component {
                             cancelText="取消"
                         >
                             <div style={{ maxHeight: 400, overflowY: 'scroll' }}>
-                                <Tree data={this.state.tree} know_lageId={this.know_lageId} know_lageName={this.know_lageName} funt={this.changeaitifen_id}></Tree>
+                                <Tree data={this.state.tree} know_lagechangeList={this.know_lagechangeList} ques_knowledge_idList={this.state.ques_knowledge_idList} know_lageId={this.know_lageId} know_lageName={this.know_lageName} funt={this.changeaitifen_id}></Tree>
                             </div>
                         </Modal>
                         <Button onClick={this.showModal}>选择知识点</Button>
                         {
                             this.state.know_lageNameList.map((res, index) =>
                                 <div className="m-left" style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }} key={index}>
-                                    {res}
+                                    {res || res.title}
                                 </div>
                             )
                         }

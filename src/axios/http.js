@@ -200,3 +200,12 @@ export const add_question = (params) => {
     return instance.post('/api/question/add_question', params)
 }
 
+//删除自己的试题
+export const del_question = (params) => {
+    return instance.post('/api/question/del_question', params)
+}
+
+//获取详情接口
+export const get_questioninfo = (params) => {
+    return instance.post('/api/question/get_questioninfo', params)
+}

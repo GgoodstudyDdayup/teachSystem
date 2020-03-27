@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Button, Divider } from 'antd';
+import { Tabs, Spin, Badge, Icon, Button, Divider, message,Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Select from './selection'
 import Searchbtn from './searchbtn'
 import Empty2 from './mysiku'
+import List from './mineList'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
-import { tkList, subjectList, get_question_cart } from '../../axios/http'
-
+import { tkList, subjectList, get_question_cart, question, remove_question_cart, get_ques_ids_cart, add_question_cart, del_question } from '../../axios/http'
+const { confirm } = Modal;
 const { TabPane } = Tabs;
 class tikuguanli4 extends Component {
     constructor(props) {
@@ -15,23 +17,7 @@ class tikuguanli4 extends Component {
             list: [
 
             ],
-            searchList: [{
-                name: '题型',
-                h: 13,
-                list: [{ id: 13, title: '不限' }, { id: 1, title: '解答' }, { id: 2, title: '判断' }, { id: 3, title: '填空' }]
-            }, {
-                name: '年份',
-                h: 14,
-                list: [{ id: 14, title: '不限' }, { id: 4, title: '171' }, { id: 5, title: '4171' }, { id: 6, title: '4141' }]
-            }, {
-                name: '来源',
-                h: 15,
-                list: [{ id: 15, title: '不限' }, { id: 7, title: '888' }, { id: 8, title: '888' }, { id: 9, title: '888' }]
-            }, {
-                name: '难度',
-                h: 16,
-                list: [{ id: 16, title: '不限' }, { id: 10, title: '999' }, { id: 11, title: '999' }, { id: 12, title: '999' }]
-            }],
+
             params: {
                 subject_id: 38,
                 province_id: '',
@@ -41,15 +27,18 @@ class tikuguanli4 extends Component {
                 grade_id: '',
                 difficulty_id: '',
                 key_words: '',
+                is_old: -1,
                 page: 1,
                 page_size: 10
             },
+            selectValue:[],
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
                 this.setState({
                     options: store.getState().XueKeList
                 })
             }),
+            
             spin: false,
             clear: 'none',
             question_cart: [],
@@ -122,19 +111,23 @@ class tikuguanli4 extends Component {
                 })
                 break
         }
-        // question(params).then(res => {
-        //     this.setState({
-        //         list: res.data.list
-        //     })
-        // })
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list
+            })
+        })
     }
     //查看答案的伸缩
     add = (e) => {
-        const list = this.state.list
-        list[e].appear = !list[e].appear
-        this.setState({
-            list
-        })
+        if (this.state.appear === e) {
+            this.setState({
+                appear: ''
+            })
+        } else {
+            this.setState({
+                appear: e
+            })
+        }
     }
     //放入答题栏的变化
     btnChange = (e) => {
@@ -144,17 +137,6 @@ class tikuguanli4 extends Component {
             list
         })
     }
-    //spin加载效果
-    // spin = () => {
-    //     this.setState({
-    //         spin: true
-    //     })
-    //     setTimeout(() => {
-    //         this.setState({
-    //             spin: false
-    //         })
-    //     }, 1500);
-    // }
     mouse = (e) => {
         if (e) {
             this.setState({
@@ -168,6 +150,16 @@ class tikuguanli4 extends Component {
     }
     componentDidMount() {
         const params = { ...this.state.params }
+        if (this.props.location.state) {
+            params.subject_id = this.props.location.state.subject_id
+            question(params).then(res => {
+                this.setState({
+                    list: res.data.list,
+                    params,
+                    selectValue: this.props.location.state.sbjArray
+                })
+            })
+        }
         //获取科目的数据
         subjectList().then(res => {
             store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
@@ -183,6 +175,11 @@ class tikuguanli4 extends Component {
             this.setState({
                 question_cart: res.data.list,
                 cardTotal
+            })
+        })
+        get_ques_ids_cart().then(res => {
+            this.setState({
+                cart_ques_ids: res.data.cart_ques_ids
             })
         })
     }
@@ -232,8 +229,77 @@ class tikuguanli4 extends Component {
     selectonChange = (e) => {
         const params = { ...this.state.params }
         params.subject_id = Number(e[1])
-        this.setState({
-            params
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list,
+                params,
+                selectValue: e
+            })
+        })
+    }
+    moveOrAdd = (id) => {
+        let cart_ques_ids = this.state.cart_ques_ids
+        let result = ''
+        if (typeof (cart_ques_ids) !== 'object') {
+            let strArray = cart_ques_ids.split(',')
+            strArray.forEach(res => {
+                if (res === id) {
+                    result = true
+                }
+            })
+        } else {
+            result = false
+        }
+        return result
+    }
+    addQuestoin = (e, id) => {
+        e.stopPropagation()
+        add_question_cart({ ques_id: id }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                get_ques_ids_cart().then(res => {
+                    this.setState({
+                        cart_ques_ids: res.data.cart_ques_ids
+                    })
+                })
+                get_question_cart().then(res => {
+                    let cardTotal = null
+                    res.data.list.forEach(res => {
+                        cardTotal += Number(res.count)
+                    })
+                    this.setState({
+                        question_cart: res.data.list,
+                        cardTotal
+                    })
+                })
+            } else {
+                message.error(res.message)
+            }
+        })
+    }
+    deleteQuestoin = (e, id) => {
+        e.stopPropagation()
+        remove_question_cart({ ques_id: id }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                get_ques_ids_cart().then(res => {
+                    this.setState({
+                        cart_ques_ids: res.data.cart_ques_ids
+                    })
+                })
+                get_question_cart().then(res => {
+                    let cardTotal = null
+                    res.data.list.forEach(res => {
+                        cardTotal += Number(res.count)
+                    })
+                    this.setState({
+                        question_cart: res.data.list,
+                        cardTotal
+                    })
+                })
+            } else {
+                message.error(res.message)
+            }
         })
     }
     onTabClick = (e) => {
@@ -254,11 +320,45 @@ class tikuguanli4 extends Component {
     creatT = () => {
         this.props.history.push('/main/question')
     }
+    del_question = (e, id) => {
+        e.stopPropagation()
+        const params = { ...this.state.params }
+        const that = this
+        confirm({
+            title: '确定要删除这道试题吗？',
+            icon: <ExclamationCircleOutlined />,
+            content: '删除后该数据会消失需要重新创建',
+            okText: '确认',
+            cancelText: '取消',
+            onOk() {
+                del_question({ ques_id: id }).then(res => {
+                    if (res.code === 0) {
+                        question(params).then(res => {
+                            that.setState({
+                                list: res.data.list
+                            })
+                        })
+                        message.success(res.message)
+                    } else {
+                        message.error(res.error)
+                    }
+                })
+            },
+            onCancel() {
+                console.log('Cancel');
+            },
+        });
+        
+    }
+    edit = (e, id, sbjArray) => {
+        e.stopPropagation()
+        this.props.history.push({ pathname: '/main/question', state: { ques_id: id, sbjArray } })
+    }
     render() {
         return (
             <div>
                 <Spin tip="加载中..." size="large" className={this.state.spin ? 'm-spin' : 'm-spin-dis'} />
-                <Select selectonChange={this.selectonChange} data={this.state.options}></Select>
+                <Select selectonChange={this.selectonChange} data={this.state.options} value={this.state.selectValue}></Select>
                 <div className="m-shopcar" onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <Icon type="container" style={{ margin: `0 15px 0 0` }} />
                     我的试题篮
@@ -303,14 +403,22 @@ class tikuguanli4 extends Component {
 
                     </TabPane>
                     <TabPane tab="我的题目" key="4">
-                        {this.state.list.length > 0 ?
+                        {this.state.selectValue.length > 0 ?
                             <div>
                                 <Button type="primary" onClick={this.creatT}>创建试题</Button>
                                 <Divider dashed />
                             </div>
                             : ''}
-                        <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
-                        {this.state.list.length > 0 ? '' : <Empty2 funt={this.creatT}></Empty2>}
+                        <div className='m-flex' style={{ flexWrap: 'nowrap' }}>
+                            {this.state.selectValue.length > 0 ?
+                                <div style={{ width: '30%', maxHeight: 500, overflowY: 'scroll' }}>
+                                    <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
+                                </div> : ""}
+                            <div style={{ width: '70%', maxHeight: 500, overflowY: 'scroll' }} className="m-left">
+                                <List data={this.state.list} fun={this.add} edit={this.edit} del_question={this.del_question} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
+                            </div>
+                        </div>
+                        {this.state.selectValue.length > 0 ? '' : <Empty2 funt={this.creatT}></Empty2>}
                     </TabPane>
                 </Tabs>
             </div >

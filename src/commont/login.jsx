@@ -65,7 +65,7 @@ class Login extends Component {
                                     sessionStorage.setItem('company', company_list[0].company)
                                     sessionStorage.setItem('company_id', company_list[0].id)
                                     this.props.history.push("/main")
-                                }else{
+                                } else {
                                     message.warning('系统繁忙请重试')
                                 }
 

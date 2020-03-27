@@ -4,7 +4,7 @@ const { TreeNode } = Tree;
 const TreeMain = (props) => {
     return (
         <div>
-            <TreeList tree={props.data} funt={props.funt} know_lageId={props.know_lageId} know_lageName={props.know_lageName}></TreeList>
+            <TreeList tree={props.data} know_lagechangeList={props.know_lagechangeList} ques_knowledge_idList={props.ques_knowledge_idList} funt={props.funt} know_lageId={props.know_lageId} know_lageName={props.know_lageName}></TreeList>
         </div>
     )
 }
@@ -67,6 +67,7 @@ const TreeList = (props) => {
         }).then(res => {
             props.know_lageId(res.result)
             props.know_lageName(res.resultKnowLage)
+            props.know_lagechangeList(checkedKeys)
         })
     };
     const l1 = props.tree.map((res) =>
@@ -91,6 +92,8 @@ const TreeList = (props) => {
             checkable
             onCheck={onCheck}
             autoExpandParent={false}
+            checkedKeys={props.ques_knowledge_idList.length > 0 ? props.ques_knowledge_idList : []}
+            defaultExpandedKeys={props.ques_knowledge_idList.length > 0 ? props.ques_knowledge_idList : []}
         >
             {l1}
         </Tree>

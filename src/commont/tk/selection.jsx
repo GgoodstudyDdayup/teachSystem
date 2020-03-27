@@ -3,10 +3,9 @@ import { Cascader } from 'antd';
 
 const Select = (props) => {
     return (<div>
-        <Btn selectonChange={props.selectonChange} data={props.data}></Btn>
+        <Btn selectonChange={props.selectonChange} data={props.data} value={props.value}></Btn>
     </div>)
 }
-
 const Btn = props => {
     return (
         <div>
@@ -17,6 +16,7 @@ const Btn = props => {
                 allowClear={false}
                 onChange={props.selectonChange}
                 placeholder="选择年级学科"
+                value={typeof (props.value) === 'object' ? props.value : []}
             />
         </div>)
 }
