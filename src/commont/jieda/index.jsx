@@ -8,9 +8,9 @@ export default class UploadDemo extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            editorState: BraftEditor.createEditorState(null),
-            editorState2: BraftEditor.createEditorState(null),
-            editorState3: BraftEditor.createEditorState(null)
+            editorState: BraftEditor.createEditorState(props.data.ques_content || null),
+            editorState2: BraftEditor.createEditorState(props.data.ques_answer || null),
+            editorState3: BraftEditor.createEditorState(props.data.ques_analysis || null)
         }
     }
     handleChange = (editorState) => {
@@ -27,8 +27,19 @@ export default class UploadDemo extends React.Component {
         this.props.ques_analysis(editorState3.toHTML())
         this.setState({ editorState3 })
     }
+    handleChange2 = e => {
+        if (e.file.status !== "uploading") {
+            this.setState({
+                editorState: ContentUtils.insertMedias(this.state.editorState, [{
+                    type: 'IMAGE',
+                    url: e.file.response.data.full_path
+                }])
+            })
+        } else {
+            return false
+        }
+    }
     uploadHandler = (param) => {
-        console.log(param)
         if (!param.file) {
             return false
         }
@@ -45,15 +56,28 @@ export default class UploadDemo extends React.Component {
     render() {
 
         const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
+        const props = {
+            action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+            onChange: this.handleChange2,
+            multiple: true,
+            name: 'upload_control',
+            headers: {
+                token: sessionStorage.getItem("token"),
+                username: sessionStorage.getItem("username"),
+                companyid: sessionStorage.getItem("companyid")
+            }
+        }
         const extendControls = [
             {
                 key: 'antd-uploader',
                 type: 'component',
                 component: (
                     <Upload
+                        {...props}
                         accept="image/*"
                         showUploadList={false}
-                        customRequest={this.uploadHandler}
+                    // customRequest={this.uploadHandler}
+                    // beforeUpload={this.beforeUpload}
                     >
                         {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
                         <button type="button" className="control-item button upload-button" data-title="插入图片">

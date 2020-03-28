@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Button, Divider, message,Modal } from 'antd';
+import { Tabs, Spin, Badge, Icon, Button, Divider, message, Modal,Result } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Select from './selection'
 import Searchbtn from './searchbtn'
-import Empty2 from './mysiku'
 import List from './mineList'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
@@ -31,14 +30,14 @@ class tikuguanli4 extends Component {
                 page: 1,
                 page_size: 10
             },
-            selectValue:[],
+            selectValue: [],
+            searchList: [],
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
                 this.setState({
                     options: store.getState().XueKeList
                 })
             }),
-            
             spin: false,
             clear: 'none',
             question_cart: [],
@@ -155,33 +154,61 @@ class tikuguanli4 extends Component {
             question(params).then(res => {
                 this.setState({
                     list: res.data.list,
-                    params,
+                    params
+                })
+            })
+            //获取科目的数据
+            subjectList().then(res => {
+
+                store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
+            })
+            tkList({ subject_id: params.subject_id }).then(res => {
+                console.log(res.data)
+                this.setState({
                     selectValue: this.props.location.state.sbjArray
+                })
+                this.shaixuanName(res.data)
+            })
+            get_question_cart().then(res => {
+                let cardTotal = null
+                res.data.list.forEach(res => {
+                    cardTotal += Number(res.count)
+                })
+                this.setState({
+                    question_cart: res.data.list,
+                    cardTotal
+                })
+            })
+            get_ques_ids_cart().then(res => {
+                this.setState({
+                    cart_ques_ids: res.data.cart_ques_ids
+                })
+            })
+        } else {
+            //获取科目的数据
+            subjectList().then(res => {
+                store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
+            })
+            tkList({ subject_id: params.subject_id }).then(res => {
+                this.shaixuanName(res.data)
+            })
+            get_question_cart().then(res => {
+                let cardTotal = null
+                res.data.list.forEach(res => {
+                    cardTotal += Number(res.count)
+                })
+                this.setState({
+                    question_cart: res.data.list,
+                    cardTotal
+                })
+            })
+            get_ques_ids_cart().then(res => {
+                this.setState({
+                    cart_ques_ids: res.data.cart_ques_ids
                 })
             })
         }
-        //获取科目的数据
-        subjectList().then(res => {
-            store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
-        })
-        tkList({ subject_id: params.subject_id }).then(res => {
-            this.shaixuanName(res.data)
-        })
-        get_question_cart().then(res => {
-            let cardTotal = null
-            res.data.list.forEach(res => {
-                cardTotal += Number(res.count)
-            })
-            this.setState({
-                question_cart: res.data.list,
-                cardTotal
-            })
-        })
-        get_ques_ids_cart().then(res => {
-            this.setState({
-                cart_ques_ids: res.data.cart_ques_ids
-            })
-        })
+
     }
     componentWillUnmount() {
         // 移除监听事件
@@ -348,12 +375,31 @@ class tikuguanli4 extends Component {
                 console.log('Cancel');
             },
         });
-        
+
     }
     edit = (e, id, sbjArray) => {
         e.stopPropagation()
         this.props.history.push({ pathname: '/main/question', state: { ques_id: id, sbjArray } })
     }
+
+    showModal = () => {
+        this.setState({
+            visible: true,
+        });
+    };
+
+    handleOk = e => {
+        console.log(e);
+        this.setState({
+            visible: false,
+        });
+    };
+
+    handleCancel = e => {
+        this.setState({
+            visible: false,
+        });
+    };
     render() {
         return (
             <div>
@@ -406,19 +452,34 @@ class tikuguanli4 extends Component {
                         {this.state.selectValue.length > 0 ?
                             <div>
                                 <Button type="primary" onClick={this.creatT}>创建试题</Button>
+                                <Button className="m-left" type="primary" onClick={this.showModal}>筛选试题</Button>
                                 <Divider dashed />
                             </div>
                             : ''}
-                        <div className='m-flex' style={{ flexWrap: 'nowrap' }}>
+                        <div >
                             {this.state.selectValue.length > 0 ?
-                                <div style={{ width: '30%', maxHeight: 500, overflowY: 'scroll' }}>
-                                    <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
-                                </div> : ""}
-                            <div style={{ width: '70%', maxHeight: 500, overflowY: 'scroll' }} className="m-left">
+                                <Modal
+                                    title="筛选我的试题"
+                                    visible={this.state.visible}
+                                    okText="确定"
+                                    cancelText="取消"
+                                    onOk={this.handleOk}
+                                    onCancel={this.handleCancel}
+                                >
+                                    <div style={{ maxHeight: 400, overflowY: 'scroll' }}>
+                                        <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
+                                    </div>
+                                </Modal>
+                                : ""}
+                            <div style={{ maxHeight: 500, overflowY: 'scroll' }} className="m-left">
                                 <List data={this.state.list} fun={this.add} edit={this.edit} del_question={this.del_question} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
                             </div>
                         </div>
-                        {this.state.selectValue.length > 0 ? '' : <Empty2 funt={this.creatT}></Empty2>}
+                        {this.state.selectValue.length > 0 ? '' : <Result
+                            status="403"
+                            title="暂时没有试题,请检查是否选择了学科再进行创建"
+                            extra={<Button type="primary" onClick={this.creatT}>创建试题</Button>}
+                        />}
                     </TabPane>
                 </Tabs>
             </div >

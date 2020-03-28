@@ -16,6 +16,7 @@ import Myresources from './resourceCenter/myResources/index/index'
 import MyresourcesWenjianjia from './resourceCenter/myResources/wenjianku/wenjianku'
 import BK from './bk/bk'
 import Prograss from './bk/prograss'
+import Kj from './bk/kejian'
 import Quanxian from './quanxian/quanxian'
 import Jiaoyanzu from './quanxian/jiaoyanzuquanxian'
 import CP from './cp'
@@ -31,7 +32,7 @@ class main extends Component {
         super(opt)
         this.state = {
             height: '',
-            collapsed: false,
+            collapsed: true,
             visible: false,
             newPassword: '',
             oldPassword: '',
@@ -195,7 +196,10 @@ class main extends Component {
                             <Menu.Item key="5">
                                 <Link to="/main/bk">课程表</Link></Menu.Item>
                             <Menu.Item key="6">
-                                <Link to="/main/bk/prograss">审核进度</Link></Menu.Item>
+                                <Link to="/main/bk/prograss">审核进度</Link>
+                            </Menu.Item>
+                            <Menu.Item key="7">
+                                <Link to="/main/bk/kejian">组卷审核</Link></Menu.Item>
                         </SubMenu>
                         {/* <SubMenu
                             key="55"
@@ -278,7 +282,7 @@ class main extends Component {
                             </Menu.Item>
                         </SubMenu> : ''}
 
-                        {/* <SubMenu
+                        <SubMenu
                             key="sub6"
                             title={
                                 <span>
@@ -293,7 +297,7 @@ class main extends Component {
                             <Menu.Item key="14">
                                 <Link to="/main/resourceCenter/myresources/wenjianjia">我的资源</Link>
                             </Menu.Item>
-                        </SubMenu> */}
+                        </SubMenu>
                     </Menu>
                 </Sider>
                 <Layout>
@@ -379,6 +383,7 @@ class main extends Component {
 
                             <Route path="/main/bk" exact component={BK} />
                             <Route path="/main/bk/prograss" component={Prograss} />
+                            <Route path="/main/bk/kejian" component={Kj} />
                             <Route path="/main/quanxian" component={Quanxian} />
                             <Route path="/main/jiaoyanzu" component={Jiaoyanzu} />
 

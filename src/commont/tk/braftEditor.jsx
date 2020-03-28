@@ -8,7 +8,7 @@ import SelectA from './selection'
 import store from '../../store/index'
 import Tree from './editorTree'
 import { XueKeActionCreators } from '../../actions/XueKeList'
-import { subjectList, tkList, tree, add_question, get_questioninfo } from '../../axios/http'
+import { subjectList, tkList, tree, add_question, get_questioninfo,edit_question_question } from '../../axios/http'
 import { Select, Divider, Radio, Input, Modal, Button, message } from 'antd'
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 const { Option } = Select
@@ -19,7 +19,6 @@ export default class EditorDemo extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            ownState: '',
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
                 this.setState({
@@ -46,6 +45,7 @@ export default class EditorDemo extends React.Component {
             know_lageNameList: [],
             ques_knowledge_idList: [],
             sbjArray: [],
+            btnChange: true,
             params: {
                 course_type_id: 1,
                 ques_type_id: [],//问题类型id
@@ -59,6 +59,7 @@ export default class EditorDemo extends React.Component {
                 ques_analysis: '',//解析
                 ques_school: '',
                 ques_options: '',
+                template_id: '',
                 ques_source_type_id: [],
                 ques_year: []
             }
@@ -74,10 +75,12 @@ export default class EditorDemo extends React.Component {
                 })
             }).then(() => {
                 get_questioninfo({ ques_id: this.props.location.state.ques_id }).then(res => {
+                    params.ques_id = this.props.location.state.ques_id
                     params.ques_content = res.data.model.ques_content
                     params.ques_subject_id = res.data.model.ques_subject_id
                     params.ques_answer = res.data.model.ques_answer
                     params.ques_analysis = res.data.model.ques_analysis
+                    params.ques_knowledge_ids = res.data.model.ques_knowledge_ids
                     params.ques_difficulty = res.data.model.ques_difficulty
                     params.ques_type_id = res.data.model.ques_type_id
                     params.ques_grade_id = res.data.model.ques_grade_id
@@ -87,6 +90,8 @@ export default class EditorDemo extends React.Component {
                     params.ques_school = res.data.model.ques_school
                     params.ques_options = res.data.model.ques_options
                     params.ques_source_type_id = res.data.model.ques_source_type_id
+                    params.template_id = Number(res.data.model.template_id)
+                    this.switchState(params.template_id, params)
                     let newSelectArray = [this.props.location.state.sbjArray[0].split('')[0] + this.props.location.state.sbjArray[0].split('')[1], this.props.location.state.sbjArray[1]]
                     const know_lageNameList = res.data.question_tree_rela_list.map(res => {
                         return res.title
@@ -97,6 +102,7 @@ export default class EditorDemo extends React.Component {
                     this.setState({
                         selectValue: newSelectArray,
                         params,
+                        btnChange: false,
                         disabled: false,
                         know_lageNameList,
                         ques_knowledge_idList,
@@ -151,6 +157,7 @@ export default class EditorDemo extends React.Component {
                             return item
                         }, '')
                         tree({ subject_id: id }).then(tree => {
+                            this.onCheck(this.state.ques_knowledge_idList, tree.data.list)
                             this.setState({
                                 tixingOptions,
                                 grandOptions,
@@ -184,8 +191,58 @@ export default class EditorDemo extends React.Component {
                 })
             })
         }
-
     }
+    onCheck = (checkedKeys, info) => {
+        new Promise((resolve, reject) => {
+            const result = checkedKeys.reduce((item, res, index) => {
+                item.push({
+                    ques_knowledge_id: res,
+                    ques_knowledge_first_id: "",
+                    ques_knowledge_second_id: "",
+                    ques_knowledge_three_id: ""
+                })
+                return item
+            }, [])
+            resolve(result)
+        }).then(res => {
+            const result = res
+            result.forEach((l1, index) => {
+                info.forEach((res2) => {
+                    if (res2.children !== null) {
+                        res2.children.forEach((res3) => {
+                            if (res3.children !== null) {
+                                res3.children.forEach((res4) => {
+                                    if (res4.children !== null) {
+                                        res4.children.forEach(res5 => {
+                                            if (res5.aitifen_id === result[index].ques_knowledge_id) {
+                                                result[index].ques_knowledge_three_id = res4.aitifen_id
+                                                result[index].ques_knowledge_second_id = res3.aitifen_id
+                                                result[index].ques_knowledge_first_id = res2.aitifen_id
+                                            }
+                                        })
+                                    } else {
+                                        if (res4.aitifen_id === result[index].ques_knowledge_id) {
+                                            result[index].ques_knowledge_second_id = res3.aitifen_id
+                                            result[index].ques_knowledge_first_id = res2.aitifen_id
+                                        }
+                                    }
+                                })
+                            } else {
+                                if (res3.aitifen_id === result[index].ques_knowledge_id) {
+                                    result[index].ques_knowledge_first_id = res2.aitifen_id
+                                }
+                            }
+                        })
+                    }
+                })
+            })
+            const params = this.state.params
+            params.ques_knowledge_ids = JSON.stringify(result)
+            this.setState({
+                params
+            })
+        })
+    };
     componentWillUnmount() {
         this.setState = (state, callback) => {
             return
@@ -205,6 +262,7 @@ export default class EditorDemo extends React.Component {
             ques_analysis: '',//解析
             ques_options: '',
             ques_school: '',
+            template_id: '',
             ques_source_type_id: [],
             ques_year: []
         }
@@ -334,30 +392,32 @@ export default class EditorDemo extends React.Component {
             params
         })
     }
+
+
+
+
     onchangetemplate = e => {
         const params = { ...this.state.params }
         params.ques_answer = ''
         params.ques_analysis = ''
         params.ques_content = ''
+        params.template_id = e.target.value
         this.setState({
-            ownState: e.target.value,
             params
         })
     }
-
-
-
-
-    switchState = (value) => {
+    switchState = (value, data) => {
         switch (value) {
             case 1:
-                return <TianK ques_content={this.quesContent} ques_analysis={this.quesAnalysis} ques_answer={this.quesAnswer}></TianK>
+                return <TianK data={data} ques_content={this.quesContent} ques_analysis={this.quesAnalysis} ques_answer={this.quesAnswer}></TianK>
             case 2:
-                return <JieD ques_content={this.quesContent} ques_analysis={this.quesAnalysis} ques_answer={this.quesAnswer}></JieD>
+                return <JieD data={data} ques_content={this.quesContent} ques_analysis={this.quesAnalysis} ques_answer={this.quesAnswer}></JieD>
             case 3:
-                return <Choose ques_content={this.quesContent} ques_analysis={this.quesAnalysis} choose={this.choose} panduanState={this.state.chooseState}></Choose>
+                const list = data.ques_answer.split('')
+                return <Choose data={data} chooseList={list} ques_content={this.quesContent} ques_analysis={this.quesAnalysis} choose={this.choose} panduanState={this.state.chooseState}></Choose>
             case 4:
-                return <PanD ques_content={this.quesContent} ques_analysis={this.quesAnalysis} panduan={this.panduan} panduanState={this.state.panduanState}></PanD>
+                console.log(data)
+                return <PanD data={data} ques_content={this.quesContent} ques_analysis={this.quesAnalysis} panduan={this.panduan} panduanState={this.state.panduanState}></PanD>
             default:
                 return ''
         }
@@ -455,17 +515,46 @@ export default class EditorDemo extends React.Component {
     tijiaoshiti = () => {
         const params = { ...this.state.params }
         const that = this
-        if (params.ques_type_id === '' || params.ques_knowledge_ids === '' || params.ques_grade_id === '' || params.ques_subject_id === '' || params.ques_difficulty === '' || params.ques_answer === '' || params.ques_content === '' || params.ques_analysis === '' || params.ques_source_type_id === '' || params.ques_year === '') {
-            message.warning('请填写必填项')
+        if (this.state.btnChange) {
+            if (params.ques_type_id === '' || params.ques_knowledge_ids === '' || params.ques_grade_id === '' || params.ques_subject_id === '' || params.ques_difficulty === '' || params.ques_answer === '' || params.ques_content === '' || params.ques_analysis === '' || params.ques_source_type_id === '' || params.ques_year === '') {
+                message.warning('请填写必填项')
+            } else {
+                confirm({
+                    title: '是否要提交试题？',
+                    icon: <ExclamationCircleOutlined />,
+                    content: '提交之后的试题请在我的题库中查看',
+                    okText: '确认',
+                    cancelText: '取消',
+                    onOk() {
+                        add_question(params).then(res => {
+                            if (res.code === 0) {
+                                message.success({
+                                    content: res.message,
+                                    onClose: () => {
+                                        console.log(that.state.params.ques_subject_id, that.state.sbjArray)
+                                        that.props.history.push({ pathname: "/main/tk/mine", state: { subject_id: that.state.params.ques_subject_id, sbjArray: that.state.sbjArray } })
+                                    }
+                                })
+                            } else {
+                                message.error(res.message)
+                            }
+                        })
+                    },
+                    onCancel() {
+                        console.log('Cancel');
+                    },
+                });
+            }
         } else {
             confirm({
-                title: '是否要提交试题？',
+                title: '是否要修改试题？',
                 icon: <ExclamationCircleOutlined />,
-                content: '提交之后的试题请在我的题库中查看',
+                content: '修改之后的试题请在我的题库中查看',
                 okText: '确认',
                 cancelText: '取消',
                 onOk() {
-                    add_question(params).then(res => {
+                    console.log(that.state.params.ques_subject_id, that.state.sbjArray)
+                    edit_question_question(params).then(res => {
                         if (res.code === 0) {
                             message.success({
                                 content: res.message,
@@ -482,7 +571,9 @@ export default class EditorDemo extends React.Component {
                     console.log('Cancel');
                 },
             });
+            console.log(params)
         }
+
     }
     render() {
         return (
@@ -532,7 +623,7 @@ export default class EditorDemo extends React.Component {
                     <div className="m-flex m-bottom" style={{ alignItems: 'center' }}>
                         <span style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }} className="m-row">选择模板</span>
                         <div className="m-left">
-                            <Radio.Group onChange={this.onchangetemplate} value={this.state.ownState} disabled={this.state.disabled}>
+                            <Radio.Group onChange={this.onchangetemplate} value={this.state.params.template_id} disabled={this.state.disabled}>
                                 <Radio value={1}>填空题模板</Radio>
                                 <Radio value={2}>解答题模板</Radio>
                                 <Radio value={3}>选择题模板</Radio>
@@ -540,7 +631,7 @@ export default class EditorDemo extends React.Component {
                             </Radio.Group>
                         </div>
                     </div>
-                    {this.switchState(this.state.ownState)}
+                    {this.switchState(this.state.params.template_id, this.state.params)}
                     <Divider dashed />
                     <div className="m-flex m-bottom" style={{ alignItems: 'center' }}>
                         <span style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }} className="m-row">关联知识点</span>
@@ -579,7 +670,8 @@ export default class EditorDemo extends React.Component {
                     </div>
                 </div>
                 <div style={{ position: 'absolute', right: 0, bottom: "-60px" }}>
-                    <Button type="primary" onClick={this.tijiaoshiti}>提交试题</Button>
+                    {this.state.btnChange ? <Button type="primary" onClick={this.tijiaoshiti}>提交试题</Button> : <Button type="primary" onClick={this.tijiaoshiti}>修改试题</Button>}
+
                 </div>
             </div>
 
