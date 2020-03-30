@@ -211,11 +211,20 @@ export const get_questioninfo = (params) => {
 }
 //编辑试题
 export const edit_question_question = (params) => {
-    return instance.post('/api/question/edit_question_question', params)
+    return instance.post('/api/question/edit_question', params)
 }
 //获取自定义组卷列表
 export const get_list = (params) => {
     return instance.post('/api/self_paper/get_list', params)
 }
+//获取自定义组卷对应的题目
+export const get_self_paper_question = (params) => {
+    return instance.post('/api/self_paper/get_self_paper_question', params)
+}
+//审核自定义组卷
+export const check_self_paper = (params) => {
+    return instance.post('/api/self_paper/check_self_paper', params)
+}
+
 
 

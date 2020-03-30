@@ -13,7 +13,7 @@ export default class EditorDemo extends React.Component {
             editorState: BraftEditor.createEditorState(props.data.ques_content || null),
             editorState3: BraftEditor.createEditorState(props.data.ques_analysis || null),
             panduan: props.panduanState,
-            panduanAnswer: props.panduanAnswer
+            panduanAnswer: props.data.ques_answer
         }
     }
     componentDidMount() {

@@ -8,7 +8,7 @@ import SelectA from './selection'
 import store from '../../store/index'
 import Tree from './editorTree'
 import { XueKeActionCreators } from '../../actions/XueKeList'
-import { subjectList, tkList, tree, add_question, get_questioninfo,edit_question_question } from '../../axios/http'
+import { subjectList, tkList, tree, add_question, get_questioninfo, edit_question_question } from '../../axios/http'
 import { Select, Divider, Radio, Input, Modal, Button, message } from 'antd'
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 const { Option } = Select
@@ -66,6 +66,7 @@ export default class EditorDemo extends React.Component {
         }
     }
     componentDidMount() {
+        this.tableChange()
         const params = { ...this.state.params }
         if (this.props.location.state) {
             subjectList().then(res => {
@@ -393,8 +394,66 @@ export default class EditorDemo extends React.Component {
         })
     }
 
+    tableChange = e => {
+        let whatSay = `
+        <table width="100%" class="ques-option-ul ques-option-ul-3653423">
+            <tr>
+                <td width="48%" height="40">
+                    <table style="height:100%;width:100%;" cellpadding="4">
+                        <tr>
+                            <th valign="middle" style="width:30px">A、</th>
+                            <td valign="middle">
+                                <div class=WordSection1 style=''>
+                                    <p class=MsoNormal>①②③④</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="48%" height="40">
+                    <table style="height:100%;width:100%;" cellpadding="4">
+                        <tr>
+                            <th valign="middle" style="width:30px">B、</th>
+                            <td valign="middle">
+                                <div class=WordSection1 style=''>
+                                    <p class=MsoNormal>①②③</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td width="48%" height="40">
+                    <table style="height:100%;width:100%;" cellpadding="4">
+                        <tr>
+                            <th valign="middle" style="width:30px">C、</th>
+                            <td valign="middle">
+                                <div class=WordSection1 style=''>
+                                    <p class=MsoNormal>①②</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="48%" height="40">
+                    <table style="height:100%;width:100%;" cellpadding="4">
+                        <tr>
+                            <th valign="middle" style="width:30px">D、</th>
+                            <td valign="middle">
+                                <div class=WordSection1 style=''>
+                                    <p class=MsoNormal>①②④</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>`
+        let newMsgHandle = whatSay.match(/<p(([\s\S])*?)<\/p>/g)
+        // console.log(newMsgHandle)
 
-
+    }
 
     onchangetemplate = e => {
         const params = { ...this.state.params }
@@ -430,6 +489,7 @@ export default class EditorDemo extends React.Component {
         })
     }
     choose = e => {
+        console.log(e)
         const params = { ...this.state.params }
         if (typeof (e) === 'object') {
             const result = e.reduce((item, res) => {

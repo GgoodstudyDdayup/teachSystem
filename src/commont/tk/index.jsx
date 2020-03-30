@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Input, message, BackTop } from 'antd';
+import { Tabs, Spin, Badge, Icon, Input, message, BackTop, Pagination } from 'antd';
 import Select from './selection'
 import Tree from './tree'
 import List from './list'
@@ -30,6 +30,7 @@ class tikuguanli extends Component {
                 page: 1,
                 page_size: 20
             },
+            totalCount: 1,
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
                 this.setState({
@@ -196,7 +197,8 @@ class tikuguanli extends Component {
         })
         question(this.state.params).then(res => {
             this.setState({
-                list: res.data.list
+                list: res.data.list,
+                totalCount: Number(res.data.total_count),
             })
         })
         get_question_cart().then(res => {
@@ -296,7 +298,7 @@ class tikuguanli extends Component {
             difficulty_id: '',
             source_id: '',
             grade_id: '',
-            is_old:1,
+            is_old: 1,
             key_words: '',
             page: 1,
             page_size: 20
@@ -305,7 +307,7 @@ class tikuguanli extends Component {
             this.setState({
                 list: res.data.list,
                 params,
-                selectValue:value
+                selectValue: value
             })
         })
         tree({ subject_id: params.subject_id }).then(res => {
@@ -433,6 +435,17 @@ class tikuguanli extends Component {
             })
         })
     }
+    changePage = page => {
+        const params = { ...this.state.params }
+        params.page = page
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list,
+                totalCount: Number(res.data.total_count),
+                params
+            })
+        })
+    };
     render() {
         return (
             <div>
@@ -473,19 +486,22 @@ class tikuguanli extends Component {
                 </div>
                 <Tabs defaultActiveKey="1" size="Default" onTabClick={this.spin} onChange={this.onTabClick}>
                     <TabPane tab="知识点" key="1" className="m-tk" >
-                        <div className="knowlage">
-                            <div className="tree">
-                                <Tree data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage} knowLageValueChange={this.knowLageValueChange} knowLageValue={this.state.params.key_words}></Tree>
+                        <div>
+                            <div className="knowlage">
+                                <div className="tree" style={this.state.height > 638 ? { maxHeight: 600, overflowY: 'scroll', width: 370 } : { maxHeight: 400, overflowY: 'scroll', width: 370 }}>
+                                    <Tree data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage} knowLageValueChange={this.knowLageValueChange} knowLageValue={this.state.params.key_words}></Tree>
+                                </div>
+                                <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 600 } : { height: 400 }}>
+                                    <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
+                                    <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton />
+                                    {/* <div className="m-scroll-list"> */}
+                                    <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}>
+                                    </List>
+                                    <BackTop target={() => document.getElementById('scroll-y')} />
+                                    {/* </div> */}
+                                </div>
                             </div>
-                            <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
-                                <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
-                                <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton />
-                                {/* <div className="m-scroll-list"> */}
-                                <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}>
-                                </List>
-                                <BackTop target={() => document.getElementById('scroll-y')} />
-                                {/* </div> */}
-                            </div>
+                            <Pagination className="m-Pleft" onChange={this.changePage} total={this.state.totalCount} />
                         </div>
                     </TabPane>
                     <TabPane tab="真题试卷" key="2" >

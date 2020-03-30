@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Input, message, BackTop } from 'antd';
+import { Tabs, Spin, Badge, Icon, Input, message, BackTop, Pagination } from 'antd';
 import Select from './selection'
 import Know from './knowlist'
 import List from './list'
@@ -35,7 +35,7 @@ class tikuguanli2 extends Component {
                 list: [{ id: 16, title: '不限' }, { id: 10, title: '999' }, { id: 11, title: '999' }, { id: 12, title: '999' }]
             }],
             params: {
-                subject_id: 38,
+                subject_id: 39,
                 province_id: '',
                 ques_type_id: '',
                 year: '',
@@ -47,7 +47,7 @@ class tikuguanli2 extends Component {
                 page: 1,
                 page_size: 20
             },
-            selectValue:[],
+            selectValue: [],
             cart_ques_ids: '',
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
@@ -190,7 +190,8 @@ class tikuguanli2 extends Component {
         })
         question(this.state.params).then(res => {
             this.setState({
-                list: res.data.list
+                list: res.data.list,
+                totalCount: Number(res.data.total_count)
             })
         })
         get_question_cart().then(res => {
@@ -263,9 +264,10 @@ class tikuguanli2 extends Component {
     selectonChange = (e) => {
         const params = { ...this.state.params }
         params.subject_id = Number(e[1])
+        params.page = 1
         this.setState({
             params,
-            selectValue:e
+            selectValue: e
         })
         question(params).then(res => {
             this.setState({
@@ -383,6 +385,20 @@ class tikuguanli2 extends Component {
             })
         })
     }
+    changePage = page => {
+        const params = { ...this.state.params }
+        params.page = page
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list,
+                totalCount: Number(res.data.total_count),
+                params
+            })
+        })
+    };
+    zujuan = () => {
+        this.props.history.push('/main/zujuan')
+    }
     render() {
         return (
             <div>
@@ -417,7 +433,7 @@ class tikuguanli2 extends Component {
                     )}
                     <div className="topic-ctrls">
                         {/* <div className="clear-btn" >清空全部</div> */}
-                        <div className="see-btn">查看试卷</div>
+                        <div className="see-btn" onClick={this.zujuan}>查看试卷</div>
                     </div>
                 </div>
 
@@ -427,16 +443,21 @@ class tikuguanli2 extends Component {
                     </TabPane>
                     <TabPane tab="真题试卷" key="2" >
                         <div className="knowlage">
-                            <div className="tree">
+                            <div className="tree" >
                                 <Know params={this.state.params} listView={this.listView}></Know>
                             </div>
-                            <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 660 } : { height: 400 }}>
-                                <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
-                                <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton />
-                                {/* <div className="m-scroll-list"> */}
-                                <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
-                                {/* </div> */}
-                                <BackTop target={() => document.getElementById('scroll-y')} />
+                            <div style={{ display: 'flex', flexFlow: 'column' }}>
+                                <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 600, width: '100%' } : { height: 400, width: '100%' }}>
+                                    <div>
+                                        <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
+                                        <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton />
+                                        {/* <div className="m-scroll-list"> */}
+                                        <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
+                                        {/* </div> */}
+                                        <BackTop target={() => document.getElementById('scroll-y')} />
+                                    </div>
+                                </div>
+                                <Pagination className="m-Pleft" onChange={this.changePage} total={this.state.totalCount} />
                             </div>
                         </div>
                     </TabPane>

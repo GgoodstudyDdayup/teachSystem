@@ -52,6 +52,7 @@ export default class ReactBeautifulDnd extends Component {
                 ques_type_id: '',
                 total_score: 0
             }],
+            totalNum: '',
             visible: false,
             visible2: false,
             editInput: '',
@@ -183,7 +184,7 @@ export default class ReactBeautifulDnd extends Component {
             })
         })
     }
-    
+
     changeSetIndex(e) {
         this.setState({
             setIndex: e
@@ -324,8 +325,9 @@ export default class ReactBeautifulDnd extends Component {
         const saveFile = this.state.saveFile
         saveFile.title = biaotiTitle
         saveFile.total_minute = datiTime
-        if (biaotiTitle === '点击修改试卷标题' || datiTime === '') {
-            message.warning('请检查标题或者考试时间')
+        console.log(this.state.totalNum)
+        if (biaotiTitle === '点击修改试卷标题' || datiTime === '' || this.state.totalNum === 0) {
+            message.warning('请检查标题、考试时间、分值设置')
         } else {
             set_self_pager(saveFile).then(res => {
                 if (res.code === 0) {
@@ -347,7 +349,7 @@ export default class ReactBeautifulDnd extends Component {
                     setTimeout(() => {
                         this.props.history.push('/main')
                     }, 2000);
-                    
+
                 } else {
                     message.error(res.message)
                 }
@@ -625,34 +627,35 @@ export default class ReactBeautifulDnd extends Component {
                                         </div>
                                     )}
                                 </div> : ''}
+                                {this.state.setIndex === 2 ? <div className="m-zujuanAction-content" style={{ marginBottom: 20 }}>
+                                    <div >
+                                        <div className="hd" style={{ cursor: 'pointer' }}>
+                                            <i className="hd-icon iconfont icon-atf-ykt-yincangtixingfenbu"></i>
+                                            <span className="hd-title">卷头设置</span>
+                                        </div>
+                                        <div className="bd">
+                                            <div className="m-flex">
+                                                <span>答题时间：</span>
+                                                <Input style={{ width: 120 }} size='small' value={this.state.datiTime} onChange={this.datiTime}></Input>
+                                                <span>分钟</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> : ''}
+                                {this.state.setIndex === 3 ? <div className="m-zujuanAction-content" style={{ marginBottom: 20 }}>
+                                    <div>
+                                        <div className="hd" style={{ cursor: 'pointer' }}>
+                                            <i className="hd-icon iconfont icon-atf-ykt-yincangtixingfenbu"></i>
+                                            <span className="hd-title">试卷标题修改</span>
+                                        </div>
+                                        <div className="bd " >
+                                            <Input value={this.state.biaotiTitle} onChange={this.biaotiTitle}></Input>
+                                        </div>
+                                    </div>
+                                </div> : ''}
                             </div>
                         </div>
-                        {this.state.setIndex === 2 ? <div className="m-zujuanAction-content" style={{ marginBottom: 20 }}>
-                            <div >
-                                <div className="hd" style={{ cursor: 'pointer' }}>
-                                    <i className="hd-icon iconfont icon-atf-ykt-yincangtixingfenbu"></i>
-                                    <span className="hd-title">卷头设置</span>
-                                </div>
-                                <div className="bd">
-                                    <div className="m-flex">
-                                        <span>答题时间：</span>
-                                        <Input style={{ width: 120 }} size='small' value={this.state.datiTime} onChange={this.datiTime}></Input>
-                                        <span>分钟</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> : ''}
-                        {this.state.setIndex === 3 ? <div className="m-zujuanAction-content" style={{ marginBottom: 20 }}>
-                            <div>
-                                <div className="hd" style={{ cursor: 'pointer' }}>
-                                    <i className="hd-icon iconfont icon-atf-ykt-yincangtixingfenbu"></i>
-                                    <span className="hd-title">试卷标题修改</span>
-                                </div>
-                                <div className="bd " >
-                                    <Input value={this.state.biaotiTitle} onChange={this.biaotiTitle}></Input>
-                                </div>
-                            </div>
-                        </div> : ''}
+
                     </div>
 
                 </div>

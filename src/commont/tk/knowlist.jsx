@@ -23,7 +23,7 @@ const Knowlage = (props) => {
         })
     }, [props.params])
     return (
-        <div>
+        <div style={{width:370}}>
             <Search
                 placeholder="搜索真题试卷"
                 onSearch={value => console.log(value)}
@@ -31,6 +31,7 @@ const Knowlage = (props) => {
             </Search>
             <div className='m-know-list'>
                 <List
+                    style={{ height: 534 }}
                     className="list-hover"
                     itemLayout="vertical"
                     dataSource={shijuanList}

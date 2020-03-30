@@ -8,6 +8,8 @@ import 'braft-editor/dist/index.css'
 const { Option } = Select
 const CheckboxGroup = Checkbox.Group;
 const plainOptions = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+const choose = ['A', 'B', 'C', 'D']
+
 export default class EditorDemo extends React.Component {
     constructor(props) {
         super(props)
@@ -17,10 +19,18 @@ export default class EditorDemo extends React.Component {
             editorState3: BraftEditor.createEditorState(props.data.ques_analysis || null),
             selectState: props.chooseList.length > 1 ? '2' : '1',
             chooseList: props.chooseList.length > 1 ? '' : props.chooseList[0],
-            checkedList: props.chooseList.length > 1 ? props.chooseList : []
+            checkedList: props.chooseList.length > 1 ? props.chooseList : [],
+            objSingle: {}
         }
     }
     componentDidMount() {
+        const objSingle = {}
+        choose.forEach(res => {
+            objSingle[res] = BraftEditor.createEditorState(null)
+        })
+        this.setState({
+            objSingle
+        })
         // 使用BraftEditor.createEditorState将html字符串转换为编辑器需要的editorStat
     }
     // submitContent = async () => {
@@ -29,12 +39,17 @@ export default class EditorDemo extends React.Component {
     //     const htmlContent = this.state.editorState.toHTML()
     //     const result = await saveEditorContent(htmlContent)
     // }
-
-
-
-
     //这个是内容
-    handleChange = (editorState) => {
+    handleChange = (editorState, res, type) => {
+        const objSingle = this.state.objSingle
+        if (type === 'single') {
+            objSingle[res] = editorState
+            console.log(editorState.toHTML())
+            this.setState({
+                objSingle
+            })
+            return
+        }
         this.props.ques_content(editorState.toHTML())
         this.setState({ editorState })
     }
@@ -42,7 +57,7 @@ export default class EditorDemo extends React.Component {
     onchange = e => {
         this.props.choose(e.target.value)
         this.setState({
-            panduan: e.target.value
+            chooseList: e.target.value
         })
     }
     //这个是解析
@@ -64,7 +79,20 @@ export default class EditorDemo extends React.Component {
         //     }])
         // })
     }
-    handleChange2 = e => {
+    handleChange2 = (e, res, type) => {
+        const objSingle = { ...this.state.objSingle }
+        if (type === 'single') {
+            if (e.file.status !== "uploading") {
+                objSingle[res] = ContentUtils.insertMedias(objSingle[res], [{
+                    type: 'IMAGE',
+                    url: e.file.response.data.full_path
+                }])
+                this.setState({
+                    objSingle
+                })
+            }
+            return
+        }
         if (e.file.status !== "uploading") {
             this.setState({
                 editorState: ContentUtils.insertMedias(this.state.editorState, [{
@@ -88,6 +116,7 @@ export default class EditorDemo extends React.Component {
             checkedList
         });
     };
+
     render() {
         const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
         const props = {
@@ -121,6 +150,54 @@ export default class EditorDemo extends React.Component {
                 )
             }
         ]
+        const propsSingle = choose.map(res => {
+            return {
+                action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+                onChange: (e) => this.handleChange2(e, res, 'single'),
+                multiple: true,
+                name: 'upload_control',
+                headers: {
+                    token: sessionStorage.getItem("token"),
+                    username: sessionStorage.getItem("username"),
+                    companyid: sessionStorage.getItem("companyid")
+                }
+            }
+        })
+        const extendControlsSingle = choose.map((res, index) => {
+            return [{
+                key: 'antd-uploader',
+                type: 'component',
+                component: (
+                    <Upload
+                        {...propsSingle[index]}
+                        accept="image/*"
+                        showUploadList={false}
+                    // customRequest={this.uploadHandler}
+                    // beforeUpload={this.beforeUpload}
+                    >
+                        {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
+                        <button type="button" className="control-item button upload-button" data-title="插入图片">
+                            <Icon type="picture" theme="filled" />
+                        </button>
+                    </Upload>
+                )
+            }]
+        })
+        const chooseEditr = choose.map((res, index) =>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 600 }} key={res}>
+                <Radio value={res}>{res}</Radio>
+                <div className="my-component my-editor-component m-bottom" style={{ width: '100%' }}>
+                    <BraftEditor
+                        value={this.state.objSingle[res]}
+                        onChange={(e) => this.handleChange(e, res, 'single')}
+                        controls={controls}
+                        onSave={this.submitContent}
+                        contentStyle={{ height: 100 }}
+                        extendControls={extendControlsSingle[index]}
+                    />
+                </div>
+            </div>
+        )
         return (
             <div>
                 <div className="m-row" style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }}>题目</div>
@@ -145,11 +222,8 @@ export default class EditorDemo extends React.Component {
                 {this.state.selectState !== '' ?
                     <div>
                         {this.state.selectState === "1" ?
-                            <Radio.Group onChange={this.onchange} value={this.state.chooseList}>
-                                <Radio value='A'>A</Radio>
-                                <Radio value='B'>B</Radio>
-                                <Radio value='C'>C</Radio>
-                                <Radio value='D'>D</Radio>
+                            <Radio.Group size='large' onChange={this.onchange} value={this.state.chooseList} style={{ display: 'flex', flexFlow: 'column' }}>
+                                {chooseEditr}
                             </Radio.Group> :
                             <CheckboxGroup
                                 options={plainOptions}

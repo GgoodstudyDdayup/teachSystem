@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Button, Divider, message, Modal,Result } from 'antd';
+import { Tabs, Spin, Badge, Icon, Button, Divider, message, Modal, Result } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Select from './selection'
 import Searchbtn from './searchbtn'
 import List from './mineList'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
-import { tkList, subjectList, get_question_cart, question, remove_question_cart, get_ques_ids_cart, add_question_cart, del_question } from '../../axios/http'
+import { tkList, subjectList, get_question_cart, question, remove_question_cart, get_ques_ids_cart, add_question_cart, del_question ,remove_question_type} from '../../axios/http'
 const { confirm } = Modal;
 const { TabPane } = Tabs;
 class tikuguanli4 extends Component {
@@ -41,7 +41,7 @@ class tikuguanli4 extends Component {
             spin: false,
             clear: 'none',
             question_cart: [],
-            cardTotal: 10
+            cardTotal: 0
         }
     }
     //更改筛选筛选条件查询更改params
@@ -150,23 +150,32 @@ class tikuguanli4 extends Component {
     componentDidMount() {
         const params = { ...this.state.params }
         if (this.props.location.state) {
+            console.log(this.props.location.state)
             params.subject_id = this.props.location.state.subject_id
-            question(params).then(res => {
-                this.setState({
-                    list: res.data.list,
-                    params
-                })
-            })
             //获取科目的数据
             subjectList().then(res => {
-
                 store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
-            })
-            tkList({ subject_id: params.subject_id }).then(res => {
-                console.log(res.data)
+                let newSelectArray = [this.props.location.state.sbjArray[0].split('')[0] + this.props.location.state.sbjArray[0].split('')[1], this.props.location.state.sbjArray[1]]
                 this.setState({
-                    selectValue: this.props.location.state.sbjArray
+                    selectValue: newSelectArray
                 })
+            }).then(() => {
+                question(params).then(res => {
+                    this.setState({
+                        list: res.data.list,
+                        params
+                    })
+                })
+            }).then(() => {
+                get_ques_ids_cart().then(res => {
+                    this.setState({
+                        cart_ques_ids: res.data.cart_ques_ids
+                    })
+                })
+            })
+
+
+            tkList({ subject_id: params.subject_id }).then(res => {
                 this.shaixuanName(res.data)
             })
             get_question_cart().then(res => {
@@ -179,11 +188,7 @@ class tikuguanli4 extends Component {
                     cardTotal
                 })
             })
-            get_ques_ids_cart().then(res => {
-                this.setState({
-                    cart_ques_ids: res.data.cart_ques_ids
-                })
-            })
+
         } else {
             //获取科目的数据
             subjectList().then(res => {
@@ -381,7 +386,28 @@ class tikuguanli4 extends Component {
         e.stopPropagation()
         this.props.history.push({ pathname: '/main/question', state: { ques_id: id, sbjArray } })
     }
-
+    deleteLei = (id) => {
+        remove_question_type({ ques_type_id: id }).then(res => {
+            message.success(res.message)
+            get_ques_ids_cart().then(res => {
+                this.setState({
+                    cart_ques_ids: res.data.cart_ques_ids
+                })
+            })
+            get_question_cart().then(res => {
+                let cardTotal = null
+                res.data.list.forEach(res => {
+                    cardTotal += Number(res.count)
+                })
+                this.setState({
+                    question_cart: res.data.list,
+                    cardTotal
+                })
+            })
+        }).catch((err) => {
+            message.error(err)
+        })
+    }
     showModal = () => {
         this.setState({
             visible: true,
