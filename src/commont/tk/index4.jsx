@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Button, Divider, message, Modal, Result } from 'antd';
+import { Tabs, Spin, Badge, Icon, Button, Divider, message, Modal, Result, Pagination } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Select from './selection'
 import Searchbtn from './searchbtn'
 import List from './mineList'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
-import { tkList, subjectList, get_question_cart, question, remove_question_cart, get_ques_ids_cart, add_question_cart, del_question ,remove_question_type} from '../../axios/http'
+import { tkList, subjectList, get_question_cart, question, remove_question_cart, get_ques_ids_cart, add_question_cart, del_question, remove_question_type } from '../../axios/http'
 const { confirm } = Modal;
 const { TabPane } = Tabs;
 class tikuguanli4 extends Component {
@@ -18,7 +18,7 @@ class tikuguanli4 extends Component {
             ],
 
             params: {
-                subject_id: 38,
+                subject_id: '',
                 province_id: '',
                 ques_type_id: '',
                 year: '',
@@ -38,6 +38,7 @@ class tikuguanli4 extends Component {
                     options: store.getState().XueKeList
                 })
             }),
+            totalCount: 1,
             spin: false,
             clear: 'none',
             question_cart: [],
@@ -163,7 +164,7 @@ class tikuguanli4 extends Component {
                 question(params).then(res => {
                     this.setState({
                         list: res.data.list,
-                        params
+                        totalCount: Number(res.data.total_count),
                     })
                 })
             }).then(() => {
@@ -265,7 +266,8 @@ class tikuguanli4 extends Component {
             this.setState({
                 list: res.data.list,
                 params,
-                selectValue: e
+                selectValue: e,
+                totalCount: Number(res.data.total_count),
             })
         })
     }
@@ -367,7 +369,7 @@ class tikuguanli4 extends Component {
                     if (res.code === 0) {
                         question(params).then(res => {
                             that.setState({
-                                list: res.data.list
+                                list: res.data.list,
                             })
                         })
                         message.success(res.message)
@@ -408,6 +410,9 @@ class tikuguanli4 extends Component {
             message.error(err)
         })
     }
+    zujuan = () => {
+        this.props.history.push('/main/zujuan')
+    }
     showModal = () => {
         this.setState({
             visible: true,
@@ -425,6 +430,17 @@ class tikuguanli4 extends Component {
         this.setState({
             visible: false,
         });
+    };
+    changePage = page => {
+        const params = { ...this.state.params }
+        params.page = page
+        question(params).then(res => {
+            this.setState({
+                list: res.data.list,
+                totalCount: Number(res.data.total_count),
+                params
+            })
+        })
     };
     render() {
         return (
@@ -459,8 +475,8 @@ class tikuguanli4 extends Component {
                         </div>
                     )}
                     <div className="topic-ctrls">
-                        <div className="clear-btn" >清空全部</div>
-                        <div className="see-btn">查看试卷</div>
+                        {/* <div className="clear-btn" >清空全部</div> */}
+                        <div className="see-btn" onClick={this.zujuan}>查看试卷</div>
                     </div>
                 </div>
 
@@ -500,6 +516,9 @@ class tikuguanli4 extends Component {
                             <div style={{ maxHeight: 500, overflowY: 'scroll' }} className="m-left">
                                 <List data={this.state.list} fun={this.add} edit={this.edit} del_question={this.del_question} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
                             </div>
+                            {this.state.selectValue.length > 0 ?
+                                <Pagination className="m-Pleft" onChange={this.changePage} total={this.state.totalCount} />
+                                : ""}
                         </div>
                         {this.state.selectValue.length > 0 ? '' : <Result
                             status="403"

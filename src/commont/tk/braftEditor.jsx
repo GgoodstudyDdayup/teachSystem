@@ -45,6 +45,7 @@ export default class EditorDemo extends React.Component {
             know_lageNameList: [],
             ques_knowledge_idList: [],
             sbjArray: [],
+            newMsgHandle: [],
             btnChange: true,
             params: {
                 course_type_id: 1,
@@ -66,7 +67,6 @@ export default class EditorDemo extends React.Component {
         }
     }
     componentDidMount() {
-        this.tableChange()
         const params = { ...this.state.params }
         if (this.props.location.state) {
             subjectList().then(res => {
@@ -92,6 +92,7 @@ export default class EditorDemo extends React.Component {
                     params.ques_options = res.data.model.ques_options
                     params.ques_source_type_id = res.data.model.ques_source_type_id
                     params.template_id = Number(res.data.model.template_id)
+                    this.tableChange(res.data.model.ques_options)
                     this.switchState(params.template_id, params)
                     let newSelectArray = [this.props.location.state.sbjArray[0].split('')[0] + this.props.location.state.sbjArray[0].split('')[1], this.props.location.state.sbjArray[1]]
                     const know_lageNameList = res.data.question_tree_rela_list.map(res => {
@@ -393,66 +394,14 @@ export default class EditorDemo extends React.Component {
             params
         })
     }
-
     tableChange = e => {
-        let whatSay = `
-        <table width="100%" class="ques-option-ul ques-option-ul-3653423">
-            <tr>
-                <td width="48%" height="40">
-                    <table style="height:100%;width:100%;" cellpadding="4">
-                        <tr>
-                            <th valign="middle" style="width:30px">A、</th>
-                            <td valign="middle">
-                                <div class=WordSection1 style=''>
-                                    <p class=MsoNormal>①②③④</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-                <td width="48%" height="40">
-                    <table style="height:100%;width:100%;" cellpadding="4">
-                        <tr>
-                            <th valign="middle" style="width:30px">B、</th>
-                            <td valign="middle">
-                                <div class=WordSection1 style=''>
-                                    <p class=MsoNormal>①②③</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr>
-                <td width="48%" height="40">
-                    <table style="height:100%;width:100%;" cellpadding="4">
-                        <tr>
-                            <th valign="middle" style="width:30px">C、</th>
-                            <td valign="middle">
-                                <div class=WordSection1 style=''>
-                                    <p class=MsoNormal>①②</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-                <td width="48%" height="40">
-                    <table style="height:100%;width:100%;" cellpadding="4">
-                        <tr>
-                            <th valign="middle" style="width:30px">D、</th>
-                            <td valign="middle">
-                                <div class=WordSection1 style=''>
-                                    <p class=MsoNormal>①②④</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>`
-        let newMsgHandle = whatSay.match(/<p(([\s\S])*?)<\/p>/g)
-        // console.log(newMsgHandle)
-
+        let whatSay = e
+        if (whatSay) {
+            let newMsgHandle = whatSay.match(/<div(([\s\S])*?)<\/div>/g)
+            this.setState({
+                newMsgHandle
+            })
+        }
     }
 
     onchangetemplate = e => {
@@ -473,7 +422,7 @@ export default class EditorDemo extends React.Component {
                 return <JieD data={data} ques_content={this.quesContent} ques_analysis={this.quesAnalysis} ques_answer={this.quesAnswer}></JieD>
             case 3:
                 const list = data.ques_answer.split('')
-                return <Choose data={data} chooseList={list} ques_content={this.quesContent} ques_analysis={this.quesAnalysis} choose={this.choose} panduanState={this.state.chooseState}></Choose>
+                return <Choose checkSingle={this.checkSingle} ques_options={this.state.newMsgHandle} data={data} chooseList={list} ques_content={this.quesContent} ques_analysis={this.quesAnalysis} choose={this.choose} panduanState={this.state.chooseState}></Choose>
             case 4:
                 console.log(data)
                 return <PanD data={data} ques_content={this.quesContent} ques_analysis={this.quesAnalysis} panduan={this.panduan} panduanState={this.state.panduanState}></PanD>
@@ -635,6 +584,73 @@ export default class EditorDemo extends React.Component {
         }
 
     }
+    checkSingle = (res, type) => {
+        const params = { ...this.state.params }
+        if (type === 'single') {
+            const arr = Object.keys(res).map(l1 => {
+                const newString = res[l1].toHTML().replace(/(\s+)?<br(\s+)?\/?>(\s+)?/gi, '')
+                return `<td width="48%" height="40">
+                <table style="height:100%;width:100%;" cellpadding="4">
+                    <tr style="display:flex;align-items: center">
+                        <th valign="middle" style="width:30px">${l1}、</th>
+                        <td valign="middle">
+                            <div class=WordSection1 style=''>
+                                ${newString}
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>`
+            })
+            let whatSay = `
+                <table width="100%" class="ques-option-ul ques-option-ul-3653423">
+                    <tr>
+                        ${arr[0] + arr[1]}
+                    </tr>
+                    <tr>
+                        ${arr[2] + arr[3]}
+                    </tr>
+                </table>`
+            params.ques_options = whatSay
+            this.setState({
+                params
+            })
+            return
+        } else {
+            const arr = Object.keys(res).map(l1 => {
+                const newString = res[l1].toHTML().replace(/(\s+)?<br(\s+)?\/?>(\s+)?/gi, '')
+                return `<td  height="40">
+                <table style="height:100%;width:100%;" cellpadding="4">
+                    <tr style="display:flex;align-items: center">
+                        <th valign="middle" style="width:30px;margin-left:10px" >${l1}、</th>
+                        <td valign="middle">
+                            <div class=WordSection1 style=''>
+                                ${newString}
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>`
+            })
+            const result = arr.reduce((item, res) => {
+                item += res
+                return item
+            }, '')
+            let whatSay = `
+                <table width="100%" class="ques-option-ul ques-option-ul-3653423">
+                    <tr>
+                        ${result}
+                    </tr>
+                   
+                </table>`
+            params.ques_options = whatSay
+            this.setState({
+                params
+            })
+            return
+        }
+    }
+
     render() {
         return (
             <div style={{ position: 'relative' }}>

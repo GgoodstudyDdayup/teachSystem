@@ -1,18 +1,17 @@
 import React from 'react'
 import { ContentUtils } from 'braft-utils'
-import { Upload, Icon, Radio, Select, Checkbox } from 'antd'
+import { Upload, Icon, Radio, Select, Checkbox, Row, Col } from 'antd'
 // 引入编辑器组件
 import BraftEditor from 'braft-editor'
 // 引入编辑器样式
 import 'braft-editor/dist/index.css'
 const { Option } = Select
-const CheckboxGroup = Checkbox.Group;
 const plainOptions = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 const choose = ['A', 'B', 'C', 'D']
-
 export default class EditorDemo extends React.Component {
     constructor(props) {
         super(props)
+        console.log(props.ques_options)
         this.state = {
             // 创建一个空的editorState作为初始值
             editorState: BraftEditor.createEditorState(props.data.ques_content || null),
@@ -25,26 +24,41 @@ export default class EditorDemo extends React.Component {
     }
     componentDidMount() {
         const objSingle = {}
-        choose.forEach(res => {
-            objSingle[res] = BraftEditor.createEditorState(null)
-        })
+        if (this.props.chooseList.length > 1) {
+            plainOptions.forEach((res, index) => {
+                if (this.props.ques_options.length > 1) {
+                    objSingle[res] = BraftEditor.createEditorState(`${this.props.ques_options[index]}`)
+                } else {
+                    objSingle[res] = BraftEditor.createEditorState(null)
+                }
+            })
+        } else {
+            choose.forEach((res, index) => {
+                if (this.props.ques_options.length > 1) {
+                    objSingle[res] = BraftEditor.createEditorState(`${this.props.ques_options[index]}`)
+                } else {
+                    objSingle[res] = BraftEditor.createEditorState(null)
+                }
+            })
+        }
         this.setState({
             objSingle
         })
-        // 使用BraftEditor.createEditorState将html字符串转换为编辑器需要的editorStat
     }
-    // submitContent = async () => {
-    //     // 在编辑器获得焦点时按下ctrl+s会执行此方法
-    //     // 编辑器内容提交到服务端之前，可直接调用editorState.toHTML()来获取HTML格式的内容
-    //     const htmlContent = this.state.editorState.toHTML()
-    //     const result = await saveEditorContent(htmlContent)
-    // }
     //这个是内容
     handleChange = (editorState, res, type) => {
         const objSingle = this.state.objSingle
         if (type === 'single') {
             objSingle[res] = editorState
-            console.log(editorState.toHTML())
+            this.props.checkSingle(objSingle, type)
+            this.setState({
+                objSingle
+            })
+            return
+        }
+        if (type === 'multiple') {
+            objSingle[res] = editorState
+            this.props.checkSingle(objSingle, type)
             this.setState({
                 objSingle
             })
@@ -81,7 +95,7 @@ export default class EditorDemo extends React.Component {
     }
     handleChange2 = (e, res, type) => {
         const objSingle = { ...this.state.objSingle }
-        if (type === 'single') {
+        if (type) {
             if (e.file.status !== "uploading") {
                 objSingle[res] = ContentUtils.insertMedias(objSingle[res], [{
                     type: 'IMAGE',
@@ -116,7 +130,6 @@ export default class EditorDemo extends React.Component {
             checkedList
         });
     };
-
     render() {
         const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
         const props = {
@@ -163,6 +176,19 @@ export default class EditorDemo extends React.Component {
                 }
             }
         })
+        const propsCheckBox = plainOptions.map(res => {
+            return {
+                action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+                onChange: (e) => this.handleChange2(e, res, 'multiple'),
+                multiple: true,
+                name: 'upload_control',
+                headers: {
+                    token: sessionStorage.getItem("token"),
+                    username: sessionStorage.getItem("username"),
+                    companyid: sessionStorage.getItem("companyid")
+                }
+            }
+        })
         const extendControlsSingle = choose.map((res, index) => {
             return [{
                 key: 'antd-uploader',
@@ -170,6 +196,26 @@ export default class EditorDemo extends React.Component {
                 component: (
                     <Upload
                         {...propsSingle[index]}
+                        accept="image/*"
+                        showUploadList={false}
+                    // customRequest={this.uploadHandler}
+                    // beforeUpload={this.beforeUpload}
+                    >
+                        {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
+                        <button type="button" className="control-item button upload-button" data-title="插入图片">
+                            <Icon type="picture" theme="filled" />
+                        </button>
+                    </Upload>
+                )
+            }]
+        })
+        const extendControlsMultiple = plainOptions.map((res, index) => {
+            return [{
+                key: 'antd-uploader',
+                type: 'component',
+                component: (
+                    <Upload
+                        {...propsCheckBox[index]}
                         accept="image/*"
                         showUploadList={false}
                     // customRequest={this.uploadHandler}
@@ -198,6 +244,23 @@ export default class EditorDemo extends React.Component {
                 </div>
             </div>
         )
+        const checkBoxEditr = plainOptions.map((res, index) =>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 600 }} key={res}>
+                <Col span={2}>
+                    <Checkbox value={res}>{res}</Checkbox>
+                </Col>
+                <div className="my-component my-editor-component m-bottom" style={{ width: '100%' }}>
+                    <BraftEditor
+                        value={this.state.objSingle[res]}
+                        onChange={(e) => this.handleChange(e, res, 'multiple')}
+                        controls={controls}
+                        onSave={this.submitContent}
+                        contentStyle={{ height: 100 }}
+                        extendControls={extendControlsMultiple[index]}
+                    />
+                </div>
+            </div>
+        )
         return (
             <div>
                 <div className="m-row" style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }}>题目</div>
@@ -215,7 +278,7 @@ export default class EditorDemo extends React.Component {
                     <div className="m-left">
                         <Select style={{ width: 150 }} onChange={this.select} value={this.state.selectState} placeholder='选择答案模式'>
                             <Option value='1' >单选</Option>
-                            <Option value='2' >7选5</Option>
+                            <Option value='2' >多选</Option>
                         </Select>
                     </div>
                 </div>
@@ -225,11 +288,11 @@ export default class EditorDemo extends React.Component {
                             <Radio.Group size='large' onChange={this.onchange} value={this.state.chooseList} style={{ display: 'flex', flexFlow: 'column' }}>
                                 {chooseEditr}
                             </Radio.Group> :
-                            <CheckboxGroup
-                                options={plainOptions}
-                                value={this.state.checkedList}
-                                onChange={this.onChange2}
-                            />
+                            <Checkbox.Group value={this.state.checkedList} onChange={this.onChange2}>
+                                <Row>
+                                    {checkBoxEditr}
+                                </Row>
+                            </Checkbox.Group>
                         }
                     </div>
                     : ''}
@@ -244,9 +307,6 @@ export default class EditorDemo extends React.Component {
                     />
                 </div>
             </div>
-
         )
-
     }
-
 }

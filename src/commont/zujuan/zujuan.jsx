@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Input, Button, message, Modal, Select, Radio } from 'antd';
 import SetMain from './tixinSet'
 import MathJax from 'react-mathjax3'
-import { get_next_cart, set_ques_type_sort, set_ques_sort, set_show_type_name, remove_question_type, set_pager_score, get_own_subject_list, get_grade_list, set_self_pager } from '../../axios/http'
+import { get_next_cart, set_ques_type_sort, set_ques_sort, set_show_type_name, remove_question_type, set_pager_score, get_own_subject_list, get_grade_list, set_self_pager, remove_question_cart } from '../../axios/http'
 import List from './zujuanList'
 const { Option } = Select;
 const { TextArea } = Input;
@@ -44,6 +44,7 @@ export default class ReactBeautifulDnd extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            waring: false,
             items: [],
             paixuIndex: 0,
             list: [
@@ -272,6 +273,10 @@ export default class ReactBeautifulDnd extends Component {
     //用于设置分值
     handleOk = e => {
         const scorePublic = this.state.scorePublic
+        if (!this.state.warning) {
+            message.warning('请重新设置分值')
+            return
+        }
         set_pager_score({ score_json: JSON.stringify(scorePublic) }).then(res => {
             if (res.code === 0) {
                 message.success(res.message)
@@ -317,6 +322,35 @@ export default class ReactBeautifulDnd extends Component {
         this.setState({
             visible2: true,
         });
+    }
+    deleteQuestoin = (e, id) => {
+        e.stopPropagation()
+        remove_question_cart({ ques_id: id }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                get_next_cart().then(res => {
+                    const scorePublic = res.data.list.reduce((item, res) => {
+                        item.push({
+                            ques_type_id: res.ques_type_id,
+                            total_score: res.ques_score
+                        })
+                        return item
+                    }, [])
+                    const totalNum = scorePublic.reduce((item, res) => {
+                        item += Number(res.total_score)
+                        return item
+                    }, 0)
+                    //scorePublic是类型的总分集合
+                    this.setState({
+                        list: res.data.list,
+                        scorePublic,
+                        totalNum
+                    })
+                })
+            } else {
+                message.error(res.message)
+            }
+        })
     }
     //试卷提交
     sjAction = () => {
@@ -373,7 +407,7 @@ export default class ReactBeautifulDnd extends Component {
             grandValue: ''
         });
     }
-    changeTotalNum = (e, id) => {
+    changeTotalNum = (e, id, num) => {
         const list = this.state.list
         const scorePublic = this.state.scorePublic
         list.forEach((res, index) => {
@@ -384,6 +418,19 @@ export default class ReactBeautifulDnd extends Component {
         this.setState({
             scorePublic
         })
+    }
+    changeonBlur = (e, num) => {
+        if (e.target.value % num !== 0) {
+            console.log(e.target.value % num)
+            this.setState({
+                warning: false
+            })
+        } else {
+            console.log(e.target.value % num)
+            this.setState({
+                warning: true
+            })
+        }
     }
     onChangeState = (e, type) => {
         const saveFile = { ...this.state.saveFile }
@@ -596,20 +643,21 @@ export default class ReactBeautifulDnd extends Component {
                                     <div className="structure-header">
                                         <div>总分：{this.state.totalNum}分<span style={{ marginLeft: 10, color: '#1890ff', cursor: 'pointer' }} onClick={this.showModal}>设置分值</span></div>
                                         <Modal
-                                            title="分数设置"
+                                            title='分数设置'
                                             cancelText='取消'
                                             okText='确认'
                                             visible={this.state.visible}
                                             onOk={this.handleOk}
                                             onCancel={this.handleCancel}
                                         >
+                                            <p style={{ color: '#f40' }}>分数除以数量要为整数哦~~</p>
                                             {this.state.list.map((res, index) =>
                                                 <div key={index} className="m-flex m-bottom" style={{ justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #dfdfdf', boxSizing: 'border-box', paddingBottom: 5 }}>
                                                     <div className="m-row">
                                                         {res.ques_type_name}
                                                     </div>
                                                     <div>数量:{res.ques_num}</div>
-                                                    <Input value={this.state.scorePublic[index].total_score} style={{ width: 100 }} placeholder={`${res.ques_type_name}分值`} onChange={(e) => this.changeTotalNum(e, res.ques_type_id)}></Input>
+                                                    <Input onBlur={(e) => this.changeonBlur(e, res.ques_num)} value={this.state.scorePublic[index].total_score} style={{ width: 100 }} placeholder={`${res.ques_type_name}分值`} onChange={(e) => this.changeTotalNum(e, res.ques_type_id, res.ques_num)}></Input>
                                                 </div>
                                             )}
                                         </Modal>

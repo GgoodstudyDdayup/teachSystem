@@ -12,8 +12,9 @@ import Recommended from './resourceCenter/recommended/index/index'
 import RecommendedReal from './resourceCenter/recommended/real/real'
 import RecommendedShare from './resourceCenter/recommended/share/share'
 import RecommendedJigousiku from './resourceCenter/recommended/jigousiku/jigousiku'
-import Myresources from './resourceCenter/myResources/index/index'
-import MyresourcesWenjianjia from './resourceCenter/myResources/wenjianku/wenjianku'
+// import Myresources from './resourceCenter/myResources/index/index'
+// import MyresourcesWenjianjia from './resourceCenter/myResources/wenjianku/wenjianku'
+import Myzujuan from './resourceCenter/myResources/zujuanList/index'
 import BK from './bk/bk'
 import Prograss from './bk/prograss'
 import Kj from './bk/kejian'
@@ -198,8 +199,9 @@ class main extends Component {
                             <Menu.Item key="6">
                                 <Link to="/main/bk/prograss">审核进度</Link>
                             </Menu.Item>
-                            <Menu.Item key="7">
-                                <Link to="/main/bk/kejian">组卷审核</Link></Menu.Item>
+                            {sessionStorage.getItem('teacher_type') === '4' ? '' : <Menu.Item key="7">
+                                <Link to="/main/bk/kejian">组卷审核</Link>
+                            </Menu.Item>}
                         </SubMenu>
                         {/* <SubMenu
                             key="55"
@@ -291,11 +293,11 @@ class main extends Component {
                                 </span>
                             }
                         >
-                            <Menu.Item key="13">
+                            {/* <Menu.Item key="13">
                                 <Link to="/main/resourceCenter/recommended">推荐资源</Link>
-                            </Menu.Item>
+                            </Menu.Item> */}
                             <Menu.Item key="14">
-                                <Link to="/main/resourceCenter/myresources/wenjianjia">我的资源</Link>
+                                <Link to="/main/resourceCenter/zj">我的资源</Link>
                             </Menu.Item>
                         </SubMenu>
                     </Menu>
@@ -370,7 +372,7 @@ class main extends Component {
                             <Route path="/main/tk/own" component={Tkown} />
                             <Route path="/main/tk/mine" component={Tkmine} />
                             <Route path="/main/question" component={Tkquestion} />
-                            <Route path="/main/test" component={Test}/>
+                            <Route path="/main/test" component={Test} />
 
                             {/* 资源中心的推荐资源 */}
                             <Route path="/main/resourceCenter/recommended" exact component={Recommended}></Route>
@@ -378,8 +380,9 @@ class main extends Component {
                             <Route path="/main/resourceCenter/recommended/share" component={RecommendedShare}></Route>
                             <Route path="/main/resourceCenter/recommended/real" component={RecommendedReal}></Route>
                             {/* 资源中心的我的资源 */}
-                            <Route path="/main/resourceCenter/myresources/wenjianjia" exact component={Myresources}></Route>
-                            <Route path="/main/resourceCenter/myresources" component={MyresourcesWenjianjia}></Route>
+                            {/* <Route path="/main/resourceCenter/myresources/wenjianjia" exact component={Myresources}></Route> */}
+                            {/* <Route path="/main/resourceCenter/myresources" component={MyresourcesWenjianjia}></Route> */}
+                            <Route path="/main/resourceCenter/zj" component={Myzujuan}></Route>
 
                             <Route path="/main/bk" exact component={BK} />
                             <Route path="/main/bk/prograss" component={Prograss} />

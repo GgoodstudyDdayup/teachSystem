@@ -31,10 +31,11 @@ const ListT = (props) => {
             }}>
             <div className="listT" onClick={() => { props.fun(res.id) }} >
                 <div className="know-name-m" >
-                    <MathJax.Html html={ res.ques_content} />
+                    {res.options ? <MathJax.Html html={res.ques_content + res.options} /> : <MathJax.Html html={res.ques_content} />}
+
                 </div>
                 <Divider dashed />
-                <Knowlage id={res.ques_id} ques_knowledge_name={res.ques_knowledge_name} ques_difficulty_text={res.ques_difficulty_text} ques_number={res.ques_number}></Knowlage>
+                <Knowlage id={res.ques_id} deleteQuestoin={props.deleteQuestoin} ques_knowledge_name={res.ques_knowledge_name} ques_difficulty_text={res.ques_difficulty_text} ques_number={res.ques_number}></Knowlage>
                 <div className={props.appear === res.id ? '' : 'question-active'} >
                     <Divider dashed />
                     <div>
@@ -66,7 +67,7 @@ const Knowlage = (props) => {
                 </p>
             </div>
             <div>
-                <Button className="z-index" type='danger'>删除试题</Button>
+                <Button className="z-index" type='danger' onClick={(e) => props.deleteQuestoin(e, props.id)}>删除试题</Button>
             </div>
         </div>
     )
