@@ -575,7 +575,7 @@ export default class ReactBeautifulDnd extends Component {
     }
     preview = () => {
         sessionStorage.setItem('previewData', JSON.stringify(this.state.previewData))
-        window.open('/#/setPreview')
+        window.open('/node/build/#/setPreview')
     }
     render() {
         return (
