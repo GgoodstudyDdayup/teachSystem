@@ -145,7 +145,8 @@ class tikuguanli extends Component {
             console.log(res)
             this.setState({
                 params,
-                list: res.data.list
+                list: res.data.list,
+                totalCount: Number(res.data.total_count)
             })
         })
     }
@@ -319,7 +320,6 @@ class tikuguanli extends Component {
             this.shaixuanName(res.data)
         })
     }
-
     searchKnowLage = e => {
         const params = { ...this.state.params }
         params.key_words = e
@@ -327,17 +327,11 @@ class tikuguanli extends Component {
             params.key_words = ''
             this.setState({
                 list: res.data.list,
-                params
+                params,
+                totalCount: Number(res.data.total_count)
             })
         })
 
-    }
-    knowLageValueChange = e => {
-        const params = { ...this.state.params }
-        params.key_words = e.target.value
-        this.setState({
-            params
-        })
     }
     moveOrAdd = (id) => {
         let cart_ques_ids = this.state.cart_ques_ids
@@ -489,7 +483,7 @@ class tikuguanli extends Component {
                         <div>
                             <div className="knowlage">
                                 <div className="tree" style={this.state.height > 638 ? { maxHeight: 600, overflowY: 'scroll', width: 370 } : { maxHeight: 400, overflowY: 'scroll', width: 370 }}>
-                                    <Tree data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage} knowLageValueChange={this.knowLageValueChange} knowLageValue={this.state.params.key_words}></Tree>
+                                    <Tree data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage}  knowLageValue={this.state.params.key_words}></Tree>
                                 </div>
                                 <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 600 } : { height: 400 }}>
                                     <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>

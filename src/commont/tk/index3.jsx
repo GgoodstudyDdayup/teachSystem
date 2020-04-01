@@ -70,6 +70,20 @@ class tikuguanli2 extends Component {
         }
     }
     componentDidMount() {
+        const params = {...this.state.params}
+        get_list(params).then(res => {
+            if (res.data.list.length >= 1) {
+                this.setState({
+                    params,
+                    stateAppear: true
+                })
+            } else {
+                this.setState({
+                    params,
+                    stateAppear: false
+                })
+            }
+        })
         get_own_subject_list().then(res => {
             const subjectchildren = res.data.own_subject_list.map((res, index) => {
                 return <Option key={res.name} value={res.name} >{res.name}</Option>

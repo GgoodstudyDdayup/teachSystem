@@ -214,7 +214,7 @@ export default class EditorDemo extends React.Component {
                         res2.children.forEach((res3) => {
                             if (res3.children !== null) {
                                 res3.children.forEach((res4) => {
-                                    if (res4.children !== null) {
+                                    if (res4.children !== null && res4.children !== undefined) {
                                         res4.children.forEach(res5 => {
                                             if (res5.aitifen_id === result[index].ques_knowledge_id) {
                                                 result[index].ques_knowledge_three_id = res4.aitifen_id
@@ -222,11 +222,6 @@ export default class EditorDemo extends React.Component {
                                                 result[index].ques_knowledge_first_id = res2.aitifen_id
                                             }
                                         })
-                                    } else {
-                                        if (res4.aitifen_id === result[index].ques_knowledge_id) {
-                                            result[index].ques_knowledge_second_id = res3.aitifen_id
-                                            result[index].ques_knowledge_first_id = res2.aitifen_id
-                                        }
                                     }
                                 })
                             } else {

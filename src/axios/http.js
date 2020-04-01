@@ -226,5 +226,13 @@ export const check_self_paper = (params) => {
     return instance.post('/api/self_paper/check_self_paper', params)
 }
 
+//预览组件
+export const get_self_paperinfo = (params) => {
+    return instance.post('/api/self_paper/get_self_paperinfo', params)
+}
+//删除自定义组卷
+export const del_self_paper = (params) => {
+    return instance.post('/api/self_paper/del_self_paper', params)
+}
 
 

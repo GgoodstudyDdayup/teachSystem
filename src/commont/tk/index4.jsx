@@ -262,6 +262,7 @@ class tikuguanli4 extends Component {
     selectonChange = (e) => {
         const params = { ...this.state.params }
         params.subject_id = Number(e[1])
+        params.page = 1
         question(params).then(res => {
             this.setState({
                 list: res.data.list,

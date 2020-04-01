@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
 import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input, Select } from 'antd';
 import { logout, change_password_byself } from '../axios/http'
-import { LogoutOutlined, EditTwoTone } from '@ant-design/icons'
+import { LogoutOutlined, EditTwoTone, SlidersOutlined } from '@ant-design/icons'
 import Tk from './tk/index'
 import Tksystem from './tk/index2'
 import Tkown from './tk/index3'
@@ -267,6 +267,22 @@ class main extends Component {
                             <Menu.Item key="9">Option 11</Menu.Item>
                             <Menu.Item key="10">Option 12</Menu.Item>
                         </SubMenu> */}
+                        <SubMenu
+                            key="sub6"
+                            title={
+                                <span>
+                                    <SlidersOutlined />
+                                    <span>资源管理</span>
+                                </span>
+                            }
+                        >
+                            {/* <Menu.Item key="13">
+                                <Link to="/main/resourceCenter/recommended">推荐资源</Link>
+                            </Menu.Item> */}
+                            <Menu.Item key="14">
+                                <Link to="/main/resourceCenter/zj">我的资源</Link>
+                            </Menu.Item>
+                        </SubMenu>
                         {sessionStorage.getItem("permission") === '1' || sessionStorage.getItem("permission") === '2' ? <SubMenu
                             key="sub5"
                             title={
@@ -284,22 +300,7 @@ class main extends Component {
                             </Menu.Item>
                         </SubMenu> : ''}
 
-                        <SubMenu
-                            key="sub6"
-                            title={
-                                <span>
-                                    <Icon type="setting" />
-                                    <span>资源管理</span>
-                                </span>
-                            }
-                        >
-                            {/* <Menu.Item key="13">
-                                <Link to="/main/resourceCenter/recommended">推荐资源</Link>
-                            </Menu.Item> */}
-                            <Menu.Item key="14">
-                                <Link to="/main/resourceCenter/zj">我的资源</Link>
-                            </Menu.Item>
-                        </SubMenu>
+
                     </Menu>
                 </Sider>
                 <Layout>

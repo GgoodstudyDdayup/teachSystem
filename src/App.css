@@ -776,11 +776,6 @@
 .WordSection1 p {
   margin-bottom: 0;
 }
-
-.WordSection1 {
-  display: flex;
-  align-items:center
-}
 .ques-option-ul tr{
   display: flex;
   flex-wrap: wrap;

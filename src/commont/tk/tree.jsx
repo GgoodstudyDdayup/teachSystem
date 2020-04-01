@@ -1,17 +1,18 @@
 import React from 'react';
-import { Input, Tree, Icon } from 'antd';
-const { Search } = Input;
+import {  Tree, Icon } from 'antd';
+// Input,
+// const { Search } = Input;
 const { TreeNode } = Tree;
 const TreeMain = (props) => {
     return (
         <div>
-            <Search
+            {/* <Search
                 placeholder="搜索知识点"
                 onSearch={value => props.search(value)}
                 style={{ width: 200 }}
                 value={props.knowLageValue}
                 onChange={props.knowLageValueChange}
-            />
+            /> */}
             <TreeList tree={props.data} funt={props.funt}></TreeList>
         </div>
     )
