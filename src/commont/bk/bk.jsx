@@ -365,7 +365,7 @@ class bk extends Component {
             },
         ];
         const props = {
-            action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+            action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
             onChange: this.handleChange,
             multiple: true,
             name: 'upload_control',

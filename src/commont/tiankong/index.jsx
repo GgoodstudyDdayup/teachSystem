@@ -47,7 +47,7 @@ export default class UploadDemo extends React.Component {
         this.setState({
             editorState: ContentUtils.insertMedias(this.state.editorState, [{
                 type: 'IMAGE',
-                url: 'https://devjiaoxueapi.yanuojiaoyu.com/upload/self_lecture/202003241722206911.jpg'
+                url: 'https://jiaoxueapi.yanuojiaoyu.com/upload/self_lecture/202003241722206911.jpg'
             }])
         })
 
@@ -57,7 +57,7 @@ export default class UploadDemo extends React.Component {
 
         const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
         const props = {
-            action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+            action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
             onChange: this.handleChange2,
             multiple: true,
             name: 'upload_control',

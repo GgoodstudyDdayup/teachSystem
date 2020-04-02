@@ -67,7 +67,7 @@ const Knowlage = (props) => {
                 </p>
             </div>
             <div>
-                <Button className="z-index" type='danger' onClick={(e) => props.deleteQuestoin(e, props.id)}>删除试题</Button>
+                <Button className="z-index" type='danger' onClick={(e) => props.deleteQuestoin(e, props.id)}>移除试题</Button>
             </div>
         </div>
     )

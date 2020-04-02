@@ -28,7 +28,7 @@ class tikuguanli extends Component {
                 key_words: '',
                 is_old: 1,
                 page: 1,
-                page_size: 20
+                page_size:10
             },
             totalCount: 1,
             options: store.getState().XueKeList,
@@ -139,10 +139,13 @@ class tikuguanli extends Component {
     //更改knowlage_id
     changeaitifen_id = (e) => {
         const params = this.state.params
-        params.knowledge_id = e[0]
-        console.log(params)
+        if (e[0] === undefined) {
+            params.knowledge_id = ''
+        } else {
+            params.knowledge_id = e[0]
+        }
+        params.page = 1
         question(params).then(res => {
-            console.log(res)
             this.setState({
                 params,
                 list: res.data.list,
@@ -302,13 +305,14 @@ class tikuguanli extends Component {
             is_old: 1,
             key_words: '',
             page: 1,
-            page_size: 20
+            page_size: 10
         }
         question(params).then(res => {
             this.setState({
                 list: res.data.list,
                 params,
-                selectValue: value
+                selectValue: value,
+                totalCount: Number(res.data.total_count),
             })
         })
         tree({ subject_id: params.subject_id }).then(res => {
@@ -483,7 +487,7 @@ class tikuguanli extends Component {
                         <div>
                             <div className="knowlage">
                                 <div className="tree" style={this.state.height > 638 ? { maxHeight: 600, overflowY: 'scroll', width: 370 } : { maxHeight: 400, overflowY: 'scroll', width: 370 }}>
-                                    <Tree data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage}  knowLageValue={this.state.params.key_words}></Tree>
+                                    <Tree data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage} knowLageValue={this.state.params.key_words}></Tree>
                                 </div>
                                 <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 600 } : { height: 400 }}>
                                     <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
@@ -495,7 +499,7 @@ class tikuguanli extends Component {
                                     {/* </div> */}
                                 </div>
                             </div>
-                            <Pagination className="m-Pleft" onChange={this.changePage} total={this.state.totalCount} />
+                            <Pagination className="m-Pleft" current={this.state.params.page} onChange={this.changePage} total={this.state.totalCount} />
                         </div>
                     </TabPane>
                     <TabPane tab="真题试卷" key="2" >

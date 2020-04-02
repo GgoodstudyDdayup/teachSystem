@@ -271,6 +271,9 @@ class tikuguanli4 extends Component {
                 totalCount: Number(res.data.total_count),
             })
         })
+        tkList({ subject_id: params.subject_id }).then(res => {
+            this.shaixuanName(res.data)
+        })
     }
     moveOrAdd = (id) => {
         let cart_ques_ids = this.state.cart_ques_ids
@@ -390,6 +393,7 @@ class tikuguanli4 extends Component {
         this.props.history.push({ pathname: '/main/question', state: { ques_id: id, sbjArray } })
     }
     deleteLei = (id) => {
+        const params = {...this.state.params}
         remove_question_type({ ques_type_id: id }).then(res => {
             message.success(res.message)
             get_ques_ids_cart().then(res => {
@@ -405,6 +409,12 @@ class tikuguanli4 extends Component {
                 this.setState({
                     question_cart: res.data.list,
                     cardTotal
+                })
+            })
+            question(params).then(res => {
+                this.setState({
+                    list: res.data.list,
+                    totalCount: Number(res.data.total_count),
                 })
             })
         }).catch((err) => {
@@ -518,7 +528,7 @@ class tikuguanli4 extends Component {
                                 <List data={this.state.list} fun={this.add} edit={this.edit} del_question={this.del_question} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
                             </div>
                             {this.state.selectValue.length > 0 ?
-                                <Pagination className="m-Pleft" onChange={this.changePage} total={this.state.totalCount} />
+                                <Pagination current={this.state.params.page} className="m-Pleft" onChange={this.changePage} total={this.state.totalCount} />
                                 : ""}
                         </div>
                         {this.state.selectValue.length > 0 ? '' : <Result

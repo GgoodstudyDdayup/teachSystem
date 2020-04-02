@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Input, message, BackTop, Pagination } from 'antd';
+import { Tabs, Spin, Badge, Icon, Input, message, BackTop } from 'antd';
 import Select from './selection'
 import Know from './knowlist'
 import List from './list'
@@ -45,7 +45,7 @@ class tikuguanli2 extends Component {
                 key_words: '',
                 is_old: 1,
                 page: 1,
-                page_size: 20
+                page_size: 10
             },
             selectValue: [],
             cart_ques_ids: '',
@@ -272,7 +272,8 @@ class tikuguanli2 extends Component {
         question(params).then(res => {
             this.setState({
                 list: res.data.list,
-                params
+                params,
+                totalCount: Number(res.data.total_count),
             })
         })
 
@@ -368,10 +369,12 @@ class tikuguanli2 extends Component {
         })
     }
     listView = e => {
-        console.log(e)
+        const params = { ...this.state.params }
+        params.page = 1
         get_paper_info({ paper_id: e }).then(res => {
             console.log(res)
             this.setState({
+                params,
                 list: res.data.ques_list
             })
         })
@@ -446,7 +449,7 @@ class tikuguanli2 extends Component {
                             <div className="tree" >
                                 <Know params={this.state.params} listView={this.listView}></Know>
                             </div>
-                            <div style={{ display: 'flex', flexFlow: 'column' }}>
+                            <div >
                                 <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 600, width: '100%' } : { height: 400, width: '100%' }}>
                                     <div>
                                         <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
@@ -457,7 +460,6 @@ class tikuguanli2 extends Component {
                                         <BackTop target={() => document.getElementById('scroll-y')} />
                                     </div>
                                 </div>
-                                <Pagination className="m-Pleft" onChange={this.changePage} total={this.state.totalCount} />
                             </div>
                         </div>
                     </TabPane>

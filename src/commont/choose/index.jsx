@@ -19,7 +19,8 @@ export default class EditorDemo extends React.Component {
             selectState: props.chooseList.length > 1 ? '2' : '1',
             chooseList: props.chooseList.length > 1 ? '' : props.chooseList[0],
             checkedList: props.chooseList.length > 1 ? props.chooseList : [],
-            objSingle: {}
+            objSingle: {},
+            disabled: false
         }
     }
     componentDidMount() {
@@ -32,6 +33,9 @@ export default class EditorDemo extends React.Component {
                     objSingle[res] = BraftEditor.createEditorState(null)
                 }
             })
+            this.setState({
+                disabled: true
+            })
         } else {
             choose.forEach((res, index) => {
                 if (this.props.ques_options.length > 1) {
@@ -39,6 +43,9 @@ export default class EditorDemo extends React.Component {
                 } else {
                     objSingle[res] = BraftEditor.createEditorState(null)
                 }
+                this.setState({
+                    disabled: true
+                })
             })
         }
         this.setState({
@@ -89,7 +96,7 @@ export default class EditorDemo extends React.Component {
         // this.setState({
         //     editorState: ContentUtils.insertMedias(this.state.editorState, [{
         //         type: 'IMAGE',
-        //         url: 'https://devjiaoxueapi.yanuojiaoyu.com/upload/self_lecture/202003241722206911.jpg'
+        //         url: 'https://jiaoxueapi.yanuojiaoyu.com/upload/self_lecture/202003241722206911.jpg'
         //     }])
         // })
     }
@@ -133,7 +140,7 @@ export default class EditorDemo extends React.Component {
     render() {
         const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
         const props = {
-            action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+            action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
             onChange: this.handleChange2,
             multiple: true,
             name: 'upload_control',
@@ -165,7 +172,7 @@ export default class EditorDemo extends React.Component {
         ]
         const propsSingle = choose.map(res => {
             return {
-                action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+                action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
                 onChange: (e) => this.handleChange2(e, res, 'single'),
                 multiple: true,
                 name: 'upload_control',
@@ -178,7 +185,7 @@ export default class EditorDemo extends React.Component {
         })
         const propsCheckBox = plainOptions.map(res => {
             return {
-                action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+                action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
                 onChange: (e) => this.handleChange2(e, res, 'multiple'),
                 multiple: true,
                 name: 'upload_control',
@@ -285,7 +292,7 @@ export default class EditorDemo extends React.Component {
                 {this.state.selectState !== '' ?
                     <div>
                         {this.state.selectState === "1" ?
-                            <Radio.Group size='large' onChange={this.onchange} value={this.state.chooseList} style={{ display: 'flex', flexFlow: 'column' }}>
+                            <Radio.Group size='large' onChange={this.onchange} value={this.state.chooseList} style={{ display: 'flex', flexFlow: 'column' }} >
                                 {chooseEditr}
                             </Radio.Group> :
                             <Checkbox.Group value={this.state.checkedList} onChange={this.onChange2}>

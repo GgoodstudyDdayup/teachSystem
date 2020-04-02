@@ -24,7 +24,7 @@ const Knowlage = (props) => {
         })
     }, [props.params])
     return (
-        <div style={{width:370}}>
+        <div style={{width:270}}>
             {/* <Search
                 placeholder="搜索真题试卷"
                 onSearch={value => console.log(value)}

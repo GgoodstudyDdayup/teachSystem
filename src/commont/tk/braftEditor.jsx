@@ -63,7 +63,8 @@ export default class EditorDemo extends React.Component {
                 template_id: '',
                 ques_source_type_id: [],
                 ques_year: []
-            }
+            },
+            disabledTemplat: false
         }
     }
     componentDidMount() {
@@ -72,7 +73,8 @@ export default class EditorDemo extends React.Component {
             subjectList().then(res => {
                 store.dispatch(XueKeActionCreators.SaveXueKeActionCreator(res.data.subject_list))
                 this.setState({
-                    subject_list: res.data.subject_list
+                    subject_list: res.data.subject_list,
+                    disabledTemplat: true
                 })
             }).then(() => {
                 get_questioninfo({ ques_id: this.props.location.state.ques_id }).then(res => {
@@ -419,7 +421,6 @@ export default class EditorDemo extends React.Component {
                 const list = data.ques_answer.split('')
                 return <Choose checkSingle={this.checkSingle} ques_options={this.state.newMsgHandle} data={data} chooseList={list} ques_content={this.quesContent} ques_analysis={this.quesAnalysis} choose={this.choose} panduanState={this.state.chooseState}></Choose>
             case 4:
-                console.log(data)
                 return <PanD data={data} ques_content={this.quesContent} ques_analysis={this.quesAnalysis} panduan={this.panduan} panduanState={this.state.panduanState}></PanD>
             default:
                 return ''
@@ -433,7 +434,6 @@ export default class EditorDemo extends React.Component {
         })
     }
     choose = e => {
-        console.log(e)
         const params = { ...this.state.params }
         if (typeof (e) === 'object') {
             const result = e.reduce((item, res) => {
@@ -520,7 +520,7 @@ export default class EditorDemo extends React.Component {
         const params = { ...this.state.params }
         const that = this
         if (this.state.btnChange) {
-            if (params.ques_type_id === '' || params.ques_knowledge_ids === '' || params.ques_grade_id === '' || params.ques_subject_id === '' || params.ques_difficulty === '' || params.ques_answer === '' || params.ques_content === '' || params.ques_analysis === '' || params.ques_source_type_id === '' || params.ques_year === '') {
+            if (typeof params.ques_type_id === 'object' || params.ques_knowledge_ids === '' || typeof params.ques_grade_id === 'object' || params.ques_subject_id === '' || params.ques_difficulty === '' || params.ques_answer === '' || params.ques_content === '' || typeof params.ques_year === 'object') {
                 message.warning('请填写必填项')
             } else {
                 confirm({
@@ -535,7 +535,6 @@ export default class EditorDemo extends React.Component {
                                 message.success({
                                     content: res.message,
                                     onClose: () => {
-                                        console.log(that.state.params.ques_subject_id, that.state.sbjArray)
                                         that.props.history.push({ pathname: "/main/tk/mine", state: { subject_id: that.state.params.ques_subject_id, sbjArray: that.state.sbjArray } })
                                     }
                                 })
@@ -557,7 +556,6 @@ export default class EditorDemo extends React.Component {
                 okText: '确认',
                 cancelText: '取消',
                 onOk() {
-                    console.log(that.state.params.ques_subject_id, that.state.sbjArray)
                     edit_question_question(params).then(res => {
                         if (res.code === 0) {
                             message.success({
@@ -575,7 +573,6 @@ export default class EditorDemo extends React.Component {
                     console.log('Cancel');
                 },
             });
-            console.log(params)
         }
 
     }
@@ -590,7 +587,9 @@ export default class EditorDemo extends React.Component {
                         <th valign="middle" style="width:30px">${l1}、</th>
                         <td valign="middle">
                             <div class=WordSection1 style=''>
-                                ${newString}
+                                <div style="display:flex;align-items: center;">
+                                    ${newString}
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -614,13 +613,15 @@ export default class EditorDemo extends React.Component {
         } else {
             const arr = Object.keys(res).map(l1 => {
                 const newString = res[l1].toHTML().replace(/(\s+)?<br(\s+)?\/?>(\s+)?/gi, '')
-                return `<td  height="40">
+                return `<td  height="40" class="m-bottom">
                 <table style="height:100%;width:100%;" cellpadding="4">
                     <tr style="display:flex;align-items: center">
                         <th valign="middle" style="width:30px;margin-left:10px" >${l1}、</th>
                         <td valign="middle">
                             <div class=WordSection1 style=''>
-                                ${newString}
+                                <div style="display:flex;align-items: center;">
+                                    ${newString}
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -633,10 +634,10 @@ export default class EditorDemo extends React.Component {
             }, '')
             let whatSay = `
                 <table width="100%" class="ques-option-ul ques-option-ul-3653423">
-                    <tr>
+                    <tr style="display: flex;
+                    flex-wrap: wrap;">
                         ${result}
                     </tr>
-                   
                 </table>`
             params.ques_options = whatSay
             this.setState({
@@ -694,7 +695,7 @@ export default class EditorDemo extends React.Component {
                     <div className="m-flex m-bottom" style={{ alignItems: 'center' }}>
                         <span style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }} className="m-row">选择模板</span>
                         <div className="m-left">
-                            <Radio.Group onChange={this.onchangetemplate} value={this.state.params.template_id} disabled={this.state.disabled}>
+                            <Radio.Group onChange={this.onchangetemplate} value={this.state.params.template_id} disabled={this.state.disabledTemplat}>
                                 <Radio value={1}>填空题模板</Radio>
                                 <Radio value={2}>解答题模板</Radio>
                                 <Radio value={3}>选择题模板</Radio>

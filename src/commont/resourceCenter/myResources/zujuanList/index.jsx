@@ -437,7 +437,7 @@ class tikuguanli2 extends Component {
         })
     }
     linkPreview = () => {
-        window.open(`/node/build/#/preview?self_paper_id=${this.state.self_paper_id}`)
+        window.open(`/#/preview?self_paper_id=${this.state.self_paper_id}`)
     }
     deleteZj = () => {
         const self_paper_id = this.state.self_paper_id

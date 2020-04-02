@@ -141,7 +141,6 @@
 }
 
 .tree {
-  width: 370px;
   margin-right: 10px;
 }
 
@@ -775,8 +774,5 @@
 
 .WordSection1 p {
   margin-bottom: 0;
-}
-.ques-option-ul tr{
-  display: flex;
-  flex-wrap: wrap;
+  
 }

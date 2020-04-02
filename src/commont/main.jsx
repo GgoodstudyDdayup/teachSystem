@@ -33,7 +33,7 @@ class main extends Component {
         super(opt)
         this.state = {
             height: '',
-            collapsed: true,
+            collapsed: false,
             visible: false,
             newPassword: '',
             oldPassword: '',
