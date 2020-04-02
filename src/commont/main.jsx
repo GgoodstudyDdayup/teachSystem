@@ -317,12 +317,12 @@ class main extends Component {
                                         {this.state.children}
                                     </Select>
                                     <span style={{ marginLeft: 10 }}>教学系统</span>
-                                    <span style={{ fontSize: 8, marginLeft: 10 }}>V 1.0.0</span>
+                                    <span style={{ fontSize: 8, marginLeft: 10 }}>V 2.0.0</span>
                                 </span>
                                 :
                                 <span>
                                     {this.state.company_name}教学系统
-                                    <span style={{ fontSize: 10, marginLeft: 10 }}>V 1.0.0</span>
+                                    <span style={{ fontSize: 10, marginLeft: 10 }}>V 2.0.0</span>
                                 </span>
                             }
                         </div>

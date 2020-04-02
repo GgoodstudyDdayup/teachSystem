@@ -31,7 +31,7 @@ instance.interceptors.request.use(function (config) {
 
 instance.interceptors.response.use(response => {
     if (response.data.code === '404') {
-        window.location.replace("http://zt.zhongxiaoxue.cn/node/build/");
+        window.location.replace("http://jiaoxue.yanuojiaoyu.com");
     } else {
         return response.data
     }

@@ -23,7 +23,7 @@ const Knowlage = (props) => {
         })
     }, [props.params])
     return (
-        <div>
+        <div style={{width:270}}>
             <Search
                 placeholder="搜索公开组卷"
                 onSearch={value => props.searchKeyWord(value)}
