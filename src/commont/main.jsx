@@ -24,6 +24,7 @@ import CP from './cp'
 import ZY from './zy'
 import Tkquestion from './tk/braftEditor'
 import Test from '../commont/tset/test'
+import Zj from './zhangjie'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 const { Option } = Select
@@ -282,6 +283,9 @@ class main extends Component {
                             <Menu.Item key="14">
                                 <Link to="/main/resourceCenter/zj">我的资源</Link>
                             </Menu.Item>
+                            <Menu.Item key="15">
+                                <Link to="/main/zhangjie">章节知识点关联</Link>
+                            </Menu.Item>
                         </SubMenu>
                         {sessionStorage.getItem("permission") === '1' || sessionStorage.getItem("permission") === '2' ? <SubMenu
                             key="sub5"
@@ -380,6 +384,7 @@ class main extends Component {
                             <Route path="/main/resourceCenter/recommended/jigousiku" component={RecommendedJigousiku}></Route>
                             <Route path="/main/resourceCenter/recommended/share" component={RecommendedShare}></Route>
                             <Route path="/main/resourceCenter/recommended/real" component={RecommendedReal}></Route>
+                            <Route path="/main/zhangjie" component={Zj}></Route>
                             {/* 资源中心的我的资源 */}
                             {/* <Route path="/main/resourceCenter/myresources/wenjianjia" exact component={Myresources}></Route> */}
                             {/* <Route path="/main/resourceCenter/myresources" component={MyresourcesWenjianjia}></Route> */}

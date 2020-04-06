@@ -234,5 +234,24 @@ export const get_self_paperinfo = (params) => {
 export const del_self_paper = (params) => {
     return instance.post('/api/self_paper/del_self_paper', params)
 }
-
+//根据科目id获取教材版本
+export const get_version_by_subject_id = (params) => {
+    return instance.post('/api/system/get_version_by_subject_id', params)
+}
+//根据科目id、教材版本获取教材
+export const get_course_by_course_id = (params) => {
+    return instance.post('/api/system/get_course_by_course_id', params)
+}
+//获取年级、章节模块
+export const get_course_section = (params) => {
+    return instance.post('/api/system/get_course_section', params)
+}
+//提交年级、章节模块跟知识点对应关系
+export const submit_knowledge_section = (params) => {
+    return instance.post('/api/system/submit_knowledge_section', params)
+}
+//获取一级设置的年级、章节模块跟知识点对应关系
+export const get_knowledge_by_section_id = (params) => {
+    return instance.post('/api/system/get_knowledge_by_section_id', params)
+}
 

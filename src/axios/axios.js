@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { message } from 'antd';
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 // import store from '../store'
 // 线上环境域名
 // axios.defaults.baseURL = 'https://jiaoxueapi.yanuojiaoyu.com/'
@@ -24,6 +26,7 @@ instance.interceptors.request.use(function (config) {
     config.headers['username'] = sessionStorage.getItem("username")
     config.headers['token'] = sessionStorage.getItem("token")
     config.headers['companyid'] = sessionStorage.getItem("company_id")
+    NProgress.start()
     return config
 }, function (error) {
     return Promise.reject(error);
@@ -33,6 +36,7 @@ instance.interceptors.response.use(response => {
     if (response.data.code === '404') {
         window.location.replace("http://jiaoxue.yanuojiaoyu.com");
     } else {
+        NProgress.done()
         return response.data
     }
 }, err => {
